@@ -1,6 +1,9 @@
+import { ObjectId } from 'mongodb';
 import UserModel from '../models/users.model';
+import UserStatsModel from '../models/userstats.model';
 import {
   DatabaseUser,
+  DatabaseUserStats,
   SafeDatabaseUser,
   User,
   UserCredentials,
@@ -33,6 +36,30 @@ export const saveUser = async (user: User): Promise<UserResponse> => {
     return safeUser;
   } catch (error) {
     return { error: `Error occurred when saving user: ${error}` };
+  }
+};
+
+/**
+ * Creates a corresponding UserStats object for a new user.
+ *
+ * @param userId - The unique identifier of the newly created user.
+ * @returns {Promise<DatabaseUserStats | { error: string }>}
+ */
+export const saveUserStats = async (userId: ObjectId): Promise<DatabaseUserStats | { error: string }> => {
+  try {
+    const result: DatabaseUserStats = await UserStatsModel.create({
+      userId,
+      questionsCount: 0,
+      commentsCount: 0,
+      answersCount: 0,
+      nimWinCount: 0,
+    });
+    if (!result) {
+      throw Error('Failed to create user');
+    }
+    return result;
+  } catch (error) {
+    return { error: `Error creating user stats: ${error}` };
   }
 };
 
