@@ -1,5 +1,7 @@
 ## Task
-*Briefly describe the task or link to the relevant task/ticket. Include user story/COS number*
+| Task ID | Task Description                                                                 |
+|---------|----------------------------------------------------------------------------------|
+|      |  |
 
 ## Description of Work
 *Provide a clear and concise description of the changes made in this PR.*
