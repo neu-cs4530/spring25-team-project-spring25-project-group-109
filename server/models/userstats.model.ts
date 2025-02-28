@@ -11,6 +11,9 @@ import userStatsSchema from './schema/userstats.schema';
  *
  * @type {Model<DatabaseUserStats>}
  */
-const UserStatsModel: Model<DatabaseUserStats> = mongoose.model<DatabaseUserStats>('UserStats', userStatsSchema);
+const UserStatsModel: Model<DatabaseUserStats> = mongoose.model<DatabaseUserStats>(
+  'UserStats',
+  userStatsSchema,
+);
 
 export default UserStatsModel;

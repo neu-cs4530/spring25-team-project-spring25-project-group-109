@@ -45,7 +45,9 @@ export const saveUser = async (user: User): Promise<UserResponse> => {
  * @param userId - The unique identifier of the newly created user.
  * @returns {Promise<DatabaseUserStats | { error: string }>}
  */
-export const saveUserStats = async (userId: ObjectId): Promise<DatabaseUserStats | { error: string }> => {
+export const saveUserStats = async (
+  userId: ObjectId,
+): Promise<DatabaseUserStats | { error: string }> => {
   try {
     const result: DatabaseUserStats = await UserStatsModel.create({
       userId,

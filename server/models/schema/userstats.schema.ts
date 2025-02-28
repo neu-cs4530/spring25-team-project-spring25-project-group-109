@@ -19,7 +19,7 @@ const userStatsSchema = new Schema(
     answersCount: { type: Number, default: 0 },
     nimWinCount: { type: Number, default: 0 },
   },
-  { collection: 'UserStats' }
+  { collection: 'UserStats' },
 );
 
 export default userStatsSchema;

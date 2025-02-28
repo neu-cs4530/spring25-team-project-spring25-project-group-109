@@ -1,7 +1,7 @@
 ## Task
-| Task ID | Task Description                                                                 |
-|---------|----------------------------------------------------------------------------------|
-|      |  |
+|   User Story    |   Task                                                              |
+|:---------------:|---------------------------------------------------------------------|
+| [User Story ID] | [Brief description of the task or functionality]                    |
 
 ## Description of Work
 *Provide a clear and concise description of the changes made in this PR.*
