@@ -9,16 +9,16 @@ import { ObjectId } from 'mongodb';
  * - nimWinCount: Number of Nim game wins achieved by the user.
  */
 export interface UserStats {
-    userId: ObjectId; // Reference to the associated user.
-    questionsCount: number;
-    commentsCount: number; 
-    answersCount: number; 
-    nimWinCount: number; 
+  userId: ObjectId; // Reference to the associated user.
+  questionsCount: number;
+  commentsCount: number;
+  answersCount: number;
+  nimWinCount: number;
 }
 
 /**
  * Represents a complete user statistics document with an ID.
  */
 export interface DatabaseUserStats extends UserStats {
-    _id: mongoose.Types.ObjectId;
+  _id: mongoose.Types.ObjectId;
 }
