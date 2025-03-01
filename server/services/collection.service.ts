@@ -16,7 +16,9 @@ import {
  */
 export const saveCollection = async (collection: Collection): Promise<CollectionResponse> => {
   try {
-    const userExists: DatabaseUser | null = await UserModel.findOne({ username: collection.username });
+    const userExists: DatabaseUser | null = await UserModel.findOne({
+      username: collection.username,
+    });
 
     if (!userExists) {
       throw new Error('User does not exist.');
@@ -42,13 +44,13 @@ export const saveCollection = async (collection: Collection): Promise<Collection
  */
 export const getCollectionsByUser = async (username: string): Promise<CollectionsResponse> => {
   try {
-    const userExists: DatabaseUser | null = await UserModel.findOne({ username: username });
+    const userExists: DatabaseUser | null = await UserModel.findOne({ username });
 
     if (!userExists) {
       throw new Error('User does not exist.');
     }
 
-    const collections = await CollectionModel.find({ username: username });
+    const collections = await CollectionModel.find({ username });
 
     if (!collections) {
       throw new Error('Collections not found for the provided user');

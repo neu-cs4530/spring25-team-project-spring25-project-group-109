@@ -6,7 +6,7 @@ const collectionController = () => {
   const router = express.Router();
   /**
    * Validates that the request body contains all required fields for a chat.
-   * 
+   *
    * @param req The incoming request containing chat data.
    * @returns `true` if the body contains valid chat fields; otherwise, `false`.
    */
@@ -22,7 +22,10 @@ const collectionController = () => {
    * @param res the response object to send the result.
    * @returns {Promise<void>} a promise that resolves when the collection is created.
    */
-  const createCollectionRoute = async (req: CreateCollectionRequest, res: Response): Promise<void> => {
+  const createCollectionRoute = async (
+    req: CreateCollectionRequest,
+    res: Response,
+  ): Promise<void> => {
     if (!req.body || !isCreateCollectionRequestValid(req)) {
       res.status(400).send('Invalid collection creation request');
       return;
@@ -45,7 +48,7 @@ const collectionController = () => {
 
   /**
    * Retrieves collections of a user based on their username.
-   * 
+   *
    * @param req the request object containing the username parameter in `req.params`.
    * @param res the response object to send the result, either the collections or an error message.
    * @returns {Promise<void>} a promise that resolves when the collections are successfully retrieved.
