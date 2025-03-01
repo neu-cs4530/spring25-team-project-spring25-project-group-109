@@ -16,7 +16,7 @@
 - [ ] No testing required (client only)
 - [ ] Added tests
 
-## Checklist
+## Checklist before merging
 - [ ] Code follows project coding/style standards
-- [ ] Populate DB added (if needed)
+- [ ] Populate DB ran on non-local DB (if needed)
 - [ ] Documentation updated (if needed)

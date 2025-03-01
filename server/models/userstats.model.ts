@@ -3,11 +3,11 @@ import { DatabaseUserStats } from '../types/types';
 import userStatsSchema from './schema/userstats.schema';
 
 /**
- * Mongoose model for the `User` collection.
+ * Mongoose model for the `UserStats` collection.
  *
- * This model is created using the `User` interface and the `userSchema`, representing the
- * `User` collection in the MongoDB database, and provides an interface for interacting with
- * the stored users.
+ * This model is created using the `UserStats` interface and the `userStatsSchema`, representing the
+ * `UserStats` collection in the MongoDB database, and provides an interface for interacting with
+ * the stored statistics of each user.
  *
  * @type {Model<DatabaseUserStats>}
  */

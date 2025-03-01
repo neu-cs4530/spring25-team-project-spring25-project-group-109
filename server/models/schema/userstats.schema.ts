@@ -13,7 +13,7 @@ import { Schema } from 'mongoose';
  */
 const userStatsSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', unique: true, required: true, index: true }, // todo should this be username?
     questionsCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
     answersCount: { type: Number, default: 0 },
