@@ -25,11 +25,6 @@ export const saveCollection = async (collection: Collection): Promise<Collection
     }
 
     const result: DatabaseCollection = await CollectionModel.create(collection);
-
-    if (!result) {
-      throw Error('Failed to create collection');
-    }
-
     return result;
   } catch (error) {
     return { error: `Error occurred when saving collection: ${error}` };
@@ -50,7 +45,7 @@ export const getCollectionsByUser = async (username: string): Promise<Collection
       throw new Error('User does not exist.');
     }
 
-    const collections = await CollectionModel.find({ username });
+    const collections = await CollectionModel.find({ username }).lean();
 
     if (!collections) {
       throw new Error('Collections not found for the provided user');
