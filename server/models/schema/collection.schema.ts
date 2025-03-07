@@ -18,7 +18,6 @@ const collectionSchema: Schema = new Schema(
     },
     username: {
       type: String,
-      ref: 'User',
       required: true,
     },
     questions: [

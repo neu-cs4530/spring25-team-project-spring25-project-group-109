@@ -1,11 +1,16 @@
-import mongoose from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
 import AnswerModel from './models/answers.model';
 import QuestionModel from './models/questions.model';
 import TagModel from './models/tags.model';
+import CommentModel from './models/comments.model';
+import UserModel from './models/users.model';
+import CollectionModel from './models/collections.model';
 import {
   Answer,
+  Collection,
   Comment,
   DatabaseAnswer,
+  DatabaseCollection,
   DatabaseComment,
   DatabaseQuestion,
   DatabaseTag,
@@ -17,20 +22,8 @@ import {
 import {
   Q1_DESC,
   Q1_TXT,
-  Q2_DESC,
-  Q2_TXT,
-  Q3_DESC,
-  Q3_TXT,
-  Q4_DESC,
-  Q4_TXT,
   A1_TXT,
   A2_TXT,
-  A3_TXT,
-  A4_TXT,
-  A5_TXT,
-  A6_TXT,
-  A7_TXT,
-  A8_TXT,
   T1_NAME,
   T1_DESC,
   T2_NAME,
@@ -46,18 +39,7 @@ import {
   C1_TEXT,
   C2_TEXT,
   C3_TEXT,
-  C4_TEXT,
-  C5_TEXT,
-  C6_TEXT,
-  C7_TEXT,
-  C8_TEXT,
-  C9_TEXT,
-  C10_TEXT,
-  C11_TEXT,
-  C12_TEXT,
 } from './data/posts_strings';
-import CommentModel from './models/comments.model';
-import UserModel from './models/users.model';
 
 // Pass URL of your mongoDB instance as first argument(e.g., mongodb://127.0.0.1:27017/fake_so)
 const userArgs = process.argv.slice(2);
@@ -201,7 +183,20 @@ async function userCreate(
     biography: biography ?? '',
   };
 
-  return await UserModel.create(userDetail);
+  const user = await UserModel.create(userDetail);
+
+  return user;
+}
+
+async function collectionCreate(
+  name: string,
+  username: string,
+  visibility: 'public' | 'private',
+  questions: mongoose.Types.ObjectId[],
+): Promise<DatabaseCollection> {
+  if (!name || !username) throw new Error('Invalid Collection Format');
+  const collection: Collection = { name, username, visibility, questions };
+  return await CollectionModel.create(collection);
 }
 
 /**
@@ -210,68 +205,10 @@ async function userCreate(
  */
 const populate = async () => {
   try {
-    await userCreate(
-      'sana',
-      'sanaPassword',
-      new Date('2023-12-11T03:30:00'),
-      'I am a software engineer.',
-    );
-    await userCreate(
-      'ihba001',
-      'SomePassword#123',
-      new Date('2022-12-11T03:30:00'),
-      'I am a student.',
-    );
-    await userCreate(
-      'saltyPeter',
-      'VeryStrongPassword#!@',
-      new Date('2023-12-11T03:30:00'),
-      'I am a chef.',
-    );
-    await userCreate('monkeyABC', 'password', new Date('2023-11-11T03:30:00'), 'I am a monkey.');
-    await userCreate('hamkalo', 'redapplecar', new Date('2023-12-02T03:30:00'), 'I am a hamster.');
-    await userCreate(
-      'azad',
-      'treeorangeBike',
-      new Date('2023-06-11T03:30:00'),
-      'I am a free spirit.',
-    );
-    await userCreate(
-      'abhi3241',
-      '112@realpassword',
-      new Date('2023-01-12T03:30:00'),
-      'I am a student.',
-    );
-    await userCreate(
-      'Joji John',
-      'jurassicPark#12',
-      new Date('2023-10-11T03:30:00'),
-      'I like Jurassic Park.',
-    );
-    await userCreate(
-      'abaya',
-      'letmein',
-      new Date('2023-04-20T03:30:00'),
-      'I like fashion designing.',
-    );
-    await userCreate(
-      'mackson3332',
-      'TrIcKyPhRaSe',
-      new Date('2023-07-26T03:30:00'),
-      'I am a magician.',
-    );
-    await userCreate(
-      'alia',
-      'correcthorsebatterystaple',
-      new Date('2023-03-19T03:30:00'),
-      'I am an actress.',
-    );
-    await userCreate(
-      'elephantCDE',
-      'ElephantPass123',
-      new Date('2023-05-10T14:28:01'),
-      'I am an elephant lover.',
-    );
+    await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.');
+    await userCreate('kyle', 'kyle', new Date('2022-12-11T03:30:00'), 'I am a software engineer.');
+    await userCreate('nitsa', 'nitsa', new Date('2023-12-11T03:30:00'), 'I am a designer.');
+    await userCreate('annabelle', 'annabelle', new Date('2022-12-11T03:30:00'), 'I am a manager.');
 
     const t1 = await tagCreate(T1_NAME, T1_DESC);
     const t2 = await tagCreate(T2_NAME, T2_DESC);
@@ -280,68 +217,26 @@ const populate = async () => {
     const t5 = await tagCreate(T5_NAME, T5_DESC);
     const t6 = await tagCreate(T6_NAME, T6_DESC);
 
-    const c1 = await commentCreate(C1_TEXT, 'sana', new Date('2023-12-12T03:30:00'));
-    const c2 = await commentCreate(C2_TEXT, 'ihba001', new Date('2023-12-01T15:24:19'));
-    const c3 = await commentCreate(C3_TEXT, 'saltyPeter', new Date('2023-12-18T09:24:00'));
-    const c4 = await commentCreate(C4_TEXT, 'monkeyABC', new Date('2023-12-20T03:24:42'));
-    const c5 = await commentCreate(C5_TEXT, 'hamkalo', new Date('2023-12-23T08:24:00'));
-    const c6 = await commentCreate(C6_TEXT, 'azad', new Date('2023-12-22T17:19:00'));
-    const c7 = await commentCreate(C7_TEXT, 'hamkalo', new Date('2023-12-22T21:17:53'));
-    const c8 = await commentCreate(C8_TEXT, 'alia', new Date('2023-12-19T18:20:59'));
-    const c9 = await commentCreate(C9_TEXT, 'ihba001', new Date('2022-02-20T03:00:00'));
-    const c10 = await commentCreate(C10_TEXT, 'abhi3241', new Date('2023-02-10T11:24:30'));
-    const c11 = await commentCreate(C11_TEXT, 'Joji John', new Date('2023-03-18T01:02:15'));
-    const c12 = await commentCreate(C12_TEXT, 'abaya', new Date('2023-04-10T14:28:01'));
+    const c1 = await commentCreate(C1_TEXT, 'sama', new Date('2023-12-12T03:30:00'));
+    const c2 = await commentCreate(C2_TEXT, 'nitsa', new Date('2023-12-01T15:24:19'));
+    const c3 = await commentCreate(C3_TEXT, 'nitsa', new Date('2023-12-01T15:24:19'));
 
-    const a1 = await answerCreate(A1_TXT, 'hamkalo', new Date('2023-11-20T03:24:42'), [c1]);
-    const a2 = await answerCreate(A2_TXT, 'azad', new Date('2023-11-23T08:24:00'), [c2]);
-    const a3 = await answerCreate(A3_TXT, 'abaya', new Date('2023-11-18T09:24:00'), [c3]);
-    const a4 = await answerCreate(A4_TXT, 'alia', new Date('2023-11-12T03:30:00'), [c4]);
-    const a5 = await answerCreate(A5_TXT, 'sana', new Date('2023-11-01T15:24:19'), [c5]);
-    const a6 = await answerCreate(A6_TXT, 'abhi3241', new Date('2023-02-19T18:20:59'), [c6]);
-    const a7 = await answerCreate(A7_TXT, 'mackson3332', new Date('2023-02-22T17:19:00'), [c7]);
-    const a8 = await answerCreate(A8_TXT, 'ihba001', new Date('2023-03-22T21:17:53'), [c8]);
+    const a1 = await answerCreate(A1_TXT, 'annabelle', new Date('2023-11-20T03:24:42'), [c1]);
+    const a2 = await answerCreate(A2_TXT, 'kyle', new Date('2023-11-23T08:24:00'), [c2]);
 
-    await questionCreate(
+    const q1 = await questionCreate(
       Q1_DESC,
       Q1_TXT,
       [t1, t2],
       [a1, a2],
-      'Joji John',
+      'sama',
       new Date('2022-01-20T03:00:00'),
-      ['sana', 'abaya', 'alia'],
-      [c9],
+      ['annabelle', 'kyle'],
+      [c3],
     );
-    await questionCreate(
-      Q2_DESC,
-      Q2_TXT,
-      [t3, t4, t2],
-      [a3, a4, a5],
-      'saltyPeter',
-      new Date('2023-01-10T11:24:30'),
-      ['mackson3332'],
-      [c10],
-    );
-    await questionCreate(
-      Q3_DESC,
-      Q3_TXT,
-      [t5, t6],
-      [a6, a7],
-      'monkeyABC',
-      new Date('2023-02-18T01:02:15'),
-      ['monkeyABC', 'elephantCDE'],
-      [c11],
-    );
-    await questionCreate(
-      Q4_DESC,
-      Q4_TXT,
-      [t3, t4, t5],
-      [a8],
-      'elephantCDE',
-      new Date('2023-03-10T14:28:01'),
-      [],
-      [c12],
-    );
+
+    await collectionCreate('favorites', 'nitsa', 'private', [q1._id]);
+    await collectionCreate('typescript', 'annabelle', 'public', []);
 
     console.log('Database populated');
   } catch (err) {
