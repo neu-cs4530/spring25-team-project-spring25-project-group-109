@@ -1,5 +1,6 @@
 import MessageModel from '../models/messages.model';
 import UserModel from '../models/users.model';
+import { updateCoins } from './currency.service';
 import { DatabaseMessage, DatabaseUser, Message, MessageResponse } from '../types/types';
 
 /**
@@ -13,6 +14,10 @@ export const saveMessage = async (message: Message): Promise<MessageResponse> =>
 
     if (!user) {
       throw new Error('Message sender is invalid or does not exist.');
+    }
+
+    if (message.type === 'global') {
+      await updateCoins(message.msgFrom, 1);
     }
 
     const result: DatabaseMessage = await MessageModel.create(message);

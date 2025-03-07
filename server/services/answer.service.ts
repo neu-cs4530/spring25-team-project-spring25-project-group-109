@@ -9,6 +9,7 @@ import {
 } from '../types/types';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
+import { updateCoins } from './currency.service';
 
 /**
  * Records the most recent answer time for a given question based on its answers.
@@ -37,6 +38,9 @@ export const getMostRecentAnswerTime = (
 export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
   try {
     const result: DatabaseAnswer = await AnswerModel.create(answer);
+
+    await updateCoins(answer.ansBy, 1);
+
     return result;
   } catch (error) {
     return { error: 'Error when saving an answer' };
