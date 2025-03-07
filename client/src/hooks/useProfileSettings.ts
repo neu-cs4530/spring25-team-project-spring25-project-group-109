@@ -26,11 +26,11 @@ const useProfileSettings = () => {
   const [newBio, setNewBio] = useState('');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
 
   // For delete-user confirmation modal
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-
   const [showPassword, setShowPassword] = useState(false);
 
   const canEditProfile =
@@ -44,6 +44,7 @@ const useProfileSettings = () => {
         setLoading(true);
         const data = await getUserByUsername(username);
         setUserData(data);
+        setProfilePhoto(data.profilePhoto || '/images/default-avatar.png');
       } catch (error) {
         setErrorMessage('Error fetching user profile');
         setUserData(null);
@@ -141,6 +142,7 @@ const useProfileSettings = () => {
 
   return {
     userData,
+    profilePhoto,
     newPassword,
     confirmNewPassword,
     setNewPassword,

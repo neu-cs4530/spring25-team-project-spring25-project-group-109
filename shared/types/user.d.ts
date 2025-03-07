@@ -17,10 +17,12 @@ export interface UserCredentials {
  * - `password`: The user's password.
  * - `dateJoined`: The date when the user registered.
  * - `biography`: A short description or bio of the user (optional).
+ * - `profilePhoto`: A path to the user's profile photo.
  */
 export interface User extends UserCredentials {
   dateJoined: Date;
   biography?: string;
+  profilePhoto?: string;
 }
 
 /**

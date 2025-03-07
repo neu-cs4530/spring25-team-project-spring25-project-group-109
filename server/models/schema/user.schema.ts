@@ -26,6 +26,10 @@ const userSchema: Schema = new Schema(
       type: String,
       default: '',
     },
+    profilePhoto: {
+      type: String,
+      default: 'images/default-avatar',
+    },
   },
   { collection: 'User' },
 );
