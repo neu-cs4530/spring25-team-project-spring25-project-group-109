@@ -5,6 +5,7 @@ import TagModel from './models/tags.model';
 import CommentModel from './models/comments.model';
 import UserModel from './models/users.model';
 import CollectionModel from './models/collections.model';
+import UserStatsModel from './models/userstats.model';
 import {
   Answer,
   Collection,
@@ -18,6 +19,7 @@ import {
   Question,
   Tag,
   User,
+  UserStats,
 } from './types/types';
 import {
   Q1_DESC,
@@ -184,7 +186,16 @@ async function userCreate(
   };
 
   const user = await UserModel.create(userDetail);
+  
+  const userStats: UserStats = {
+    userId: user._id,
+    answersCount: 0,
+    commentsCount: 0,
+    nimWinCount: 0,
+    questionsCount: 0,
+  };
 
+  await UserStatsModel.create(userStats);
   return user;
 }
 
@@ -205,10 +216,30 @@ async function collectionCreate(
  */
 const populate = async () => {
   try {
-    await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.');
-    await userCreate('kyle', 'kyle', new Date('2022-12-11T03:30:00'), 'I am a software engineer.');
-    await userCreate('nitsa', 'nitsa', new Date('2023-12-11T03:30:00'), 'I am a designer.');
-    await userCreate('annabelle', 'annabelle', new Date('2022-12-11T03:30:00'), 'I am a manager.');
+    await userCreate(
+      'sama',
+      'sama',
+      new Date('2023-12-11T03:30:00'),
+      'I am a student.',
+    );
+    await userCreate(
+      'kyle',
+      'kyle',
+      new Date('2022-12-11T03:30:00'),
+      'I am a software engineer.',
+    );
+    await userCreate(
+      'nitsa',
+      'nitsa',
+      new Date('2023-12-11T03:30:00'),
+      'I am a designer.',
+    );
+    await userCreate(
+      'annabelle',
+      'annabelle',
+      new Date('2022-12-11T03:30:00'),
+      'I am a manager.',
+    );
 
     const t1 = await tagCreate(T1_NAME, T1_DESC);
     const t2 = await tagCreate(T2_NAME, T2_DESC);
