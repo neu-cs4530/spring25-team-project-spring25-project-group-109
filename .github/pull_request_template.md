@@ -1,5 +1,7 @@
 ## Task
-*Briefly describe the task or link to the relevant task/ticket. Include user story/COS number*
+|   User Story    |   Task                                                              |
+|:---------------:|---------------------------------------------------------------------|
+| [User Story ID] | [Brief description of the task or functionality]                    |
 
 ## Description of Work
 *Provide a clear and concise description of the changes made in this PR.*
@@ -14,7 +16,7 @@
 - [ ] No testing required (client only)
 - [ ] Added tests
 
-## Checklist
+## Checklist before merging
 - [ ] Code follows project coding/style standards
-- [ ] Populate DB added (if needed)
+- [ ] Populate DB ran on non-local DB (if needed)
 - [ ] Documentation updated (if needed)

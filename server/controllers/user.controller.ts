@@ -13,6 +13,7 @@ import {
   getUsersList,
   loginUser,
   saveUser,
+  saveUserStats,
   updateUser,
 } from '../services/user.service';
 
@@ -69,11 +70,17 @@ const userController = (socket: FakeSOSocket) => {
         throw new Error(result.error);
       }
 
+      // Create corresponding user stats object
+      const statsResult = await saveUserStats(result._id);
+      if ('error' in statsResult) {
+        throw new Error(statsResult.error);
+      }
+
       socket.emit('userUpdate', {
         user: result,
         type: 'created',
       });
-      res.status(200).json(result);
+      res.status(200).json({ user: result, userStats: statsResult });
     } catch (error) {
       res.status(500).send(`Error when saving user: ${error}`);
     }
