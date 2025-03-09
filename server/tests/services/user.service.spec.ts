@@ -195,7 +195,7 @@ describe('updateUser', () => {
     _id: new mongoose.Types.ObjectId(),
     username: user.username,
     dateJoined: user.dateJoined,
-    badgesEarned: []
+    badgesEarned: [],
   };
 
   const updates: Partial<User> = {
