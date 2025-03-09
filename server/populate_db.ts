@@ -208,6 +208,7 @@ async function collectionCreate(
   if (!name || !username) throw new Error('Invalid Collection Format');
   const collection: Collection = { name, username, visibility, questions };
   return await CollectionModel.create(collection);
+}
 
 /**
  * Populates the database with predefined data.
