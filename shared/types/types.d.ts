@@ -8,3 +8,4 @@ export * from './socket';
 export * from './tag';
 export * from './user';
 export * from './userstats';
+export * from './badge';
