@@ -1,6 +1,8 @@
 import { ObjectId } from 'mongodb';
 import {
+  Badge,
   DatabaseAnswer,
+  DatabaseBadge,
   DatabaseComment,
   DatabaseQuestion,
   DatabaseTag,
@@ -196,4 +198,21 @@ export const safeUser: SafeDatabaseUser = {
   username: 'user1',
   dateJoined: new Date('2024-12-03'),
   badgesEarned: [],
+};
+
+export const badge: Badge = {
+  name: 'Inquisitive',
+  description: 'Asked 5 Questions',
+  type: 'question',
+  threshold: 5,
+  imagePath: 'imagePath',
+};
+
+export const dbBadge: DatabaseBadge = {
+  name: 'Inquisitive',
+  description: 'Asked 5 Questions',
+  type: 'question',
+  threshold: 5,
+  imagePath: 'imagePath',
+  _id: new ObjectId(),
 };

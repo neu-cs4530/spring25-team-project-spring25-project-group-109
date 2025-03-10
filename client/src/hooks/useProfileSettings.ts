@@ -6,7 +6,8 @@ import {
   resetPassword,
   updateBiography,
 } from '../services/userService';
-import { SafeDatabaseUser } from '../types/types';
+import { getBadges } from '../services/badgeService';
+import { DatabaseBadge, SafeDatabaseUser } from '../types/types';
 import useUserContext from './useUserContext';
 
 /**
@@ -26,6 +27,7 @@ const useProfileSettings = () => {
   const [newBio, setNewBio] = useState('');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [allBadges, setAllBadges] = useState<DatabaseBadge[] | null>(null);
 
   // For delete-user confirmation modal
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -52,7 +54,18 @@ const useProfileSettings = () => {
       }
     };
 
+    const fetchBadges = async () => {
+      try {
+        const badgesData = await getBadges();
+        setAllBadges(badgesData);
+      } catch (error) {
+        setErrorMessage('Error fetching badges');
+        setAllBadges(null);
+      }
+    };
+
     fetchUserData();
+    fetchBadges();
   }, [username]);
 
   /**
@@ -147,6 +160,7 @@ const useProfileSettings = () => {
     setConfirmNewPassword,
     loading,
     editBioMode,
+    allBadges,
     setEditBioMode,
     newBio,
     setNewBio,

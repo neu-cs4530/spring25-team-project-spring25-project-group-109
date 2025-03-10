@@ -1,11 +1,7 @@
 import { ObjectId } from 'mongodb';
+import { Request } from 'express';
 
-export enum BadgeType {
-  QUESTION = 'question',
-  ANSWER = 'answer',
-  COMMENT = 'comment',
-  NIM = 'nim',
-}
+type BadgeType = 'question' | 'answer' | 'comment' | 'nim';
 
 export interface Badge {
   name: string;
@@ -16,7 +12,7 @@ export interface Badge {
 }
 
 export interface DatabaseBadge extends Badge {
-  _id: mongoose.Types.ObjectId;
+  _id: ObjectId;
 }
 
 // todo javadoc

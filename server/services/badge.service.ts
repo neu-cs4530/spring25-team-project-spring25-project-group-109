@@ -1,8 +1,16 @@
-import { ObjectId } from 'mongodb';
 import { Badge, BadgeResponse, BadgesResponse, BadgeType, DatabaseBadge } from '../types/types';
 import BadgeModel from '../models/badge.model';
 
-// todo javadoc
+/**
+ * Saves a new badge to the database.
+ *
+ * @param {Badge} badge - The badge object to be saved in the database.
+ * @returns {Promise<BadgeResponse>} - A promise that resolves to the saved badge data or an error response.
+ *   - If successful, the saved badge object is returned.
+ *   - If an error occurs, an error message is returned in the format `{ error: string }`.
+ *
+ * @throws {Error} - If there is an error while saving the badge, an error message is thrown.
+ */
 export const saveBadge = async (badge: Badge): Promise<BadgeResponse> => {
   try {
     const result: DatabaseBadge = await BadgeModel.create(badge);

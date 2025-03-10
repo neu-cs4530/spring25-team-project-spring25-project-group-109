@@ -78,7 +78,7 @@ export const C12_TEXT =
   "I feel like there's so much more to Android Studio that I'm just scratching the surface of. Thanks for sharing your experience!";
 
 // Badge for Questions
-export const BQ1_NAME = 'The Inquisitive Beginner';
+export const BQ1_NAME = 'Inquisitive Beginner';
 export const BQ1_DESCRIPTION = 'Asked 1 Question';
 export const BQ10_NAME = 'Questioning Enthusiast';
 export const BQ10_DESCRIPTION = 'Asked 10 Questions';
@@ -104,7 +104,7 @@ export const BC50_DESCRIPTION = 'Commented 50 Times';
 // Badge for Nim Game
 export const BN1_NAME = 'Nim Rookie';
 export const BN1_DESCRIPTION = 'Won 1 Game of Nim';
-export const BN10_NAME = 'Nim Strategist';
+export const BN5_NAME = 'Nim Strategist';
+export const BN5_DESCRIPTION = 'Won 5 Games of Nim';
+export const BN10_NAME = 'Nim Legend';
 export const BN10_DESCRIPTION = 'Won 10 Games of Nim';
-export const BN50_NAME = 'Nim Legend';
-export const BN50_DESCRIPTION = 'Won 50 Games of Nim';

@@ -3,9 +3,13 @@ import { DatabaseBadge } from '../types/types';
 import badgeSchema from './schema/badge.schema';
 
 /**
- * Mongoose model for the `Badges` collection.
+ * Mongoose model for the `Badge` collection.
  *
- * This model provides an interface for interacting with badge documents in the database.
+ * This model is created using the `Badge` interface and the `badgeSchema`, representing the
+ * `Badge` collection in the MongoDB database, and provides an interface for interacting with
+ * the stored badges.
+ *
+ * @type {Model<DatabaseBadge>}
  */
 const BadgeModel: Model<DatabaseBadge> = mongoose.model<DatabaseBadge>('Badge', badgeSchema);
 

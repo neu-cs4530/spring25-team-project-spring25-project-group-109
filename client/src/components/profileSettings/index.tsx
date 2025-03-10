@@ -17,6 +17,7 @@ const ProfileSettings: React.FC = () => {
     canEditProfile,
     showPassword,
     togglePasswordVisibility,
+    allBadges,
 
     setEditBioMode,
     setNewBio,
@@ -97,6 +98,22 @@ const ProfileSettings: React.FC = () => {
               <strong>Date Joined:</strong>{' '}
               {userData.dateJoined ? new Date(userData.dateJoined).toLocaleDateString() : 'N/A'}
             </p>
+
+            {/* ---- Badges Section ---- */}
+            <h4>Badges</h4>
+            <div className='badges-grid'>
+              {allBadges && allBadges.length > 0 ? (
+                allBadges.map(badge => (
+                  <div key={String(badge._id)} className='badge'>
+                    <img src={badge.imagePath} alt={badge.name} className='badge-image' />
+                    <p className='badge-name'>{badge.name}</p>
+                    <div className='badge-description'>{badge.description}</div>
+                  </div>
+                ))
+              ) : (
+                <p>No badges available yet.</p>
+              )}
+            </div>
 
             {/* ---- Reset Password Section ---- */}
             {canEditProfile && (
