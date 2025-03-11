@@ -100,13 +100,12 @@ const ProfileSettings: React.FC = () => {
             </p>
 
             {/* ---- Badges Section ---- */}
+            {/* Future work will render only earned badges in color. Can be accessed from useData.earnedBadges */}
             <h4>Badges</h4>
             <div className='badges-grid'>
               {allBadges && allBadges.length > 0 ? (
                 allBadges.map(badge => (
-                  <div
-                    key={String(badge._id)}
-                    className={`badge ${userData?.badgesEarned.map(b => b.badgeId).includes(String(badge._id)) ? 'colored' : 'grayscale'}`}>
+                  <div key={String(badge._id)} className='badge'>
                     <img src={badge.imagePath} alt={badge.name} className={`badge-image`} />
                     <div className='badge-description'>{badge.description}</div>
                   </div>

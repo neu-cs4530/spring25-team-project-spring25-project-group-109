@@ -154,15 +154,6 @@
   object-fit: cover;
 }
 
-.colored {
-  filter: none;
-}
-
-.grayscale {
-  filter: grayscale(100%);
-  opacity: 0.3;
-}
-
 .badge-description {
   margin-top: 5px;
   text-align: center;
