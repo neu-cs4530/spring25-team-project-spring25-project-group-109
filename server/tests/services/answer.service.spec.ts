@@ -8,6 +8,10 @@ import { QUESTIONS, ans1, ans4 } from '../mockData.models';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
 
+jest.mock('../../services/currency.service', () => ({
+  updateCoins: jest.fn().mockResolvedValue({ coinCount: 100 }),
+}));
+
 describe('Answer model', () => {
   beforeEach(() => {
     mockingoose.resetAll();
