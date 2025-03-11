@@ -24,7 +24,6 @@ import {
 import * as strings from './data/posts_strings';
 import CommentModel from './models/comments.model';
 import UserModel from './models/users.model';
-import UserStatsModel from './models/userstats.model';
 import BadgeModel from './models/badge.model';
 
 // Pass URL of your mongoDB instance as first argument(e.g., mongodb://127.0.0.1:27017/fake_so)
