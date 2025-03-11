@@ -19,12 +19,14 @@ import {
   User,
   UserStats,
   BadgeType,
+  EarnedBadge,
 } from './types/types';
 import * as strings from './data/posts_strings';
 import CommentModel from './models/comments.model';
 import UserModel from './models/users.model';
 import UserStatsModel from './models/userstats.model';
 import BadgeModel from './models/badge.model';
+import { checkAndAwardBadges } from './services/badge.service';
 
 // Pass URL of your mongoDB instance as first argument(e.g., mongodb://127.0.0.1:27017/fake_so)
 const userArgs = process.argv.slice(2);
@@ -74,7 +76,16 @@ async function commentCreate(
     commentBy: commentBy,
     commentDateTime: commentDateTime,
   };
-  return await CommentModel.create(commentDetail);
+  const comment = await CommentModel.create(commentDetail);
+  const stats  = await UserStatsModel.findOneAndUpdate(
+    { username: commentBy },
+    { $inc: { commentsCount: 1 } },
+    { new: true }
+  );
+  if (stats) {
+    await checkAndAwardBadges(commentBy);
+  }
+  return comment;
 }
 
 /**
@@ -101,7 +112,16 @@ async function answerCreate(
     ansDateTime: ansDateTime,
     comments: comments,
   };
-  return await AnswerModel.create(answerDetail);
+  const answer = await AnswerModel.create(answerDetail);
+  const stats  = await UserStatsModel.findOneAndUpdate(
+    { username: ansBy },
+    { $inc: { answersCount: 1 } },
+    { new: true }
+  );
+  if (stats) {
+    await checkAndAwardBadges(ansBy);
+  }
+  return answer;
 }
 
 /**
@@ -137,7 +157,7 @@ async function questionCreate(
     comments == null
   )
     throw new Error('Invalid Question Format');
-  return await QuestionModel.create({
+  const question = await QuestionModel.create({
     title: title,
     text: text,
     tags: tags,
@@ -149,6 +169,15 @@ async function questionCreate(
     downVotes: [],
     comments: comments,
   });
+  const stats  = await UserStatsModel.findOneAndUpdate(
+    { username: question.askedBy },
+    { $inc: { questionsCount: 1 } },
+    { new: true }
+  );
+  if (stats) {
+    await checkAndAwardBadges(question.askedBy);
+  }
+  return question;
 }
 
 /**
@@ -184,10 +213,6 @@ async function userCreate(
   password: string,
   dateJoined: Date,
   biography?: string,
-  startingQuestionStats?: number,
-  startingCommentStats?: number,
-  startingAnswerStats?: number,
-  startingNimStats?: number,
 ): Promise<DatabaseUser> {
   if (username === '' || password === '' || dateJoined === null) {
     throw new Error('Invalid User Format');
@@ -205,10 +230,10 @@ async function userCreate(
 
   const userStats: UserStats = {
     username: user.username,
-    questionsCount: startingQuestionStats || 0,
-    commentsCount: startingCommentStats || 0,
-    answersCount: startingAnswerStats || 0,
-    nimWinCount: startingNimStats || 0,
+    questionsCount: 0,
+    commentsCount: 0,
+    answersCount: 0,
+    nimWinCount: 0,
   };
 
   await UserStatsModel.create(userStats);
@@ -232,7 +257,7 @@ async function collectionCreate(
  */
 const populate = async () => {
   try {
-    await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
+    const q1badge = await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
     await badgeCreate(strings.BQ10_NAME, strings.BQ10_DESCRIPTION, 'question', 10, `/images/badges/question/10.png`);
     await badgeCreate(strings.BQ50_NAME, strings.BQ50_DESCRIPTION, 'question', 50, `/images/badges/question/50.png`);
     
@@ -248,7 +273,7 @@ const populate = async () => {
     await badgeCreate(strings.BN5_NAME, strings.BN5_DESCRIPTION, 'nim', 5, `/images/badges/nim/5.png`);
     await badgeCreate(strings.BN10_NAME, strings.BN10_DESCRIPTION, 'nim', 10, `/images/badges/nim/10.png`);    
 
-    await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.', 1);
+    await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.');
     await userCreate('kyle', 'kyle', new Date('2022-12-11T03:30:00'), 'I am a software engineer.');
     await userCreate('nitsa', 'nitsa', new Date('2023-12-11T03:30:00'), 'I am a designer.');
     await userCreate('annabelle', 'annabelle', new Date('2022-12-11T03:30:00'), 'I am a manager.');

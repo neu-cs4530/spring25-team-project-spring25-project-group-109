@@ -1,8 +1,6 @@
 import express, { Request, Response, Router } from 'express';
-import { getBadgesList, saveBadge } from '../services/badge.service';
+import { checkAndAwardBadges, getBadgesList, saveBadge } from '../services/badge.service';
 import { BadgeRequest, FakeSOSocket, UpdateBadgeByUsernameRequest } from '../types/types';
-import { awardBadgeToUser, getUserByUsername } from '../services/user.service';
-import { getUserStats } from '../services/userstats.service';
 
 const badgeController = (socket: FakeSOSocket) => {
   const router: Router = express.Router();
@@ -74,45 +72,15 @@ const badgeController = (socket: FakeSOSocket) => {
   // todo
   const updateBadges = async (req: UpdateBadgeByUsernameRequest, res: Response): Promise<void> => {
     try {
-      // get user by username
-      const user = await getUserByUsername(req.params.username);
-      if (!user || 'error' in user) {
-        throw new Error('User not found');
+      const { username } = req.params;
+      if (!username) {
+        res.status(400).json({ error: 'Username is required' });
+        return;
       }
-
-      // get existing badge IDs from the user and get the user's stats
-      const existingBadgeIds = new Set(user.badgesEarned.map(badge => badge.toString()));
-      const userStats = await getUserStats(user.username);
-      if (!userStats || 'error' in userStats) {
-        throw new Error('User stats not found');
-      }
-
-      // get all badges from the database
-      const allBadges = await getBadgesList();
-      if (!allBadges || 'error' in allBadges) {
-        throw new Error('Error retrieving badges');
-      }
-
-      // check which badges the user qualifies for but doesn't already have
-      const newBadges = allBadges.filter(
-        badge =>
-          !existingBadgeIds.has(badge._id.toString()) &&
-          ((badge.type === 'question' && userStats.questionsCount >= badge.threshold) ||
-            (badge.type === 'answer' && userStats.answersCount >= badge.threshold) ||
-            (badge.type === 'comment' && userStats.commentsCount >= badge.threshold) ||
-            (badge.type === 'nim' && userStats.nimWinCount >= badge.threshold)),
-      );
-
-      // if there are new badges to award, update the user
-      if (newBadges.length > 0) {
-        await awardBadgeToUser(
-          user.username,
-          newBadges.map(badge => badge._id),
-        );
-      }
-      res.status(200).json({ awardedBadges: newBadges });
+      await checkAndAwardBadges(username);
+      res.status(200).json({ message: 'Badges updated successfully' });
     } catch (error) {
-      res.status(500).send(`Error when getting users: ${error}`);
+      res.status(500).json({ error: 'Failed to update badges' });
     }
   };
 

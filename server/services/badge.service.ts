@@ -1,5 +1,8 @@
 import { Badge, BadgeResponse, BadgesResponse, BadgeType, DatabaseBadge } from '../types/types';
 import BadgeModel from '../models/badge.model';
+import UserModel from '../models/users.model';
+import UserStatsModel from '../models/userstats.model';
+import { awardBadgeToUser } from './user.service';
 
 /**
  * Saves a new badge to the database.
@@ -37,5 +40,41 @@ export const getBadgesList = async (type?: BadgeType): Promise<BadgesResponse> =
     return badges;
   } catch (error) {
     throw new Error(`Error retrieving badges: ${error}`);
+  }
+};
+
+export const checkAndAwardBadges = async (username: string): Promise<void> => {
+  try {
+    // get user by username
+    const user = await UserModel.findOne({ username });
+    if (!user) throw new Error('User not found');
+
+    // get existing badge IDs from the user and get the user's stats
+    const userStats = await UserStatsModel.findOne({ username: user.username });
+    if (!userStats) throw new Error('User stats not found');
+
+    // get all badges from the database
+    const allBadges = await getBadgesList();
+    if (!allBadges || 'error' in allBadges) throw new Error('Could not retrieve badges');
+
+    // find badges the user qualifies for but doesn't already have
+    const existingBadgeIds = new Set(user.badgesEarned.map(badge => badge.badgeId.toString()));
+    const newBadges = allBadges.filter(
+      badge =>
+        !existingBadgeIds.has(badge._id.toString()) &&
+        ((badge.type === 'question' && userStats.questionsCount >= badge.threshold) ||
+          (badge.type === 'answer' && userStats.answersCount >= badge.threshold) ||
+          (badge.type === 'comment' && userStats.commentsCount >= badge.threshold) ||
+          (badge.type === 'nim' && userStats.nimWinCount >= badge.threshold)),
+    );
+
+    if (newBadges.length > 0) {
+      await awardBadgeToUser(
+        user.username,
+        newBadges.map(badge => badge._id),
+      );
+    }
+  } catch (error) {
+    throw new Error(`Error awarding badges: ${error}`);
   }
 };

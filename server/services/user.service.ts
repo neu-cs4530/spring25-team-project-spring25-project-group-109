@@ -195,7 +195,7 @@ export const awardBadgeToUser = async (
     // create badge objects with badgeId and dateEarned for each badgeId
     const badgesToAward = badgeIds.map(badgeId => ({
       badgeId,
-      dateEarned: new Date(), // Current date when the badge is awarded
+      dateEarned: new Date(),
     }));
 
     // add badges to the user's badgesEarned array

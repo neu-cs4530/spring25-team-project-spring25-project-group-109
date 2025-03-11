@@ -12,6 +12,16 @@ export interface UserCredentials {
 }
 
 /**
+ * Represents a badge earned by a user
+ * - `badgeId`: Badge id
+ * - `dateEarned`: Date of achievement
+ */
+export interface EarnedBadge {
+  badgeId: string;
+  dateEarned: Date;
+}
+
+/**
  * Represents a user document, including user credentials and additional details.
  * - `username`: The unique username of the user.
  * - `password`: The user's password.
@@ -21,7 +31,7 @@ export interface UserCredentials {
 export interface User extends UserCredentials {
   dateJoined: Date;
   biography?: string;
-  badgesEarned: { badgeId: string; dateEarned: Date }[];
+  badgesEarned: EarnedBadge[];
 }
 
 /**
