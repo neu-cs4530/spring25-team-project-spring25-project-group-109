@@ -202,6 +202,7 @@ describe('Test Currency Service', () => {
 
       expect(result.nim).toBe(true);
       expect(result.coinCount).toBe(initialCoinCount - cost);
+      expect(updateCoinsSpy).toHaveBeenCalledWith(user.username, -cost);
     });
 
     it('should successfully unlock the "customPhoto" feature if user has enough coins', async () => {

@@ -90,10 +90,19 @@ A class diagram for the schema definition is shown below:
 | /games   | GET    | Retrieve all games    |
 
 ### `/currency`
-| Endpoint         | Method | Description                 |
-| ---------------- | ------ | --------------------------- |
-| /createCurrency  | POST   | Create a currency object    |
-| /unlockFeature   | POST   | Unlock a feature with coins |
+
+| Endpoint                     | Method | Description                 |
+| ---------------------------- | ------ | --------------------------- |
+| /createCurrency              | POST   | Create a currency object    |
+| /getCurrencyByUser/:username | POST   | Create a currency object    |
+| /unlockFeature               | POST   | Unlock a feature with coins |
+
+### `/collection`
+
+| Endpoint                        | Method | Description                                                          |
+| ------------------------------- | ------ | -------------------------------------------------------------------- |
+| /createCollection               | POST   | Create a new collection                                              |
+| /getCollectionsByUser/:username | GET    | Retrieve all collections for a specific user based on their username |
 
 ## Running Stryker Mutation Testing
 

@@ -2,7 +2,7 @@ import supertest from 'supertest';
 import mongoose from 'mongoose';
 import { app } from '../../app';
 import * as util from '../../services/user.service';
-import { SafeDatabaseUser, User } from '../../types/types';
+import { DatabaseUserStats, SafeDatabaseUser, User } from '../../types/types';
 
 const mockUser: User = {
   username: 'user1',
@@ -16,6 +16,24 @@ const mockSafeUser: SafeDatabaseUser = {
   dateJoined: new Date('2024-12-03'),
 };
 
+const mockUserStats: DatabaseUserStats = {
+  _id: new mongoose.Types.ObjectId(),
+  userId: mockSafeUser._id,
+  questionsCount: 0,
+  commentsCount: 0,
+  answersCount: 0,
+  nimWinCount: 0,
+};
+
+const mockUserStatsJSONResponse = {
+  _id: mockUserStats._id.toString(),
+  userId: mockSafeUser._id.toString(),
+  questionsCount: 0,
+  commentsCount: 0,
+  answersCount: 0,
+  nimWinCount: 0,
+};
+
 const mockUserJSONResponse = {
   _id: mockSafeUser._id.toString(),
   username: 'user1',
@@ -23,6 +41,7 @@ const mockUserJSONResponse = {
 };
 
 const saveUserSpy = jest.spyOn(util, 'saveUser');
+const saveUserStatsSpy = jest.spyOn(util, 'saveUserStats');
 const loginUserSpy = jest.spyOn(util, 'loginUser');
 const updatedUserSpy = jest.spyOn(util, 'updateUser');
 const getUserByUsernameSpy = jest.spyOn(util, 'getUserByUsername');
@@ -39,16 +58,21 @@ describe('Test userController', () => {
       };
 
       saveUserSpy.mockResolvedValueOnce({ ...mockSafeUser, biography: mockReqBody.biography });
+      saveUserStatsSpy.mockResolvedValueOnce(mockUserStats);
 
       const response = await supertest(app).post('/user/signup').send(mockReqBody);
-
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({ ...mockUserJSONResponse, biography: mockReqBody.biography });
+      expect(response.body.userStats.userId).toEqual(response.body.user._id);
+      expect(response.body).toEqual({
+        user: { ...mockUserJSONResponse, biography: mockReqBody.biography },
+        userStats: mockUserStatsJSONResponse,
+      });
       expect(saveUserSpy).toHaveBeenCalledWith({
         ...mockReqBody,
         biography: mockReqBody.biography,
         dateJoined: expect.any(Date),
       });
+      expect(saveUserStatsSpy).toHaveBeenCalledWith(mockSafeUser._id);
     });
 
     it('should return 400 for request missing username', async () => {
@@ -97,13 +121,27 @@ describe('Test userController', () => {
       expect(response.text).toEqual('Invalid user body');
     });
 
-    it('should return 500 for a database error while saving', async () => {
+    it('should return 500 for a database error while saving user', async () => {
       const mockReqBody = {
         username: mockUser.username,
         password: mockUser.password,
       };
 
       saveUserSpy.mockResolvedValueOnce({ error: 'Error saving user' });
+
+      const response = await supertest(app).post('/user/signup').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+    });
+    it('should return 500 for a database error while saving user stats', async () => {
+      const mockReqBody = {
+        username: mockUser.username,
+        password: mockUser.password,
+        biography: 'This is a test biography',
+      };
+
+      saveUserSpy.mockResolvedValueOnce({ ...mockSafeUser, biography: mockReqBody.biography });
+      saveUserStatsSpy.mockResolvedValueOnce({ error: 'Error saving user' });
 
       const response = await supertest(app).post('/user/signup').send(mockReqBody);
 
