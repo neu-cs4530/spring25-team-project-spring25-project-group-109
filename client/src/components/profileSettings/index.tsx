@@ -106,7 +106,6 @@ const ProfileSettings: React.FC = () => {
                 allBadges.map(badge => (
                   <div key={String(badge._id)} className='badge'>
                     <img src={badge.imagePath} alt={badge.name} className='badge-image' />
-                    <p className='badge-name'>{badge.name}</p>
                     <div className='badge-description'>{badge.description}</div>
                   </div>
                 ))

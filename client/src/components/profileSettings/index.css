@@ -155,13 +155,8 @@
     filter: grayscale(100%); 
   }
 
-  .badge-name {
+  .badge-description {
     margin-top: 5px;
     text-align: center;
-  }
-
-  .badge-description {
-    margin-top: 10px;
-    text-align: center;
-    font-size: x-small;
+    font-size: small;
   }
