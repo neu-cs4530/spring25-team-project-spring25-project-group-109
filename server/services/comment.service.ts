@@ -10,6 +10,7 @@ import {
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
 import CommentModel from '../models/comments.model';
+import UserStatsModel from '../models/userstats.model';
 
 /**
  * Saves a new comment to the database.
@@ -50,10 +51,20 @@ export const addComment = async (
         { $push: { comments: { $each: [comment._id] } } },
         { new: true },
       );
+      await UserStatsModel.findOneAndUpdate(
+        { username: comment.commentBy },
+        { $inc: { commentsCount: 1 } },
+        { new: true },
+      );
     } else {
       result = await AnswerModel.findOneAndUpdate(
         { _id: id },
         { $push: { comments: { $each: [comment._id] } } },
+        { new: true },
+      );
+      await UserStatsModel.findOneAndUpdate(
+        { username: comment.commentBy },
+        { $inc: { commentsCount: 1 } },
         { new: true },
       );
     }

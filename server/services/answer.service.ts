@@ -9,6 +9,7 @@ import {
 } from '../types/types';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
+import UserStatsModel from '../models/userstats.model';
 
 /**
  * Records the most recent answer time for a given question based on its answers.
@@ -68,6 +69,12 @@ export const addAnswerToQuestion = async (
     if (result === null) {
       throw new Error('Error when adding answer to question');
     }
+
+    await UserStatsModel.findOneAndUpdate(
+      { username: ans.ansBy },
+      { $inc: { answersCount: 1 } },
+      { new: true },
+    );
     return result;
   } catch (error) {
     return { error: 'Error when adding answer to question' };

@@ -19,7 +19,6 @@ import {
 } from '../services/question.service';
 import { processTags } from '../services/tag.service';
 import { populateDocument } from '../utils/database.util';
-import UserStatsModel from '../models/userstats.model';
 
 const questionController = (socket: FakeSOSocket) => {
   const router = express.Router();
@@ -157,12 +156,6 @@ const questionController = (socket: FakeSOSocket) => {
       if ('error' in populatedQuestion) {
         throw new Error(populatedQuestion.error);
       }
-
-      await UserStatsModel.findOneAndUpdate(
-        { username: req.body.askedBy },
-        { $inc: { questionsCount: 1 } },
-        { new: true },
-      );
 
       socket.emit('questionUpdate', populatedQuestion as PopulatedDatabaseQuestion);
       res.json(populatedQuestion);

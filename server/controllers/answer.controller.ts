@@ -72,12 +72,6 @@ const answerController = (socket: FakeSOSocket) => {
         throw new Error(populatedAns.error);
       }
 
-      await UserStatsModel.findOneAndUpdate(
-        { username: req.body.ans.ansBy },
-        { $inc: { answersCount: 1 } },
-        { new: true },
-      );
-
       // Populates the fields of the answer that was added and emits the new object
       socket.emit('answerUpdate', {
         qid: new ObjectId(qid),
