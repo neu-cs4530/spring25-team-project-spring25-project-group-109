@@ -55,7 +55,7 @@ describe('Test userController', () => {
         username: mockUser.username,
         password: mockUser.password,
         biography: 'This is a test biography',
-        profilePhoto: '/images/avatars/default-avatar.png'
+        profilePhoto: '/images/avatars/default-avatar.png',
       };
 
       saveUserSpy.mockResolvedValueOnce({ ...mockSafeUser, biography: mockReqBody.biography });
