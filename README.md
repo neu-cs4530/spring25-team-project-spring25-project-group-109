@@ -60,15 +60,16 @@ A class diagram for the schema definition is shown below:
 
 ### `/user`
 
-| Endpoint         | Method | Description                    |
-| ---------------- | ------ | ------------------------------ |
-| /signup          | POST   | Create a new user account      |
-| /login           | POST   | Log in as a user               |
-| /resetPassword   | PATCH  | Reset user password            |
-| /getUser/        | GET    | Fetch user details by username |
-| /getUsers        | GET    | Fetch all users                |
-| /deleteUser/     | DELETE | Delete a user by username      |
-| /updateBiography | PATCH  | Update user biography          |
+| Endpoint            | Method | Description                    |
+| ------------------- | ------ | ------------------------------ |
+| /signup             | POST   | Create a new user account      |
+| /login              | POST   | Log in as a user               |
+| /resetPassword      | PATCH  | Reset user password            |
+| /getUser/           | GET    | Fetch user details by username |
+| /getUsers           | GET    | Fetch all users                |
+| /deleteUser/        | DELETE | Delete a user by username      |
+| /updateBiography    | PATCH  | Update user biography          |
+| /updateProfilePhoto | PATCH  | Update user profile photo      |
 
 ### `/chat`
 
