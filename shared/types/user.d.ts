@@ -21,6 +21,7 @@ export interface UserCredentials {
 export interface User extends UserCredentials {
   dateJoined: Date;
   biography?: string;
+  badgesEarned: { badgeId: string; dateEarned: Date }[];
 }
 
 /**

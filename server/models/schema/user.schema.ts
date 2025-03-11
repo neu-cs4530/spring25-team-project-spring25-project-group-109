@@ -26,6 +26,12 @@ const userSchema: Schema = new Schema(
       type: String,
       default: '',
     },
+    badgesEarned: [
+      {
+        badgeId: { type: Schema.Types.ObjectId, ref: 'Badge', required: true },
+        dateEarned: { type: Date, required: true, default: Date.now },
+      },
+    ],
   },
   { collection: 'User' },
 );

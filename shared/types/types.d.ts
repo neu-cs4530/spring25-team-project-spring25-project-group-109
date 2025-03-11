@@ -10,3 +10,4 @@ export * from './user';
 export * from './currency';
 export * from './collection';
 export * from './userstats';
+export * from './badge';

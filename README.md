@@ -97,6 +97,13 @@ A class diagram for the schema definition is shown below:
 | /getCurrencyByUser/:username | GET    | Get a user's currency data  |
 | /unlockFeature               | POST   | Unlock a feature with coins |
 
+### `/badge`
+
+| Endpoint   | Method | Description           |
+| ---------- | ------ | --------------------- |
+| /addBadge  | POST   | Create a new badge    |
+| /getBadges | GET    | Gets all badges       |
+
 ### `/collection`
 
 | Endpoint                        | Method | Description                                                          |
