@@ -1,3 +1,8 @@
+## ⚠️ DB Warnings
+- If your changes require changing populate_db make sure you are up to date with main
+   - Before you merge into main ask Sama to populate the remote db!
+- Keep in mind if you need to update populate document function if schema includes references to other objects
+
 ## Task
 |   User Story    |   Task                                                              |
 |:---------------:|---------------------------------------------------------------------|

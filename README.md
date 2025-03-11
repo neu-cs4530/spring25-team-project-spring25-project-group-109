@@ -89,6 +89,13 @@ A class diagram for the schema definition is shown below:
 | /leave   | POST   | Leave a game          |
 | /games   | GET    | Retrieve all games    |
 
+### `/badge`
+
+| Endpoint   | Method | Description           |
+| ---------- | ------ | --------------------- |
+| /addBadge  | POST   | Create a new badge    |
+| /getBadges | GET    | Gets all badges       |
+
 ### `/collection`
 
 | Endpoint                        | Method | Description                                                          |
