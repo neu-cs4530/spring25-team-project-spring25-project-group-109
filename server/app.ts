@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import { Server } from 'socket.io';
 import * as http from 'http';
+import path from 'path';
 
 import answerController from './controllers/answer.controller';
 import questionController from './controllers/question.controller';
@@ -70,6 +71,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use('/images', express.static(path.join(__dirname, '../client/public/images')));
 
 app.get('/', (_: Request, res: Response) => {
   res.send('hello world');
