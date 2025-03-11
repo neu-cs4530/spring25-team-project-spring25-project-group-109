@@ -3,7 +3,6 @@ import { ObjectId } from 'mongodb';
 import { Answer, AddAnswerRequest, FakeSOSocket, PopulatedDatabaseAnswer } from '../types/types';
 import { addAnswerToQuestion, saveAnswer } from '../services/answer.service';
 import { populateDocument } from '../utils/database.util';
-import UserStatsModel from '../models/userstats.model';
 
 const answerController = (socket: FakeSOSocket) => {
   const router = express.Router();
