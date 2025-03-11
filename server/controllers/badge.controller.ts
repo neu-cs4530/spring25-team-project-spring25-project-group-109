@@ -5,7 +5,12 @@ import { BadgeRequest, FakeSOSocket } from '../types/types';
 const badgeController = (socket: FakeSOSocket) => {
   const router: Router = express.Router();
 
-  // todo javadoc
+  /**
+   * Checks if the badge request body is valid by ensuring all required fields are present and non-empty.
+   *
+   * @param {BadgeRequest} req - The badge request object containing the necessary fields.
+   * @returns {boolean} - Returns true if the request body is valid, false otherwise.
+   */
   const isBadgeBodyValid = (req: BadgeRequest): boolean =>
     req.body.description !== undefined &&
     req.body.description !== '' &&
