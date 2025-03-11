@@ -17,7 +17,7 @@ import TagModel from '../models/tags.model';
 import CommentModel from '../models/comments.model';
 import { parseKeyword, parseTags } from '../utils/parse.util';
 import { checkTagInQuestion } from './tag.service';
-import { updateCoins } from './currency.service';
+import { updateCoins } from './store.service';
 import {
   sortQuestionsByActive,
   sortQuestionsByMostViews,

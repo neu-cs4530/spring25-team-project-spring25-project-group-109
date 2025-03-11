@@ -89,12 +89,12 @@ A class diagram for the schema definition is shown below:
 | /leave   | POST   | Leave a game          |
 | /games   | GET    | Retrieve all games    |
 
-### `/currency`
+### `/store`
 
 | Endpoint                     | Method | Description                 |
 | ---------------------------- | ------ | --------------------------- |
-| /createCurrency              | POST   | Create a currency object    |
-| /getCurrencyByUser/:username | GET    | Get a user's currency data  |
+| /createStore                 | POST   | Create a store object       |
+| /getStoreByUser/:username    | GET    | Get a user's store data     |
 | /unlockFeature               | POST   | Unlock a feature with coins |
 
 ### `/badge`

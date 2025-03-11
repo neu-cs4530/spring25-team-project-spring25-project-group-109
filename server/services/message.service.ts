@@ -1,6 +1,6 @@
 import MessageModel from '../models/messages.model';
 import UserModel from '../models/users.model';
-import { updateCoins } from './currency.service';
+import { updateCoins } from './store.service';
 import { DatabaseMessage, DatabaseUser, Message, MessageResponse } from '../types/types';
 
 /**

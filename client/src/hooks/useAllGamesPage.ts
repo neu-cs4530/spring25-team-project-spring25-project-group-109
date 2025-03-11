@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createGame, getGames } from '../services/gamesService';
-import { getUserCurrency } from '../services/currencyService';
+import getUserStore from '../services/storeService';
 import { GameInstance, GameState, GameType } from '../types/types';
 import useUserContext from './useUserContext';
 
@@ -22,14 +22,14 @@ const useAllGamesPage = () => {
   const [availableGames, setAvailableGames] = useState<GameInstance<GameState>[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currency, setCurrency] = useState<{ nim: boolean }>({ nim: false });
+  const [permissions, setPermissions] = useState<{ nim: boolean }>({ nim: false });
 
-  const fetchUserCurrency = async () => {
+  const fetchUserStore = async () => {
     try {
-      const userCurrency = await getUserCurrency(user.username); // Fetch currency
-      setCurrency(userCurrency);
-    } catch (currencyError) {
-      setError('Error fetching user currency');
+      const userStore = await getUserStore(user.username); // Fetch store
+      setPermissions({ nim: userStore.unlockedFeatures.includes('Nim') });
+    } catch (storeError) {
+      setError('Error fetching user store');
     }
   };
 
@@ -56,7 +56,7 @@ const useAllGamesPage = () => {
   };
 
   useEffect(() => {
-    fetchUserCurrency();
+    fetchUserStore();
   });
 
   useEffect(() => {
@@ -80,7 +80,7 @@ const useAllGamesPage = () => {
     handleToggleModal,
     handleSelectGameType,
     error,
-    currency,
+    permissions,
   };
 };
 

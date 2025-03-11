@@ -19,12 +19,14 @@ import {
   User,
   UserStats,
   BadgeType,
+  Store,
 } from './types/types';
 import * as strings from './data/posts_strings';
 import CommentModel from './models/comments.model';
 import UserModel from './models/users.model';
 import UserStatsModel from './models/userstats.model';
 import BadgeModel from './models/badge.model';
+import StoreModel from './models/store.model';
 
 // Pass URL of your mongoDB instance as first argument(e.g., mongodb://127.0.0.1:27017/fake_so)
 const userArgs = process.argv.slice(2);
@@ -200,14 +202,21 @@ async function userCreate(
   const user = await UserModel.create(userDetail);
 
   const userStats: UserStats = {
-    userId: user._id,
+    username: user.username,
     answersCount: 0,
     commentsCount: 0,
     nimWinCount: 0,
     questionsCount: 0,
   };
-
   await UserStatsModel.create(userStats);
+
+  const userStore: Store = {
+    username: user.username,
+    coinCount: 0,
+    unlockedFeatures: []
+  };
+  await StoreModel.create(userStore);
+  
   return user;
 }
 

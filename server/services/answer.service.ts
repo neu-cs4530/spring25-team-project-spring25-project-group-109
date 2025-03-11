@@ -9,7 +9,7 @@ import {
 } from '../types/types';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
-import { updateCoins } from './currency.service';
+import { updateCoins } from './store.service';
 
 /**
  * Records the most recent answer time for a given question based on its answers.

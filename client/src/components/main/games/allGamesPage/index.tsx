@@ -19,22 +19,39 @@ const AllGamesPage = () => {
     handleToggleModal,
     handleSelectGameType,
     error,
-    currency,
+    permissions,
   } = useAllGamesPage();
+
+  const hasUnlockedGames = permissions.nim;
 
   return (
     <div className='game-page'>
+      {!hasUnlockedGames && (
+        <div className='overlay'>
+          <div className='locked-modal'>
+            <h2>You have not purchased any games.</h2>
+            <p>Visit the store to unlock games like Nim and more!</p>
+            {/* <button onClick={handleGoToStore}>Go to Store</button> */}
+          </div>
+        </div>
+      )}
+
       <div className='game-controls'>
         <button className='btn-create-game' onClick={handleToggleModal}>
           Create Game
         </button>
       </div>
 
-      {isModalOpen && (
+      {isModalOpen && hasUnlockedGames && (
         <div className='game-modal'>
           <div className='modal-content'>
             <h2>Select Game Type</h2>
-            {currency.nim && <button onClick={() => handleSelectGameType('Nim')}>Nim</button>}
+
+            {/* Check if nim permission is true */}
+            {permissions.nim ? (
+              <button onClick={() => handleSelectGameType('Nim')}>Nim</button>
+            ) : null}
+
             <button onClick={handleToggleModal}>Cancel</button>
           </div>
         </div>

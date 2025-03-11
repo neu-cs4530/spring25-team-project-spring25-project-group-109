@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { app } from '../../app';
 import * as util from '../../services/user.service';
 import { DatabaseUserStats, SafeDatabaseUser, User } from '../../types/types';
+import { mockDatabaseStore, mockStoreJSONResponse } from '../mockData.models';
 
 const mockUser: User = {
   username: 'user1',
@@ -20,7 +21,7 @@ const mockSafeUser: SafeDatabaseUser = {
 
 const mockUserStats: DatabaseUserStats = {
   _id: new mongoose.Types.ObjectId(),
-  userId: mockSafeUser._id,
+  username: 'user1',
   questionsCount: 0,
   commentsCount: 0,
   answersCount: 0,
@@ -29,7 +30,7 @@ const mockUserStats: DatabaseUserStats = {
 
 const mockUserStatsJSONResponse = {
   _id: mockUserStats._id.toString(),
-  userId: mockSafeUser._id.toString(),
+  username: 'user1',
   questionsCount: 0,
   commentsCount: 0,
   answersCount: 0,
@@ -45,6 +46,7 @@ const mockUserJSONResponse = {
 
 const saveUserSpy = jest.spyOn(util, 'saveUser');
 const saveUserStatsSpy = jest.spyOn(util, 'saveUserStats');
+const saveUserStoreSpy = jest.spyOn(util, 'saveUserStore');
 const loginUserSpy = jest.spyOn(util, 'loginUser');
 const updatedUserSpy = jest.spyOn(util, 'updateUser');
 const getUserByUsernameSpy = jest.spyOn(util, 'getUserByUsername');
@@ -62,13 +64,15 @@ describe('Test userController', () => {
 
       saveUserSpy.mockResolvedValueOnce({ ...mockSafeUser, biography: mockReqBody.biography });
       saveUserStatsSpy.mockResolvedValueOnce(mockUserStats);
+      saveUserStoreSpy.mockResolvedValueOnce(mockDatabaseStore);
 
       const response = await supertest(app).post('/user/signup').send(mockReqBody);
       expect(response.status).toBe(200);
-      expect(response.body.userStats.userId).toEqual(response.body.user._id);
+      expect(response.body.userStats.username).toEqual(response.body.user.username);
       expect(response.body).toEqual({
         user: { ...mockUserJSONResponse, biography: mockReqBody.biography },
         userStats: mockUserStatsJSONResponse,
+        userStore: mockStoreJSONResponse,
       });
       expect(saveUserSpy).toHaveBeenCalledWith({
         ...mockReqBody,
@@ -76,7 +80,8 @@ describe('Test userController', () => {
         dateJoined: expect.any(Date),
         badgesEarned: [],
       });
-      expect(saveUserStatsSpy).toHaveBeenCalledWith(mockSafeUser._id);
+      expect(saveUserStatsSpy).toHaveBeenCalledWith(mockSafeUser.username);
+      expect(saveUserStoreSpy).toHaveBeenCalledWith(mockSafeUser.username);
     });
 
     it('should return 400 for request missing username', async () => {

@@ -18,7 +18,7 @@ import userController from './controllers/user.controller';
 import messageController from './controllers/message.controller';
 import chatController from './controllers/chat.controller';
 import gameController from './controllers/game.controller';
-import currencyController from './controllers/currency.controller';
+import storeController from './controllers/store.controller';
 import badgeController from './controllers/badge.controller';
 import collectionController from './controllers/collection.controller';
 
@@ -85,7 +85,7 @@ app.use('/messaging', messageController(socket));
 app.use('/user', userController(socket));
 app.use('/chat', chatController(socket));
 app.use('/games', gameController(socket));
-app.use('/currency', currencyController());
+app.use('/store', storeController());
 app.use('/badge', badgeController(socket));
 app.use('/collection', collectionController());
 
