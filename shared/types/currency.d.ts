@@ -30,6 +30,16 @@ export interface CreateCurrencyRequest extends Request {
 }
 
 /**
+ * Request for fetching currency based on the user's username.
+ * - `params`: contains the `currency` of the user to look up.
+ */
+export interface GetCurrencyByUserRequest extends Request {
+  params: {
+    username: string;
+  };
+}
+
+/**
  * Interface extending the request body for unlocking a feature.
  * - `body`: the currency object being updated.
  */

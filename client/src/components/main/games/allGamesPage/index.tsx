@@ -19,6 +19,7 @@ const AllGamesPage = () => {
     handleToggleModal,
     handleSelectGameType,
     error,
+    currency,
   } = useAllGamesPage();
 
   return (
@@ -33,7 +34,7 @@ const AllGamesPage = () => {
         <div className='game-modal'>
           <div className='modal-content'>
             <h2>Select Game Type</h2>
-            <button onClick={() => handleSelectGameType('Nim')}>Nim</button>
+            {currency.nim && <button onClick={() => handleSelectGameType('Nim')}>Nim</button>}
             <button onClick={handleToggleModal}>Cancel</button>
           </div>
         </div>

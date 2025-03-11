@@ -25,6 +25,30 @@ export const saveCurrency = async (currency: Currency): Promise<DatabaseCurrency
   }
 };
 
+/** Gets user's currency given a username.
+ * @param username - the username to search for
+ * @returns {Promise<Currency>} - The currency object or an error message.
+ */
+export const getCurrency = async (username: string): Promise<Currency> => {
+  try {
+    const userExists: DatabaseUser | null = await UserModel.findOne({ username });
+
+    if (!userExists) {
+      throw new Error('User does not exist.');
+    }
+
+    const currency = await CurrencyModel.findOne({ username }).lean();
+
+    if (!currency) {
+      throw new Error('Currency not found for the provided user');
+    }
+
+    return currency;
+  } catch (error) {
+    throw new Error(`Error occurred when fetching currency: ${error}`);
+  }
+};
+
 /**
  * Updates the coin count for a user.
  *
@@ -71,6 +95,13 @@ export const unlockFeature = async (
       throw new Error('User currency data not found.');
     }
 
+    if (
+      (feature === 'nim' && userCurrency.nim) ||
+      (feature === 'customPhoto' && userCurrency.customPhoto)
+    ) {
+      throw new Error(`${feature} is already unlocked.`);
+    }
+
     if (userCurrency.coinCount < cost) {
       throw new Error(`Insufficient coins to unlock ${feature}.`);
     }
@@ -81,13 +112,17 @@ export const unlockFeature = async (
       throw new Error(`Failed to unlock ${feature}.`);
     }
 
-    if (feature === 'nim') {
-      updatedCurrency.nim = true;
-    } else {
-      updatedCurrency.customPhoto = true;
+    const updatedCurrencywithFeatureUnlocked = await CurrencyModel.findOneAndUpdate(
+      { username },
+      { [feature]: true },
+      { new: true },
+    );
+
+    if (!updatedCurrencywithFeatureUnlocked) {
+      throw new Error(`Failed to update feature ${feature}.`);
     }
 
-    return updatedCurrency;
+    return updatedCurrencywithFeatureUnlocked;
   } catch (error) {
     throw new Error(`Error occurred when unlocking: ${error}`);
   }
@@ -95,6 +130,7 @@ export const unlockFeature = async (
 
 export default {
   saveCurrency,
+  getCurrency,
   updateCoins,
   unlockFeature,
 };

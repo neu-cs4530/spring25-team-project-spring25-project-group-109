@@ -1,13 +1,22 @@
 import express, { Response } from 'express';
-import { CreateCurrencyRequest, UnlockFeatureRequest } from '../types/types';
-import { saveCurrency, unlockFeature } from '../services/currency.service';
+import {
+  CreateCurrencyRequest,
+  GetCurrencyByUserRequest,
+  UnlockFeatureRequest,
+} from '../types/types';
+import { saveCurrency, getCurrency, unlockFeature } from '../services/currency.service';
 
 const currencyController = () => {
   const router = express.Router();
 
   const isCreateCurrencyRequestValid = (req: CreateCurrencyRequest): boolean => {
     const { username, coinCount, customPhoto, nim } = req.body;
-    return !!username && !!coinCount && !!customPhoto && !!nim;
+    return (
+      username !== undefined &&
+      coinCount !== undefined &&
+      customPhoto !== undefined &&
+      nim !== undefined
+    );
   };
 
   const isUpdateFeatureRequestValid = (req: UnlockFeatureRequest): boolean => {
@@ -33,13 +42,31 @@ const currencyController = () => {
     try {
       const savedCurrency = await saveCurrency({ username, coinCount, customPhoto, nim });
 
-      if (!savedCurrency) {
-        throw new Error('Failed to save currency');
-      }
-
       res.status(200).json(savedCurrency);
     } catch (err: unknown) {
       res.status(500).send(`Error saving currency: ${(err as Error).message}`);
+    }
+  };
+
+  /**
+   * Gets the currency data for a user.
+   *
+   * @param req the request object containing the user's username.
+   * @param res the response object to send the result.
+   * @returns {Promise<void>} a promise that resolves when the currency data is retrieved.
+   */
+  const getCurrenyByUserRoute = async (
+    req: GetCurrencyByUserRequest,
+    res: Response,
+  ): Promise<void> => {
+    const { username } = req.params;
+
+    try {
+      const currency = await getCurrency(username);
+
+      res.status(200).json(currency);
+    } catch (err: unknown) {
+      res.status(500).send(`Error fetching currency: ${(err as Error).message}`);
     }
   };
 
@@ -61,10 +88,6 @@ const currencyController = () => {
     try {
       const response = await unlockFeature(username, feature, cost);
 
-      if (!response) {
-        throw new Error(response);
-      }
-
       res.status(200).json(response);
     } catch (err: unknown) {
       res.status(500).send(`Error unlocking feature: ${(err as Error).message}`);
@@ -72,6 +95,7 @@ const currencyController = () => {
   };
 
   router.post('/createCurrency', createCurrencyRoute);
+  router.get('/getCurrencyByUser/:username', getCurrenyByUserRoute);
   router.post('/unlockFeature', unlockFeatureRoute);
 
   return router;

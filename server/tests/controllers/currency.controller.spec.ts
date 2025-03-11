@@ -2,7 +2,7 @@ import supertest from 'supertest';
 import mongoose from 'mongoose';
 import { app } from '../../app';
 import * as util from '../../services/currency.service';
-import { Currency, DatabaseCurrency } from '../../types/types';
+import { DatabaseCurrency } from '../../types/types';
 
 const mockUnlockRequestBody = {
   username: 'user1',
@@ -34,9 +34,77 @@ const mockCurrencyJSONResponse = {
 };
 
 const saveCurrencySpy = jest.spyOn(util, 'saveCurrency');
+const getCurrencySpy = jest.spyOn(util, 'getCurrency');
 const unlockFeatureSpy = jest.spyOn(util, 'unlockFeature');
 
-// TODO: Write tests for createCurrency
+describe('POST /createCurrency', () => {
+  it('should create a currency object given correct arguments', async () => {
+    saveCurrencySpy.mockResolvedValueOnce({ ...mockDatabaseCurrency });
+
+    const response = await supertest(app)
+      .post('/currency/createCurrency')
+      .send(mockCreateCurrencyRequestBody);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ ...mockCurrencyJSONResponse });
+    expect(saveCurrencySpy).toHaveBeenCalledWith(mockCreateCurrencyRequestBody);
+  });
+
+  it('should return 400 for a missing name', async () => {
+    const mockIncompleteReqBody = {
+      coinCount: 0,
+      customPhoto: false,
+      nim: false,
+    };
+
+    const response = await supertest(app)
+      .post('/currency/createCurrency')
+      .send(mockIncompleteReqBody);
+    expect(response.status).toBe(400);
+    expect(response.text).toEqual('Invalid currency creation request');
+  });
+
+  it('should return 500 for an error', async () => {
+    saveCurrencySpy.mockRejectedValueOnce(new Error('Test error'));
+
+    const response = await supertest(app)
+      .post('/currency/createCurrency')
+      .send(mockCreateCurrencyRequestBody);
+
+    expect(response.status).toBe(500);
+    expect(response.text).toEqual('Error saving currency: Test error');
+  });
+});
+
+describe('GET /getCurrencyByUser', () => {
+  it('should return a currency object given a valid username', async () => {
+    getCurrencySpy.mockResolvedValueOnce({ ...mockDatabaseCurrency });
+
+    const response = await supertest(app).get(
+      `/currency/getCurrencyByUser/${mockDatabaseCurrency.username}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ ...mockCurrencyJSONResponse });
+    expect(getCurrencySpy).toHaveBeenCalledWith(mockDatabaseCurrency.username);
+  });
+
+  it('should return 500 for an error', async () => {
+    getCurrencySpy.mockRejectedValueOnce(new Error('Test error'));
+
+    const response = await supertest(app).get(
+      `/currency/getCurrencyByUser/${mockDatabaseCurrency.username}`,
+    );
+
+    expect(response.status).toBe(500);
+    expect(response.text).toEqual('Error fetching currency: Test error');
+  });
+
+  it('should return 404 for a missing username', async () => {
+    const response = await supertest(app).get('/currency/getCurrencyByUser/');
+    expect(response.status).toBe(404);
+  });
+});
 
 describe('POST /unlockFeature', () => {
   it('should unlock a feature given correct arguments', async () => {

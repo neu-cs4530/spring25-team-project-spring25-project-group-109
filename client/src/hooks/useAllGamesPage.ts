@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createGame, getGames } from '../services/gamesService';
+import { getUserCurrency } from '../services/currencyService';
 import { GameInstance, GameState, GameType } from '../types/types';
+import useUserContext from './useUserContext';
 
 /**
  * Custom hook to manage the state and logic for the "All Games" page, including fetching games,
@@ -15,10 +17,21 @@ import { GameInstance, GameState, GameType } from '../types/types';
  * - `handleSelectGameType`: A function to select a game type, create a new game, and close the modal.
  */
 const useAllGamesPage = () => {
+  const { user } = useUserContext();
   const navigate = useNavigate();
   const [availableGames, setAvailableGames] = useState<GameInstance<GameState>[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currency, setCurrency] = useState<{ nim: boolean }>({ nim: false });
+
+  const fetchUserCurrency = async () => {
+    try {
+      const userCurrency = await getUserCurrency(user.username); // Fetch currency
+      setCurrency(userCurrency);
+    } catch (currencyError) {
+      setError('Error fetching user currency');
+    }
+  };
 
   const fetchGames = async () => {
     try {
@@ -43,6 +56,10 @@ const useAllGamesPage = () => {
   };
 
   useEffect(() => {
+    fetchUserCurrency();
+  }, []);
+
+  useEffect(() => {
     fetchGames();
   }, []);
 
@@ -63,6 +80,7 @@ const useAllGamesPage = () => {
     handleToggleModal,
     handleSelectGameType,
     error,
+    currency,
   };
 };
 
