@@ -20,7 +20,7 @@ const mockSafeUser: SafeDatabaseUser = {
 
 const mockUserStats: DatabaseUserStats = {
   _id: new mongoose.Types.ObjectId(),
-  userId: mockSafeUser._id,
+  username: 'user1',
   questionsCount: 0,
   commentsCount: 0,
   answersCount: 0,
@@ -29,7 +29,7 @@ const mockUserStats: DatabaseUserStats = {
 
 const mockUserStatsJSONResponse = {
   _id: mockUserStats._id.toString(),
-  userId: mockSafeUser._id.toString(),
+  username: 'user1',
   questionsCount: 0,
   commentsCount: 0,
   answersCount: 0,
@@ -65,7 +65,7 @@ describe('Test userController', () => {
 
       const response = await supertest(app).post('/user/signup').send(mockReqBody);
       expect(response.status).toBe(200);
-      expect(response.body.userStats.userId).toEqual(response.body.user._id);
+      expect(response.body.userStats.username).toEqual(response.body.user.username);
       expect(response.body).toEqual({
         user: { ...mockUserJSONResponse, biography: mockReqBody.biography },
         userStats: mockUserStatsJSONResponse,

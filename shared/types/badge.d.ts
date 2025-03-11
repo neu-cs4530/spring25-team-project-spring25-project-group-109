@@ -34,3 +34,10 @@ export type BadgesResponse = DatabaseBadge[] | { error: string };
 export interface BadgeRequest extends Request {
   body: Badge;
 }
+
+// todo
+export interface UpdateBadgeByUsernameRequest extends Request {
+  params: {
+    username: string;
+  };
+}

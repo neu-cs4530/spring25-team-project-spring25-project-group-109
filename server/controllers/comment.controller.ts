@@ -9,6 +9,7 @@ import {
 } from '../types/types';
 import { addComment, saveComment } from '../services/comment.service';
 import { populateDocument } from '../utils/database.util';
+import UserStatsModel from '../models/userstats.model';
 
 const commentController = (socket: FakeSOSocket) => {
   const router = express.Router();
@@ -94,6 +95,12 @@ const commentController = (socket: FakeSOSocket) => {
       if (populatedDoc && 'error' in populatedDoc) {
         throw new Error(populatedDoc.error);
       }
+
+      await UserStatsModel.findOneAndUpdate(
+        { username: req.body.comment.commentBy },
+        { $inc: { commentsCount: 1 } },
+        { new: true },
+      );
 
       socket.emit('commentUpdate', {
         result: populatedDoc as PopulatedDatabaseQuestion | PopulatedDatabaseAnswer,

@@ -1,5 +1,3 @@
-import { ObjectId } from 'mongodb';
-
 /**
  * Represents a user statistics object
  * - userId: Reference to the associated user.
@@ -9,7 +7,7 @@ import { ObjectId } from 'mongodb';
  * - nimWinCount: Number of Nim game wins achieved by the user.
  */
 export interface UserStats {
-  userId: ObjectId; // Reference to the associated user.
+  username: string;
   questionsCount: number;
   commentsCount: number;
   answersCount: number;
@@ -22,3 +20,10 @@ export interface UserStats {
 export interface DatabaseUserStats extends UserStats {
   _id: mongoose.Types.ObjectId;
 }
+
+/**
+ * Represents the response for user-stats-related operations.
+ * - `DatabaseUserStats`: A user stats object if the operation is successful.
+ * - `error`: An error message if the operation fails.
+ */
+export type UserStatsResponse = DatabaseUserStats | { error: string };

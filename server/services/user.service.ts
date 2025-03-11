@@ -179,3 +179,37 @@ export const updateUser = async (
     return { error: `Error occurred when updating user: ${error}` };
   }
 };
+
+/**
+ * Award one or more badges to a user.
+ *
+ * @param userId - The ID of the user to award the badges to.
+ * @param badgeIds - The IDs of the badges to award.
+ * @returns {Promise<UserResponse>} - The updated user object after badges are awarded.
+ */
+export const awardBadgeToUser = async (
+  username: string,
+  badgeIds: ObjectId[],
+): Promise<UserResponse> => {
+  try {
+    // create badge objects with badgeId and dateEarned for each badgeId
+    const badgesToAward = badgeIds.map(badgeId => ({
+      badgeId,
+      dateEarned: new Date(), // Current date when the badge is awarded
+    }));
+
+    // add badges to the user's badgesEarned array
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { username },
+      { $push: { badgesEarned: { $each: badgesToAward } } },
+      { new: true },
+    ).select('-password');
+
+    if (!updatedUser) {
+      throw new Error('User not found');
+    }
+    return updatedUser;
+  } catch (error) {
+    throw new Error(`Failed to award badge(s) to user: ${error}`);
+  }
+};

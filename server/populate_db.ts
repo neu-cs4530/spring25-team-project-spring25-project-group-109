@@ -1,4 +1,4 @@
-import mongoose, { ObjectId } from 'mongoose';
+import mongoose from 'mongoose';
 import AnswerModel from './models/answers.model';
 import QuestionModel from './models/questions.model';
 import TagModel from './models/tags.model';
@@ -200,7 +200,7 @@ async function userCreate(
   const user = await UserModel.create(userDetail);
 
   const userStats: UserStats = {
-    userId: user._id,
+    username: user.username,
     answersCount: 0,
     commentsCount: 0,
     nimWinCount: 0,

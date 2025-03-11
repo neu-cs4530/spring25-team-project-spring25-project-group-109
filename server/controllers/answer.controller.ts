@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Answer, AddAnswerRequest, FakeSOSocket, PopulatedDatabaseAnswer } from '../types/types';
 import { addAnswerToQuestion, saveAnswer } from '../services/answer.service';
 import { populateDocument } from '../utils/database.util';
+import UserStatsModel from '../models/userstats.model';
 
 const answerController = (socket: FakeSOSocket) => {
   const router = express.Router();
@@ -70,6 +71,12 @@ const answerController = (socket: FakeSOSocket) => {
       if (populatedAns && 'error' in populatedAns) {
         throw new Error(populatedAns.error);
       }
+
+      await UserStatsModel.findOneAndUpdate(
+        { username: req.body.ans.ansBy },
+        { $inc: { answersCount: 1 } },
+        { new: true },
+      );
 
       // Populates the fields of the answer that was added and emits the new object
       socket.emit('answerUpdate', {

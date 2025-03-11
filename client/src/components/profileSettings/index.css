@@ -152,7 +152,14 @@
     width: 90px;
     height: 90px;
     object-fit: cover;
-    filter: grayscale(100%); 
+  }
+
+  .colored {
+    filter: none;
+  }
+
+  .grayscale {
+    filter: grayscale(100%);
   }
 
   .badge-description {
