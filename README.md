@@ -94,7 +94,7 @@ A class diagram for the schema definition is shown below:
 | Endpoint                     | Method | Description                 |
 | ---------------------------- | ------ | --------------------------- |
 | /createCurrency              | POST   | Create a currency object    |
-| /getCurrencyByUser/:username | POST   | Create a currency object    |
+| /getCurrencyByUser/:username | GET    | Get a user's currency data  |
 | /unlockFeature               | POST   | Unlock a feature with coins |
 
 ### `/collection`
