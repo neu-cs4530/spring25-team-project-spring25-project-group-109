@@ -1,10 +1,12 @@
 import { ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
 import {
   Badge,
   DatabaseAnswer,
   DatabaseBadge,
   DatabaseComment,
   DatabaseQuestion,
+  DatabaseStore,
   DatabaseTag,
   PopulatedDatabaseQuestion,
   SafeDatabaseUser,
@@ -215,4 +217,18 @@ export const dbBadge: DatabaseBadge = {
   threshold: 5,
   imagePath: 'imagePath',
   _id: new ObjectId(),
+};
+
+export const mockDatabaseStore: DatabaseStore = {
+  _id: new mongoose.Types.ObjectId(),
+  username: 'user1',
+  coinCount: 0,
+  unlockedFeatures: [],
+};
+
+export const mockStoreJSONResponse = {
+  _id: mockDatabaseStore._id.toString(),
+  username: 'user1',
+  coinCount: 0,
+  unlockedFeatures: [],
 };

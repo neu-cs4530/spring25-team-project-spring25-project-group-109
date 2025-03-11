@@ -1,15 +1,13 @@
-import { ObjectId } from 'mongodb';
-
 /**
  * Represents a user statistics object
- * - userId: Reference to the associated user.
+ * - username: Reference to the associated user.
  * - questionsCount: Number of questions posted by the user.
  * - commentsCount: Number of comments made by the user.
  * - answersCount: Number of answers provided by the user.
  * - nimWinCount: Number of Nim game wins achieved by the user.
  */
 export interface UserStats {
-  userId: ObjectId; // Reference to the associated user.
+  username: string; // Reference to the associated user.
   questionsCount: number;
   commentsCount: number;
   answersCount: number;

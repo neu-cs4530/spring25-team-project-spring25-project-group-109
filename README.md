@@ -90,6 +90,14 @@ A class diagram for the schema definition is shown below:
 | /leave   | POST   | Leave a game          |
 | /games   | GET    | Retrieve all games    |
 
+### `/store`
+
+| Endpoint                     | Method | Description                 |
+| ---------------------------- | ------ | --------------------------- |
+| /createStore                 | POST   | Create a store object       |
+| /getStoreByUser/:username    | GET    | Get a user's store data     |
+| /unlockFeature               | POST   | Unlock a feature with coins |
+
 ### `/badge`
 
 | Endpoint   | Method | Description           |

@@ -1,7 +1,7 @@
-import { ObjectId } from 'mongodb';
 import UserModel from '../models/users.model';
 import UserStatsModel from '../models/userstats.model';
 import {
+  DatabaseStore,
   DatabaseUser,
   DatabaseUserStats,
   SafeDatabaseUser,
@@ -10,6 +10,7 @@ import {
   UserResponse,
   UsersResponse,
 } from '../types/types';
+import StoreModel from '../models/store.model';
 
 /**
  * Saves a new user to the database.
@@ -44,15 +45,15 @@ export const saveUser = async (user: User): Promise<UserResponse> => {
 /**
  * Creates a corresponding UserStats object for a new user.
  *
- * @param userId - The unique identifier of the newly created user.
+ * @param username - The unique identifier of the newly created user.
  * @returns {Promise<DatabaseUserStats | { error: string }>}
  */
 export const saveUserStats = async (
-  userId: ObjectId,
+  username: string,
 ): Promise<DatabaseUserStats | { error: string }> => {
   try {
     const result: DatabaseUserStats = await UserStatsModel.create({
-      userId,
+      username,
       questionsCount: 0,
       commentsCount: 0,
       answersCount: 0,
@@ -64,6 +65,30 @@ export const saveUserStats = async (
     return result;
   } catch (error) {
     return { error: `Error creating user stats: ${error}` };
+  }
+};
+
+/**
+ * Creates a corresponding Store object for a new user.
+ *
+ * @param username - The unique identifier of the newly created user.
+ * @returns {Promise<DatabaseStore | { error: string }>}
+ */
+export const saveUserStore = async (
+  username: string,
+): Promise<DatabaseStore | { error: string }> => {
+  try {
+    const result: DatabaseStore = await StoreModel.create({
+      username,
+      coinCount: 0,
+      unlockedFeatures: [],
+    });
+    if (!result) {
+      throw Error('Failed to create user store');
+    }
+    return result;
+  } catch (error) {
+    return { error: `Error creating user store: ${error}` };
   }
 };
 
