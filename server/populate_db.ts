@@ -1,12 +1,15 @@
-import mongoose from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
 import AnswerModel from './models/answers.model';
 import QuestionModel from './models/questions.model';
 import TagModel from './models/tags.model';
+import CollectionModel from './models/collections.model';
 import {
   Answer,
   Badge,
+  Collection,
   Comment,
   DatabaseAnswer,
+  DatabaseCollection,
   DatabaseComment,
   DatabaseQuestion,
   DatabaseBadge,
@@ -208,6 +211,17 @@ async function userCreate(
   return user;
 }
 
+async function collectionCreate(
+  name: string,
+  username: string,
+  visibility: 'public' | 'private',
+  questions: mongoose.Types.ObjectId[],
+): Promise<DatabaseCollection> {
+  if (!name || !username) throw new Error('Invalid Collection Format');
+  const collection: Collection = { name, username, visibility, questions };
+  return await CollectionModel.create(collection);
+}
+
 /**
  * Populates the database with predefined data.
  * Logs the status of the operation to the console.
@@ -249,7 +263,7 @@ const populate = async () => {
     const a1 = await answerCreate(strings.A1_TXT, 'annabelle', new Date('2023-11-20T03:24:42'), [c1]);
     const a2 = await answerCreate(strings.A2_TXT, 'kyle', new Date('2023-11-23T08:24:00'), [c2]);
 
-    await questionCreate(
+    const q1 = await questionCreate(
       strings.Q1_DESC,
       strings.Q1_TXT,
       [t1, t2],
@@ -259,6 +273,10 @@ const populate = async () => {
       ['annabelle', 'kyle'],
       [c3],
     );
+
+    await collectionCreate('favorites', 'nitsa', 'private', [q1._id]);
+    await collectionCreate('typescript', 'annabelle', 'public', []);
+
     console.log('Database populated');
   } catch (err) {
     console.log('ERROR: ' + err);
