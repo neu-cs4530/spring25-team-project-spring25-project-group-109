@@ -2,46 +2,30 @@ import mongoose, { ObjectId } from 'mongoose';
 import AnswerModel from './models/answers.model';
 import QuestionModel from './models/questions.model';
 import TagModel from './models/tags.model';
-import CommentModel from './models/comments.model';
-import UserModel from './models/users.model';
 import CollectionModel from './models/collections.model';
 import UserStatsModel from './models/userstats.model';
 import {
   Answer,
+  Badge,
   Collection,
   Comment,
   DatabaseAnswer,
   DatabaseCollection,
   DatabaseComment,
   DatabaseQuestion,
+  DatabaseBadge,
   DatabaseTag,
   DatabaseUser,
-  Question,
   Tag,
   User,
   UserStats,
+  BadgeType,
 } from './types/types';
-import {
-  Q1_DESC,
-  Q1_TXT,
-  A1_TXT,
-  A2_TXT,
-  T1_NAME,
-  T1_DESC,
-  T2_NAME,
-  T2_DESC,
-  T3_NAME,
-  T3_DESC,
-  T4_NAME,
-  T4_DESC,
-  T5_NAME,
-  T5_DESC,
-  T6_NAME,
-  T6_DESC,
-  C1_TEXT,
-  C2_TEXT,
-  C3_TEXT,
-} from './data/posts_strings';
+import * as strings from './data/posts_strings';
+import CommentModel from './models/comments.model';
+import UserModel from './models/users.model';
+import UserStatsModel from './models/userstats.model';
+import BadgeModel from './models/badge.model';
 
 // Pass URL of your mongoDB instance as first argument(e.g., mongodb://127.0.0.1:27017/fake_so)
 const userArgs = process.argv.slice(2);
@@ -168,6 +152,34 @@ async function questionCreate(
   });
 }
 
+/**
+ * Creates a new Badge document in the database.
+ *
+ * @param name The name of the badge.
+ * @param description The description of the badge.
+ * @returns A Promise that resolves to the created Badge document.
+ */
+async function badgeCreate(
+  name: string,
+  description: string,
+  type: BadgeType,
+  threshold: number,
+  imagePath: string,
+): Promise<DatabaseBadge> {
+  
+  if (name === '' || description === '' || imagePath === '' || type === null || threshold === 0) {
+    throw new Error('Invalid Badge Format');
+  }
+  const badge: Badge = {
+    name: name,
+    description: description,
+    type: type,
+    threshold: threshold,
+    imagePath: imagePath,
+  };
+  return await BadgeModel.create(badge);
+}
+
 async function userCreate(
   username: string,
   password: string,
@@ -183,10 +195,11 @@ async function userCreate(
     password,
     dateJoined,
     biography: biography ?? '',
+    badgesEarned: [],
   };
 
   const user = await UserModel.create(userDetail);
-  
+
   const userStats: UserStats = {
     userId: user._id,
     answersCount: 0,
@@ -216,48 +229,44 @@ async function collectionCreate(
  */
 const populate = async () => {
   try {
-    await userCreate(
-      'sama',
-      'sama',
-      new Date('2023-12-11T03:30:00'),
-      'I am a student.',
-    );
-    await userCreate(
-      'kyle',
-      'kyle',
-      new Date('2022-12-11T03:30:00'),
-      'I am a software engineer.',
-    );
-    await userCreate(
-      'nitsa',
-      'nitsa',
-      new Date('2023-12-11T03:30:00'),
-      'I am a designer.',
-    );
-    await userCreate(
-      'annabelle',
-      'annabelle',
-      new Date('2022-12-11T03:30:00'),
-      'I am a manager.',
-    );
+    await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
+    await badgeCreate(strings.BQ10_NAME, strings.BQ10_DESCRIPTION, 'question', 10, `/images/badges/question/10.png`);
+    await badgeCreate(strings.BQ50_NAME, strings.BQ50_DESCRIPTION, 'question', 50, `/images/badges/question/50.png`);
+    
+    await badgeCreate(strings.BA1_NAME, strings.BA1_DESCRIPTION, 'answer', 1, `/images/badges/answer/1.png`);
+    await badgeCreate(strings.BA10_NAME, strings.BA10_DESCRIPTION, 'answer', 10, `/images/badges/answer/10.png`);
+    await badgeCreate(strings.BA50_NAME, strings.BA50_DESCRIPTION, 'answer', 50, `/images/badges/answer/50.png`);
+    
+    await badgeCreate(strings.BC1_NAME, strings.BC1_DESCRIPTION, 'comment', 1, `/images/badges/comment/1.png`);
+    await badgeCreate(strings.BC10_NAME, strings.BC10_DESCRIPTION, 'comment', 10, `/images/badges/comment/10.png`);
+    await badgeCreate(strings.BC50_NAME, strings.BC50_DESCRIPTION, 'comment', 50, `/images/badges/comment/50.png`);
+    
+    await badgeCreate(strings.BN1_NAME, strings.BN1_DESCRIPTION, 'nim', 1, `/images/badges/nim/1.png`);
+    await badgeCreate(strings.BN5_NAME, strings.BN5_DESCRIPTION, 'nim', 5, `/images/badges/nim/5.png`);
+    await badgeCreate(strings.BN10_NAME, strings.BN10_DESCRIPTION, 'nim', 10, `/images/badges/nim/10.png`);    
 
-    const t1 = await tagCreate(T1_NAME, T1_DESC);
-    const t2 = await tagCreate(T2_NAME, T2_DESC);
-    const t3 = await tagCreate(T3_NAME, T3_DESC);
-    const t4 = await tagCreate(T4_NAME, T4_DESC);
-    const t5 = await tagCreate(T5_NAME, T5_DESC);
-    const t6 = await tagCreate(T6_NAME, T6_DESC);
+    await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.');
+    await userCreate('kyle', 'kyle', new Date('2022-12-11T03:30:00'), 'I am a software engineer.');
+    await userCreate('nitsa', 'nitsa', new Date('2023-12-11T03:30:00'), 'I am a designer.');
+    await userCreate('annabelle', 'annabelle', new Date('2022-12-11T03:30:00'), 'I am a manager.');
 
-    const c1 = await commentCreate(C1_TEXT, 'sama', new Date('2023-12-12T03:30:00'));
-    const c2 = await commentCreate(C2_TEXT, 'nitsa', new Date('2023-12-01T15:24:19'));
-    const c3 = await commentCreate(C3_TEXT, 'nitsa', new Date('2023-12-01T15:24:19'));
+    const t1 = await tagCreate(strings.T1_NAME, strings.T1_DESC);
+    const t2 = await tagCreate(strings.T2_NAME, strings.T2_DESC);
+    const t3 = await tagCreate(strings.T3_NAME, strings.T3_DESC);
+    const t4 = await tagCreate(strings.T4_NAME, strings.T4_DESC);
+    const t5 = await tagCreate(strings.T5_NAME, strings.T5_DESC);
+    const t6 = await tagCreate(strings.T6_NAME, strings.T6_DESC);
 
-    const a1 = await answerCreate(A1_TXT, 'annabelle', new Date('2023-11-20T03:24:42'), [c1]);
-    const a2 = await answerCreate(A2_TXT, 'kyle', new Date('2023-11-23T08:24:00'), [c2]);
+    const c1 = await commentCreate(strings.C1_TEXT, 'sama', new Date('2023-12-12T03:30:00'));
+    const c2 = await commentCreate(strings.C2_TEXT, 'nitsa', new Date('2023-12-01T15:24:19'));
+    const c3 = await commentCreate(strings.C3_TEXT, 'nitsa', new Date('2023-12-01T15:24:19'));
+
+    const a1 = await answerCreate(strings.A1_TXT, 'annabelle', new Date('2023-11-20T03:24:42'), [c1]);
+    const a2 = await answerCreate(strings.A2_TXT, 'kyle', new Date('2023-11-23T08:24:00'), [c2]);
 
     const q1 = await questionCreate(
-      Q1_DESC,
-      Q1_TXT,
+      strings.Q1_DESC,
+      strings.Q1_TXT,
       [t1, t2],
       [a1, a2],
       'sama',

@@ -7,7 +7,8 @@ import {
   updateBiography,
   updateProfilePhoto,
 } from '../services/userService';
-import { SafeDatabaseUser } from '../types/types';
+import { getBadges } from '../services/badgeService';
+import { DatabaseBadge, SafeDatabaseUser } from '../types/types';
 import useUserContext from './useUserContext';
 
 const AVAILABLE_AVATARS = [
@@ -37,6 +38,7 @@ const useProfileSettings = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [editProfilePhotoMode, setEditProfilePhotoMode] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState<string>('/images/avatars/default-avatar.png');
+  const [allBadges, setAllBadges] = useState<DatabaseBadge[] | null>(null);
 
   // For delete-user confirmation modal
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -63,7 +65,18 @@ const useProfileSettings = () => {
       }
     };
 
+    const fetchBadges = async () => {
+      try {
+        const badgesData = await getBadges();
+        setAllBadges(badgesData);
+      } catch (error) {
+        setErrorMessage('Error fetching badges');
+        setAllBadges(null);
+      }
+    };
+
     fetchUserData();
+    fetchBadges();
   }, [username]);
 
   /**
@@ -181,6 +194,7 @@ const useProfileSettings = () => {
     setConfirmNewPassword,
     loading,
     editBioMode,
+    allBadges,
     setEditBioMode,
     newBio,
     setNewBio,

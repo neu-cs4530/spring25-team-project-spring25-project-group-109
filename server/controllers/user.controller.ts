@@ -74,6 +74,7 @@ const userController = (socket: FakeSOSocket) => {
       dateJoined: new Date(),
       biography: requestUser.biography ?? '',
       profilePhoto: requestUser.profilePhoto ?? '/images/avatars/default-avatar.png',
+      badgesEarned: [],
     };
 
     try {
