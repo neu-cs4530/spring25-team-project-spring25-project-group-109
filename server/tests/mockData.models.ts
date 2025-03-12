@@ -5,6 +5,7 @@ import {
   DatabaseAnswer,
   DatabaseBadge,
   DatabaseComment,
+  DatabaseFeature,
   DatabaseQuestion,
   DatabaseStore,
   DatabaseTag,
@@ -231,4 +232,16 @@ export const mockStoreJSONResponse = {
   username: 'user1',
   coinCount: 0,
   unlockedFeatures: [],
+};
+
+export const mockFeature: DatabaseFeature = {
+  _id: new mongoose.Types.ObjectId(),
+  name: 'Nim',
+  description: 'description',
+  price: 0,
+};
+
+export const mockFeatureJSONResponse: DatabaseFeature = {
+  ...mockFeature,
+  _id: mockFeature._id.toString(),
 };
