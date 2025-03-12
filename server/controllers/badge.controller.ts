@@ -1,8 +1,8 @@
 import express, { Request, Response, Router } from 'express';
 import { checkAndAwardBadges, getBadgesList, saveBadge } from '../services/badge.service';
-import { BadgeRequest, FakeSOSocket, UpdateBadgeByUsernameRequest } from '../types/types';
+import { BadgeRequest, UpdateBadgeByUsernameRequest } from '../types/types';
 
-const badgeController = (socket: FakeSOSocket) => {
+const badgeController = () => {
   const router: Router = express.Router();
 
   /**
@@ -73,12 +73,11 @@ const badgeController = (socket: FakeSOSocket) => {
   const updateBadges = async (req: UpdateBadgeByUsernameRequest, res: Response): Promise<void> => {
     try {
       const { username } = req.params;
-      if (!username) {
-        res.status(400).json({ error: 'Username is required' });
-        return;
+      const badges = await checkAndAwardBadges(username);
+      if ('error' in badges) {
+        throw Error(badges.error);
       }
-      await checkAndAwardBadges(username);
-      res.status(200).json({ message: 'Badges updated successfully' });
+      res.status(200).json({ badges });
     } catch (error) {
       res.status(500).json({ error: 'Failed to update badges' });
     }
@@ -86,7 +85,7 @@ const badgeController = (socket: FakeSOSocket) => {
 
   router.post('/addBadge', createBadge);
   router.get('/getBadges', getBadges);
-  router.put('/updateBadges/:username', updateBadges);
+  router.patch('/updateBadges/:username', updateBadges);
   return router;
 };
 

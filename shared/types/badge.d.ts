@@ -35,7 +35,10 @@ export interface BadgeRequest extends Request {
   body: Badge;
 }
 
-// todo
+/**
+ * Represents a request containing a username in the parameter.
+ * Extends the Express Request object to include a query param of type string.
+ */
 export interface UpdateBadgeByUsernameRequest extends Request {
   params: {
     username: string;

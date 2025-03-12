@@ -97,6 +97,25 @@
   background-color: #003f7f;
 }
 
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.badge {
+  display: flex;
+  flex-direction: column;
+}
+
+.badge-image {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  filter: grayscale(100%);
+}
+
 .badge-description {
   margin-top: 5px;
   text-align: center;

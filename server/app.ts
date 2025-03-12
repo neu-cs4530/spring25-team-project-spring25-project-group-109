@@ -88,7 +88,7 @@ app.use('/user', userController(socket));
 app.use('/chat', chatController(socket));
 app.use('/games', gameController(socket));
 app.use('/store', storeController());
-app.use('/badge', badgeController(socket));
+app.use('/badge', badgeController());
 app.use('/collection', collectionController());
 
 // Export the app instance

@@ -33,7 +33,7 @@ export interface User extends UserCredentials {
   dateJoined: Date;
   biography?: string;
   profilePhoto?: string;
-  badgesEarned: { badgeId: string; dateEarned: Date }[];
+  badgesEarned: EarnedBadge[];
 }
 
 /**

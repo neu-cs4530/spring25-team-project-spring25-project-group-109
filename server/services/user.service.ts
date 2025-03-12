@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import UserModel from '../models/users.model';
 import UserStatsModel from '../models/userstats.model';
 import {
@@ -236,6 +237,6 @@ export const awardBadgeToUser = async (
     }
     return updatedUser;
   } catch (error) {
-    throw new Error(`Failed to award badge(s) to user: ${error}`);
+    return { error: `Error occurred when updating badges: ${error}` };
   }
 };

@@ -26,7 +26,7 @@ export const getBadges = async (): Promise<DatabaseBadge[]> => {
  */
 export const updateBadges = async (username: string): Promise<void> => {
   try {
-    const res = await api.put(`${USER_API_URL}/updateBadges/${username}`);
+    const res = await api.patch(`${USER_API_URL}/updateBadges/${username}`);
     if (res.status !== 200) {
       throw new Error('Failed to update badges');
     }

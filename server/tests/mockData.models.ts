@@ -8,9 +8,11 @@ import {
   DatabaseQuestion,
   DatabaseStore,
   DatabaseTag,
+  DatabaseUserStats,
   PopulatedDatabaseQuestion,
   SafeDatabaseUser,
   User,
+  UserStats,
 } from '../types/types';
 import { T1_DESC, T2_DESC, T3_DESC } from '../data/posts_strings';
 
@@ -200,6 +202,27 @@ export const safeUser: SafeDatabaseUser = {
   username: 'user1',
   dateJoined: new Date('2024-12-03'),
   badgesEarned: [],
+};
+
+export const mockUserStatsFull: UserStats = {
+  username: 'user1',
+  questionsCount: 10,
+  commentsCount: 0,
+  answersCount: 0,
+  nimWinCount: 0,
+};
+
+export const mockUserStats: UserStats = {
+  username: 'user1',
+  questionsCount: 0,
+  commentsCount: 0,
+  answersCount: 0,
+  nimWinCount: 0,
+};
+
+export const mockDBUserStats: DatabaseUserStats = {
+  ...mockUserStats,
+  _id: new ObjectId(),
 };
 
 export const badge: Badge = {

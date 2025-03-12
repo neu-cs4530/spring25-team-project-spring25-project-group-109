@@ -37,13 +37,13 @@ export const getBadgesList = async (type?: BadgeType): Promise<BadgesResponse> =
   try {
     const query = type ? { type } : {};
     const badges: DatabaseBadge[] = await BadgeModel.find(query);
-    return badges;
+    return badges || [];
   } catch (error) {
-    throw new Error(`Error retrieving badges: ${error}`);
+    return { error: `Error retrieving badges: ${error}` };
   }
 };
 
-export const checkAndAwardBadges = async (username: string): Promise<void> => {
+export const checkAndAwardBadges = async (username: string): Promise<BadgesResponse> => {
   try {
     // get user by username
     const user = await UserModel.findOne({ username });
@@ -74,7 +74,8 @@ export const checkAndAwardBadges = async (username: string): Promise<void> => {
         newBadges.map(badge => badge._id),
       );
     }
+    return newBadges;
   } catch (error) {
-    throw new Error(`Error awarding badges: ${error}`);
+    return { error: `Error awarding badges: ${error}` };
   }
 };
