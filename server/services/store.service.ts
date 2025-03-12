@@ -3,7 +3,13 @@ import StoreModel from '../models/store.model';
 import UserModel from '../models/users.model';
 import { DatabaseStore, Store, DatabaseUser, DatabaseFeature } from '../types/types';
 
-// todo
+/**
+ * Saves a new store entry for a user.
+ *
+ * @param {Store} store - The store object to save.
+ * @returns {Promise<DatabaseStore>} - The saved store object.
+ * @throws {Error} - If the user does not exist or if an error occurs.
+ */
 export const saveStore = async (store: Store): Promise<DatabaseStore> => {
   try {
     const userExists: DatabaseUser | null = await UserModel.findOne({
@@ -20,7 +26,13 @@ export const saveStore = async (store: Store): Promise<DatabaseStore> => {
   }
 };
 
-// todo
+/**
+ * Retrieves the store data for a specific user.
+ *
+ * @param {string} username - The username of the store owner.
+ * @returns {Promise<Store>} - The store object.
+ * @throws {Error} - If the user or store does not exist.
+ */
 export const getStore = async (username: string): Promise<Store> => {
   try {
     const userExists: DatabaseUser | null = await UserModel.findOne({ username });
@@ -44,9 +56,10 @@ export const getStore = async (username: string): Promise<Store> => {
 /**
  * Updates the coin count for a user.
  *
- * @param username user to update
- * @param amount number of coins to add or subtract
+ * @param {string} username - The username of the user.
+ * @param {number} amount - The number of coins to add (positive) or subtract (negative).
  * @returns {Promise<DatabaseStore | null>} - The updated store object or an error message.
+ * @throws {Error} - If the user does not exist or the update fails.
  */
 export const updateCoins = async (
   username: string,
@@ -75,11 +88,17 @@ export const updateCoins = async (
   }
 };
 
-// todo
-// removes coins from store and adds to unlocked feature
+/**
+ * Unlocks a feature for a user by deducting the necessary coins and updating the store.
+ *
+ * @param {string} username - The username of the user unlocking the feature.
+ * @param {'Nim' | 'Custom Profile Photo'} featureName - The name of the feature to unlock.
+ * @returns {Promise<DatabaseStore>} - The updated store object with the unlocked feature.
+ * @throws {Error} - If the store, feature, or user data is missing, or if there are insufficient coins.
+ */
 export const unlockFeature = async (
   username: string,
-  featureName: 'Nim' | 'Custom Photo',
+  featureName: 'Nim' | 'Custom Profile Photo',
 ): Promise<DatabaseStore> => {
   try {
     const userStore: DatabaseStore | null = await StoreModel.findOne({ username });

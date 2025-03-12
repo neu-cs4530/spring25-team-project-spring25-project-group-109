@@ -18,11 +18,13 @@ const store: Store = {
 
 const nimFeature: Feature = {
   name: 'Nim',
+  description: 'Nim description',
   price: 10,
 };
 
 const profileFeature: Feature = {
-  name: 'Custom Photo',
+  name: 'Custom Profile Photo',
+  description: 'Profile description',
   price: 0,
 };
 
@@ -206,7 +208,7 @@ describe('Test Store Service', () => {
 
     it('should successfully unlock the "customPhoto" feature if user has enough coins', async () => {
       const initialCoinCount = 15;
-      const feature = 'Custom Photo';
+      const feature = 'Custom Profile Photo';
       const cost = 5;
 
       const savedStore: DatabaseStore = {
@@ -219,7 +221,7 @@ describe('Test Store Service', () => {
       const updatedStore: DatabaseStore = {
         ...savedStore,
         coinCount: initialCoinCount - cost,
-        unlockedFeatures: ['Custom Photo'],
+        unlockedFeatures: ['Custom Profile Photo'],
       };
 
       mockingoose(UserModel).toReturn(user, 'findOne');
@@ -230,7 +232,7 @@ describe('Test Store Service', () => {
 
       const result = await unlockFeature(user.username, feature);
 
-      expect(result.unlockedFeatures).toEqual(['Custom Photo']);
+      expect(result.unlockedFeatures).toEqual(['Custom Profile Photo']);
       expect(result.coinCount).toBe(initialCoinCount - cost);
     });
 

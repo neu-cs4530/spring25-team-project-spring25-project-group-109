@@ -168,6 +168,7 @@ async function questionCreate(
  */
 async function featureCreate(
   name: FeatureType,
+  description: string,
   price: number,
 ): Promise<DatabaseFeature> {
   if (name === null || price <= 0) {
@@ -175,8 +176,9 @@ async function featureCreate(
   }
 
   const feature: Feature = {
-    name: name,
-    price: price,
+    name,
+    description,
+    price,
   };
   return await FeatureModel.create(feature);
 }
@@ -265,8 +267,8 @@ async function collectionCreate(
  */
 const populate = async () => {
   try {
-    await featureCreate("Nim", 5);
-    await featureCreate("Custom Photo", 10);
+    await featureCreate("Nim", strings.NIM_FEATURE_DESCRIPTION, 5);
+    await featureCreate("Custom Profile Photo", strings.PROFILE_FEATURE_DESCRIPTION, 10);
     
     await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
     await badgeCreate(strings.BQ10_NAME, strings.BQ10_DESCRIPTION, 'question', 10, `/images/badges/question/10.png`);

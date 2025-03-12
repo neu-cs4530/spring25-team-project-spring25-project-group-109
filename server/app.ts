@@ -22,6 +22,7 @@ import gameController from './controllers/game.controller';
 import storeController from './controllers/store.controller';
 import badgeController from './controllers/badge.controller';
 import collectionController from './controllers/collection.controller';
+import featureController from './controllers/feature.controller';
 
 dotenv.config();
 
@@ -90,6 +91,7 @@ app.use('/games', gameController(socket));
 app.use('/store', storeController());
 app.use('/badge', badgeController(socket));
 app.use('/collection', collectionController());
+app.use('/features', featureController());
 
 // Export the app instance
 export { app, server, startServer };
