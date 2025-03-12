@@ -9,20 +9,20 @@
   background: #dddddd;
   padding: 5px 10px;
   border-radius: 10px;
-  width: auto; 
+  width: auto;
   max-width: fit-content;
 }
 
 .coin-box-wrapper {
-  margin-left: 20px; /* Space from the left edge */
+  margin-left: 20px;
 }
 
 .coin-icon {
-  width: 24px; /* Adjusted icon size */
+  width: 24px;
   height: 24px;
-  margin-right: 5px; /* Adjust margin for a tighter fit */
+  margin-right: 5px;
 }
 
 .coin-count {
-  font-size: 1.5rem; /* Adjust coin number size */
+  font-size: 1.5rem;
 }

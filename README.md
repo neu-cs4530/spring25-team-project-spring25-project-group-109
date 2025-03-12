@@ -112,6 +112,12 @@ A class diagram for the schema definition is shown below:
 | /createCollection               | POST   | Create a new collection                                              |
 | /getCollectionsByUser/:username | GET    | Retrieve all collections for a specific user based on their username |
 
+### `/features`
+
+| Endpoint     | Method | Description           |
+| ------------ | ------ | --------------------- |
+| /getFeatures | GET    | Gets all features     |
+
 ## Running Stryker Mutation Testing
 
 Mutation testing helps you measure the effectiveness of your tests by introducing small changes (mutations) to your code and checking if your tests catch them. To run mutation testing with Stryker, use the following command in `server/`:
