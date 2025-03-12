@@ -37,15 +37,6 @@
   border-radius: 5px;
 }
 
-.feature-card {
-  background: #f0f0f0;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  text-align: center;
-  transition: 0.3s;
-}
-
 .feature-footer {
   display: flex;
   align-items: center;
