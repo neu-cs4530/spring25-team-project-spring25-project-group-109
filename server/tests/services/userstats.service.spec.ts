@@ -1,6 +1,6 @@
 import UserStatsModel from '../../models/userstats.model';
 import { mockDBUserStats } from '../mockData.models';
-import getUserStats from '../../services/userstats.service';
+import { getUserStats } from '../../services/userstats.service';
 import { DatabaseUserStats } from '../../types/types';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
