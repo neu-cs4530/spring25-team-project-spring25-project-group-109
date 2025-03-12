@@ -4,11 +4,12 @@ import { Schema } from 'mongoose';
  * Mongoose schema for the Notification collection.
  *
  * This schema defines the structure for storing notifications in the database.
- * Each answer includes the following fields:
- * - `text`: The content of the answer.
- * - `ansBy`: The username of the user who provided the answer.
- * - `ansDateTime`: The date and time when the answer was given.
- * - `comments`: Comments that have been added to the answer by users.
+ * Each notification includes the following fields:
+ * - `username`: The username of the user who received the notification.
+ * - `text`: The notification text.
+ * - `seen`: Indicator if the notification has been seen or not.
+ * - `type`: The notification type.
+
  */
 const notificationSchema: Schema = new Schema({
   username: {

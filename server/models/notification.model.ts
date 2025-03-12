@@ -1,14 +1,13 @@
 import mongoose, { Model } from 'mongoose';
-import answerSchema from './schema/answer.schema';
 import { DatabaseNotification } from '../types/types';
 import notificationSchema from './schema/notification.schema';
 
 /**
- * Mongoose model for the `Answer` collection.
+ * Mongoose model for the `Notification` collection.
  *
- * This model is created using the `Answer` interface and the `answerSchema`, representing the
- * `Answer` collection in the MongoDB database, and provides an interface for interacting with
- * the stored answers.
+ * This model is created using the `Notification` interface and the `notificationrSchema`, representing the
+ * `Notification` collection in the MongoDB database, and provides an interface for interacting with
+ * the notifications answers.
  *
  * @type {Model<DatabaseAnswer>}
  */
