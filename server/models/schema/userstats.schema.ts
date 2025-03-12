@@ -5,7 +5,7 @@ import { Schema } from 'mongoose';
  *
  * This schema defines the structure for storing various user activity metrics
  * in the database. Each record includes the following fields:
- * - `userId`: Reference to the corresponding User document.
+ * - `username`: Reference to the corresponding User document.
  * - `questionsCount`: Number of questions posted by the user.
  * - `commentsCount`: Number of comments made by the user.
  * - `answersCount`: Number of answers provided by the user.
@@ -13,7 +13,7 @@ import { Schema } from 'mongoose';
  */
 const userStatsSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', unique: true, required: true, index: true }, // todo should this be username?
+    username: { type: String, unique: true, required: true, index: true }, // username
     questionsCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
     answersCount: { type: Number, default: 0 },

@@ -5,6 +5,9 @@ import useProfileSettings from '../../hooks/useProfileSettings';
 const ProfileSettings: React.FC = () => {
   const {
     userData,
+    profilePhoto,
+    availableAvatars,
+    editProfilePhotoMode,
     loading,
     editBioMode,
     newBio,
@@ -17,8 +20,10 @@ const ProfileSettings: React.FC = () => {
     canEditProfile,
     showPassword,
     togglePasswordVisibility,
+    allBadges,
 
     setEditBioMode,
+    setEditProfilePhotoMode,
     setNewBio,
     setNewPassword,
     setConfirmNewPassword,
@@ -27,6 +32,7 @@ const ProfileSettings: React.FC = () => {
     handleResetPassword,
     handleUpdateBiography,
     handleDeleteUser,
+    handleUpdateProfilePhoto,
   } = useProfileSettings();
 
   if (loading) {
@@ -47,6 +53,38 @@ const ProfileSettings: React.FC = () => {
         {errorMessage && <p className='error-message'>{errorMessage}</p>}
         {userData ? (
           <>
+            {/* ---- Profile Photo ---- */}
+            <div className='profile-photo-container'>
+              <img
+                src={profilePhoto || '/images/avatars/default-avatar.png'}
+                className='profile-photo'
+              />
+              {canEditProfile && (
+                <button className='edit-button' onClick={() => setEditProfilePhotoMode(true)}>
+                  {editProfilePhotoMode ? 'Cancel' : 'Edit'}
+                </button>
+              )}
+            </div>
+
+            {/* ---- Avatar Selection ---- */}
+            {editProfilePhotoMode && canEditProfile && (
+              <div className='avatar-selection'>
+                <div className='avatar-grid'>
+                  {availableAvatars.map(avatar => (
+                    <img
+                      key={avatar}
+                      src={avatar}
+                      className={`avatar-option ${profilePhoto === avatar ? 'selected' : ''}`}
+                      onClick={() => {
+                        handleUpdateProfilePhoto(avatar);
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ---- General Information ---- */}
             <h4>General Information</h4>
             <p>
               <strong>Username:</strong> {userData.username}
@@ -97,6 +135,21 @@ const ProfileSettings: React.FC = () => {
               <strong>Date Joined:</strong>{' '}
               {userData.dateJoined ? new Date(userData.dateJoined).toLocaleDateString() : 'N/A'}
             </p>
+
+            {/* ---- Badges Section ---- */}
+            <h4>Badges</h4>
+            <div className='badges-grid'>
+              {allBadges && allBadges.length > 0 ? (
+                allBadges.map(badge => (
+                  <div key={String(badge._id)} className='badge'>
+                    <img src={badge.imagePath} alt={badge.name} className='badge-image' />
+                    <div className='badge-description'>{badge.description}</div>
+                  </div>
+                ))
+              ) : (
+                <p>No badges available yet.</p>
+              )}
+            </div>
 
             {/* ---- Reset Password Section ---- */}
             {canEditProfile && (

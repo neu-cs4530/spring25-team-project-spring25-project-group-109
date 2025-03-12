@@ -26,6 +26,12 @@ const UserCardView = (props: UserProps) => {
   return (
     <div className='user right_padding' onClick={() => handleUserCardViewClickHandler(user)}>
       <div className='user_mid'>
+        {/* Displaying profile photo */}
+        <img
+          src={user.profilePhoto}
+          alt={`${user.username}'s profile`}
+          className='userProfilePhoto'
+        />
         <div className='userUsername'>{user.username}</div>
       </div>
       <div className='userStats'>

@@ -1,8 +1,12 @@
 import { ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
 import {
+  Badge,
   DatabaseAnswer,
+  DatabaseBadge,
   DatabaseComment,
   DatabaseQuestion,
+  DatabaseStore,
   DatabaseTag,
   PopulatedDatabaseQuestion,
   SafeDatabaseUser,
@@ -188,10 +192,43 @@ export const user: User = {
   username: 'user1',
   password: 'password',
   dateJoined: new Date('2024-12-03'),
+  badgesEarned: [],
 };
 
 export const safeUser: SafeDatabaseUser = {
   _id: new ObjectId(),
   username: 'user1',
   dateJoined: new Date('2024-12-03'),
+  badgesEarned: [],
+};
+
+export const badge: Badge = {
+  name: 'Inquisitive',
+  description: 'Asked 5 Questions',
+  type: 'question',
+  threshold: 5,
+  imagePath: 'imagePath',
+};
+
+export const dbBadge: DatabaseBadge = {
+  name: 'Inquisitive',
+  description: 'Asked 5 Questions',
+  type: 'question',
+  threshold: 5,
+  imagePath: 'imagePath',
+  _id: new ObjectId(),
+};
+
+export const mockDatabaseStore: DatabaseStore = {
+  _id: new mongoose.Types.ObjectId(),
+  username: 'user1',
+  coinCount: 0,
+  unlockedFeatures: [],
+};
+
+export const mockStoreJSONResponse = {
+  _id: mockDatabaseStore._id.toString(),
+  username: 'user1',
+  coinCount: 0,
+  unlockedFeatures: [],
 };

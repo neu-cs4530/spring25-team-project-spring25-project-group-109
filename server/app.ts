@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import { Server } from 'socket.io';
 import * as http from 'http';
+import path from 'path';
 
 import answerController from './controllers/answer.controller';
 import questionController from './controllers/question.controller';
@@ -18,6 +19,9 @@ import userController from './controllers/user.controller';
 import messageController from './controllers/message.controller';
 import chatController from './controllers/chat.controller';
 import gameController from './controllers/game.controller';
+import storeController from './controllers/store.controller';
+import badgeController from './controllers/badge.controller';
+import collectionController from './controllers/collection.controller';
 
 dotenv.config();
 
@@ -68,6 +72,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use('/images', express.static(path.join(__dirname, '../client/public/images')));
 
 app.get('/', (_: Request, res: Response) => {
   res.send('hello world');
@@ -82,6 +87,9 @@ app.use('/messaging', messageController(socket));
 app.use('/user', userController(socket));
 app.use('/chat', chatController(socket));
 app.use('/games', gameController(socket));
+app.use('/store', storeController());
+app.use('/badge', badgeController(socket));
+app.use('/collection', collectionController());
 
 // Export the app instance
 export { app, server, startServer };

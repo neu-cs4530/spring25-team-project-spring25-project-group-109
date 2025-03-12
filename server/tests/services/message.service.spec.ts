@@ -7,6 +7,10 @@ import { Message } from '../../types/types';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
 
+jest.mock('../../services/store.service', () => ({
+  updateCoins: jest.fn().mockResolvedValue({ coinCount: 100 }),
+}));
+
 const message1: Message = {
   msg: 'Hello',
   msgFrom: 'User1',
