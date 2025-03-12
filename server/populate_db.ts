@@ -48,6 +48,7 @@ if (!userArgs[0].startsWith('mongodb')) {
 }
 
 const mongoDB = userArgs[0];
+// const mongoDB = 'mongodb+srv://goldk:JNxme1fST4ICsoPq@db-cs4530-spring25-109.sn9ik.mongodb.net/?retryWrites=true&w=majority&appName=db-cs4530-spring25-109';
 mongoose.connect(mongoDB);
 const db = mongoose.connection;
 
@@ -170,6 +171,7 @@ async function userCreate(
   password: string,
   dateJoined: Date,
   biography?: string,
+  following?: string[],
 ): Promise<DatabaseUser> {
   if (username === '' || password === '' || dateJoined === null) {
     throw new Error('Invalid User Format');
@@ -180,6 +182,7 @@ async function userCreate(
     password,
     dateJoined,
     biography: biography ?? '',
+    following: following ?? [],
   };
 
   const user = await UserModel.create(userDetail);
@@ -207,6 +210,7 @@ const populate = async () => {
       'sama',
       new Date('2023-12-11T03:30:00'),
       'I am a student.',
+      ['nitsa', 'kyle', 'annabelle'],
     );
     await userCreate(
       'kyle',

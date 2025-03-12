@@ -26,6 +26,7 @@ const userSchema: Schema = new Schema(
       type: String,
       default: '',
     },
+    following: [{ type: String, required: true }], // the strings are usernames
   },
   { collection: 'User' },
 );
