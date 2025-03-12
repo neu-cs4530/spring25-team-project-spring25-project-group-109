@@ -3,6 +3,7 @@ import AnswerModel from './models/answers.model';
 import QuestionModel from './models/questions.model';
 import TagModel from './models/tags.model';
 import CollectionModel from './models/collections.model';
+import UserStatsModel from './models/userstats.model';
 import {
   Answer,
   Badge,
@@ -20,13 +21,18 @@ import {
   UserStats,
   BadgeType,
   EarnedBadge,
+  Store,
+  Feature,
+  DatabaseFeature,
+  FeatureType,
 } from './types/types';
 import * as strings from './data/posts_strings';
 import CommentModel from './models/comments.model';
 import UserModel from './models/users.model';
-import UserStatsModel from './models/userstats.model';
 import BadgeModel from './models/badge.model';
 import { checkAndAwardBadges } from './services/badge.service';
+import StoreModel from './models/store.model';
+import FeatureModel from './models/feature.model';
 
 // Pass URL of your mongoDB instance as first argument(e.g., mongodb://127.0.0.1:27017/fake_so)
 const userArgs = process.argv.slice(2);
@@ -181,6 +187,30 @@ async function questionCreate(
 }
 
 /**
+ * Creates a new Feature document in the database.
+ *
+ * @param name The name of the feature.
+ * @param description The description of the feature.
+ * @param price The price of the feature in coins.
+ * @param imagePath (optional) The image path associated with the feature (if applicable).
+ * @returns A Promise that resolves to the created Feature document.
+ */
+async function featureCreate(
+  name: FeatureType,
+  price: number,
+): Promise<DatabaseFeature> {
+  if (name === null || price <= 0) {
+    throw new Error('Invalid Feature Format');
+  }
+
+  const feature: Feature = {
+    name: name,
+    price: price,
+  };
+  return await FeatureModel.create(feature);
+}
+
+/**
  * Creates a new Badge document in the database.
  *
  * @param name The name of the badge.
@@ -230,13 +260,20 @@ async function userCreate(
 
   const userStats: UserStats = {
     username: user.username,
-    questionsCount: 0,
-    commentsCount: 0,
     answersCount: 0,
+    commentsCount: 0,
     nimWinCount: 0,
+    questionsCount: 0,
   };
-
   await UserStatsModel.create(userStats);
+
+  const userStore: Store = {
+    username: user.username,
+    coinCount: 0,
+    unlockedFeatures: []
+  };
+  await StoreModel.create(userStore);
+  
   return user;
 }
 
@@ -257,7 +294,10 @@ async function collectionCreate(
  */
 const populate = async () => {
   try {
-    const q1badge = await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
+    await featureCreate("Nim", 5);
+    await featureCreate("Custom Photo", 10);
+    
+    await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
     await badgeCreate(strings.BQ10_NAME, strings.BQ10_DESCRIPTION, 'question', 10, `/images/badges/question/10.png`);
     await badgeCreate(strings.BQ50_NAME, strings.BQ50_DESCRIPTION, 'question', 50, `/images/badges/question/50.png`);
     

@@ -5,7 +5,7 @@ import { Schema } from 'mongoose';
  *
  * This schema defines the structure for storing various user activity metrics
  * in the database. Each record includes the following fields:
- * - `username`: username to a user
+ * - `username`: Reference to the corresponding User document.
  * - `questionsCount`: Number of questions posted by the user.
  * - `commentsCount`: Number of comments made by the user.
  * - `answersCount`: Number of answers provided by the user.

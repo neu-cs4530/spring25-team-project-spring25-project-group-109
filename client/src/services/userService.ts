@@ -123,6 +123,24 @@ const updateBiography = async (
   return res.data;
 };
 
+/**
+ * Updates the user's profile picture.
+ * @param username - The username of the user whose profile picture is being updated
+ * @param newPhoto - The new profile photo URL
+ * @returns A promise resolving to the updated user
+ * @throws Error if the request fails
+ */
+const updateProfilePhoto = async (username: string, newPhoto: string) => {
+  const res = await api.patch(`${USER_API_URL}/updateProfilePhoto`, {
+    username,
+    profilePhoto: newPhoto,
+  });
+  if (res.status !== 200) {
+    throw new Error('Error when updating profile photo');
+  }
+  return res.data;
+};
+
 export {
   getUsers,
   getUserByUsername,
@@ -131,4 +149,5 @@ export {
   deleteUser,
   resetPassword,
   updateBiography,
+  updateProfilePhoto,
 };

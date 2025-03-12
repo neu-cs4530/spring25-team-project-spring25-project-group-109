@@ -17,6 +17,7 @@ import TagModel from '../models/tags.model';
 import CommentModel from '../models/comments.model';
 import { parseKeyword, parseTags } from '../utils/parse.util';
 import { checkTagInQuestion } from './tag.service';
+import { updateCoins } from './store.service';
 import {
   sortQuestionsByActive,
   sortQuestionsByMostViews,
@@ -164,6 +165,9 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
       { $inc: { questionsCount: 1 } },
       { new: true },
     );
+
+    await updateCoins(question.askedBy, 1);
+
     return result;
   } catch (error) {
     return { error: 'Error when saving a question' };

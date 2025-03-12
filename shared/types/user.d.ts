@@ -27,11 +27,13 @@ export interface EarnedBadge {
  * - `password`: The user's password.
  * - `dateJoined`: The date when the user registered.
  * - `biography`: A short description or bio of the user (optional).
+ * - `profilePhoto`: A path to the user's profile photo.
  */
 export interface User extends UserCredentials {
   dateJoined: Date;
   biography?: string;
-  badgesEarned: EarnedBadge[];
+  profilePhoto?: string;
+  badgesEarned: { badgeId: string; dateEarned: Date }[];
 }
 
 /**
@@ -51,12 +53,14 @@ export interface DatabaseUser extends User {
  * - `username`: The username submitted in the request (body).
  * - `password`: The password submitted in the request (body).
  * - `biography`: Optional field for biography information (body).
+ * - `profilePhoto`: Optional field for path to the user's profile photo (body).
  */
 export interface UserRequest extends Request {
   body: {
     username: string;
     password: string;
     biography?: string;
+    profilePhoto?: string;
   };
 }
 
@@ -98,5 +102,17 @@ export interface UpdateBiographyRequest extends Request {
   body: {
     username: string;
     biography: string;
+  };
+}
+
+/**
+ * Express request for updating a user's profile photo.
+ * - `username`: The username whose biography is being updated (body).
+ * - `biography`: The new profile URL to be set (body).
+ */
+export interface UpdateProfilePhotoRequest extends Request {
+  body: {
+    username: string;
+    profilePhoto: string;
   };
 }

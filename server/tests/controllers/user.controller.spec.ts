@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { app } from '../../app';
 import * as util from '../../services/user.service';
 import { DatabaseUserStats, SafeDatabaseUser, User } from '../../types/types';
+import { mockDatabaseStore, mockStoreJSONResponse } from '../mockData.models';
 
 const mockUser: User = {
   username: 'user1',
@@ -45,6 +46,7 @@ const mockUserJSONResponse = {
 
 const saveUserSpy = jest.spyOn(util, 'saveUser');
 const saveUserStatsSpy = jest.spyOn(util, 'saveUserStats');
+const saveUserStoreSpy = jest.spyOn(util, 'saveUserStore');
 const loginUserSpy = jest.spyOn(util, 'loginUser');
 const updatedUserSpy = jest.spyOn(util, 'updateUser');
 const getUserByUsernameSpy = jest.spyOn(util, 'getUserByUsername');
@@ -58,10 +60,12 @@ describe('Test userController', () => {
         username: mockUser.username,
         password: mockUser.password,
         biography: 'This is a test biography',
+        profilePhoto: '/images/avatars/default-avatar.png',
       };
 
       saveUserSpy.mockResolvedValueOnce({ ...mockSafeUser, biography: mockReqBody.biography });
       saveUserStatsSpy.mockResolvedValueOnce(mockUserStats);
+      saveUserStoreSpy.mockResolvedValueOnce(mockDatabaseStore);
 
       const response = await supertest(app).post('/user/signup').send(mockReqBody);
       expect(response.status).toBe(200);
@@ -69,14 +73,17 @@ describe('Test userController', () => {
       expect(response.body).toEqual({
         user: { ...mockUserJSONResponse, biography: mockReqBody.biography },
         userStats: mockUserStatsJSONResponse,
+        userStore: mockStoreJSONResponse,
       });
       expect(saveUserSpy).toHaveBeenCalledWith({
         ...mockReqBody,
         biography: mockReqBody.biography,
+        profilePhoto: mockReqBody.profilePhoto,
         dateJoined: expect.any(Date),
         badgesEarned: [],
       });
-      expect(saveUserStatsSpy).toHaveBeenCalledWith(mockSafeUser._id);
+      expect(saveUserStatsSpy).toHaveBeenCalledWith(mockSafeUser.username);
+      expect(saveUserStoreSpy).toHaveBeenCalledWith(mockSafeUser.username);
     });
 
     it('should return 400 for request missing username', async () => {
@@ -447,6 +454,78 @@ describe('Test userController', () => {
       expect(response.status).toBe(500);
       expect(response.text).toContain(
         'Error when updating user biography: Error: Error updating user',
+      );
+    });
+  });
+
+  describe('PATCH /updateProfilePhoto', () => {
+    it('should successfully update profilePhoto given correct arguments', async () => {
+      const mockReqBody = {
+        username: mockUser.username,
+        profilePhoto: '/images/avatars/avatar1.png',
+      };
+
+      // Mock a successful updateUser call
+      updatedUserSpy.mockResolvedValueOnce(mockSafeUser);
+
+      const response = await supertest(app).patch('/user/updateProfilePhoto').send(mockReqBody);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockUserJSONResponse);
+      // Ensure updateUser is called with the correct args
+      expect(updatedUserSpy).toHaveBeenCalledWith(mockUser.username, {
+        profilePhoto: '/images/avatars/avatar1.png',
+      });
+    });
+
+    it('should return 400 for request missing username', async () => {
+      const mockReqBody = {
+        profilePhoto: '/images/avatars/avatar1.png',
+      };
+
+      const response = await supertest(app).patch('/user/updateProfilePhoto').send(mockReqBody);
+
+      expect(response.status).toBe(400);
+      expect(response.text).toEqual('Invalid user body');
+    });
+
+    it('should return 400 for request with empty username', async () => {
+      const mockReqBody = {
+        username: '',
+        profilePhoto: '/images/avatars/avatar1.png',
+      };
+
+      const response = await supertest(app).patch('/user/updateProfilePhoto').send(mockReqBody);
+
+      expect(response.status).toBe(400);
+      expect(response.text).toEqual('Invalid user body');
+    });
+
+    it('should return 400 for request missing profile photo field', async () => {
+      const mockReqBody = {
+        username: mockUser.username,
+      };
+
+      const response = await supertest(app).patch('/user/updateProfilePhoto').send(mockReqBody);
+
+      expect(response.status).toBe(400);
+      expect(response.text).toEqual('Invalid user body');
+    });
+
+    it('should return 500 if updateUser returns an error', async () => {
+      const mockReqBody = {
+        username: mockUser.username,
+        profilePhoto: '/images/avatars/avatar1.png',
+      };
+
+      // Simulate a DB error
+      updatedUserSpy.mockResolvedValueOnce({ error: 'Error updating user' });
+
+      const response = await supertest(app).patch('/user/updateProfilePhoto').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toContain(
+        'Error when updating user profile photo: Error: Error updating user',
       );
     });
   });

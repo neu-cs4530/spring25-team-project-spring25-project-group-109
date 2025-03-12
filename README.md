@@ -60,15 +60,16 @@ A class diagram for the schema definition is shown below:
 
 ### `/user`
 
-| Endpoint         | Method | Description                    |
-| ---------------- | ------ | ------------------------------ |
-| /signup          | POST   | Create a new user account      |
-| /login           | POST   | Log in as a user               |
-| /resetPassword   | PATCH  | Reset user password            |
-| /getUser/        | GET    | Fetch user details by username |
-| /getUsers        | GET    | Fetch all users                |
-| /deleteUser/     | DELETE | Delete a user by username      |
-| /updateBiography | PATCH  | Update user biography          |
+| Endpoint            | Method | Description                    |
+| ------------------- | ------ | ------------------------------ |
+| /signup             | POST   | Create a new user account      |
+| /login              | POST   | Log in as a user               |
+| /resetPassword      | PATCH  | Reset user password            |
+| /getUser/           | GET    | Fetch user details by username |
+| /getUsers           | GET    | Fetch all users                |
+| /deleteUser/        | DELETE | Delete a user by username      |
+| /updateBiography    | PATCH  | Update user biography          |
+| /updateProfilePhoto | PATCH  | Update user profile photo      |
 
 ### `/chat`
 
@@ -88,6 +89,14 @@ A class diagram for the schema definition is shown below:
 | /join    | POST   | Join an existing game |
 | /leave   | POST   | Leave a game          |
 | /games   | GET    | Retrieve all games    |
+
+### `/store`
+
+| Endpoint                     | Method | Description                 |
+| ---------------------------- | ------ | --------------------------- |
+| /createStore                 | POST   | Create a store object       |
+| /getStoreByUser/:username    | GET    | Get a user's store data     |
+| /unlockFeature               | POST   | Unlock a feature with coins |
 
 ### `/badge`
 

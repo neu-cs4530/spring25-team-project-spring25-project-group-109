@@ -97,65 +97,62 @@
   background-color: #003f7f;
 }
 
-/* Destructive action button (Delete) */
-.delete-button {
-  background-color: #ff4c4c;
-  color: white;
-}
-
-.delete-button:hover {
-  background-color: #cc0000;
-}
-
-.delete-button:active {
-  background-color: #990000;
-}
-
-.profile-card .success-message {
-  color: #028002;
-  margin-top: 10px;
-}
-
-.profile-card .error-message {
-  color: #ff0000;
-  margin-top: 10px;
-}
-
-.toggle-password-button {
-  background-color: #ddd;
-  color: #333;
-  border: none;
-  padding: 5px 10px;
-  margin-top: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.toggle-password-button:hover {
-  background-color: #bbb;
-}
-
-.badges-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 20px;
-  padding: 10px 0;
-}
-
-.badge {
-  display: flex;
-  flex-direction: column;
-}
-
-.badge-image {
-  width: 90px;
-  height: 90px;
-  object-fit: cover;
-}
-
 .badge-description {
   margin-top: 5px;
   text-align: center;
   font-size: small;
+}
+
+.profile-photo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.edit-button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.edit-button:hover {
+  background-color: #0056b3;
+}
+
+.avatar-selection {
+  margin-top: 10px;
+}
+
+.avatar-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.avatar-option {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.avatar-option:hover {
+  transform: scale(1.1);
+}
+
+.avatar-option.selected {
+  border: 3px solid #007bff;
+  padding: 2px;
 }
