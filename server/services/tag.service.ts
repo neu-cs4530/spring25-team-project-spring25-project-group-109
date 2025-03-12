@@ -1,6 +1,10 @@
-import { DatabaseQuestion, DatabaseTag, Question, Tag } from '../types/types';
+import { DatabaseQuestion, DatabaseTag, Question, Tag, YouTubeVideo } from '../types/types';
 import QuestionModel from '../models/questions.model';
 import TagModel from '../models/tags.model';
+
+// Global constants for youtube videos - to be used below
+const YOUTUBE_API_KEY = 'AIzaSyC_6UhgEsCf-dYTplfBqUGUseLI7l3ooc0';
+const YOUTUBE_SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search';
 
 /**
  * Checks if given question contains any tags from the given list.
@@ -123,3 +127,78 @@ export const getTagCountMap = async (): Promise<Map<string, number> | null | { e
     return { error: 'Error when constructing tag map' };
   }
 };
+
+/**
+ * Retreives the list of tags from the last question asked by the given
+ *  user
+ * @param askedBy the user which asked the question
+ * @returns Promise<string[] | null>, where the string array is the array of tag names
+ */
+
+export async function getMostRecentQuestionTags(askedBy: string): Promise<string[] | null> {
+  try {
+    // Query the database for all questions asked by the user
+    const questions = await QuestionModel.find({ askedBy }).sort({ askDateTime: -1 }); // Sort by askDateTime descending (most recent first)
+
+    if (questions.length === 0) return null;
+
+    // Take the most recent question
+    const mostRecentQuestion = questions[0];
+
+    const mostRecentQTags = mostRecentQuestion.tags;
+    if (!mostRecentQTags) {
+      return null;
+    }
+
+    // Return the tag of the most recent question
+    const tags = await TagModel.find({ _id: { $in: mostRecentQTags } });
+    const tagNames = tags.map(tag => tag.name);
+    return tagNames;
+  } catch (error) {
+    console.error('Error fetching questions:', error);
+    return null;
+  }
+}
+
+/**
+ * Gets a list of youtube videos from the list of tags of the last question asked by the user
+ * @param askedBy
+ * @returns
+ */
+export async function fetchYoutubeVideos(askedBy: string): Promise<YouTubeVideo[]> {
+  try {
+    const tagNames = await getMostRecentQuestionTags(askedBy);
+    if (!tagNames || tagNames.length === 0) {
+      return []; // Return an empty array if no tags are found
+    }
+
+    const videoSet = new Map<string, YouTubeVideo>(); // To store unique videos
+
+    await Promise.all(
+      tagNames.map(async tag => {
+        const query = `intitle:${encodeURIComponent(tag)}`;
+        const response = await fetch(
+          `${YOUTUBE_SEARCH_URL}?part=snippet&q=${query}&key=${YOUTUBE_API_KEY}&maxResults=5`,
+        );
+        const data = await response.json();
+
+        (data.items || []).forEach((video: any) => {
+          const { videoId } = video.id;
+          if (!videoSet.has(videoId)) {
+            videoSet.set(videoId, {
+              title: video.snippet.title,
+              url: `https://www.youtube.com/watch?v=${videoId}`,
+              thumbnail: video.snippet.thumbnails.high.url,
+              channelTitle: video.snippet.channelTitle,
+            });
+          }
+        });
+      }),
+    );
+
+    return Array.from(videoSet.values()); // Return unique videos as an array
+  } catch (error) {
+    console.error('Error fetching YouTube videos:', error);
+    return [];
+  }
+}

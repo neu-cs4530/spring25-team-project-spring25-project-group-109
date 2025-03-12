@@ -18,6 +18,7 @@ import userController from './controllers/user.controller';
 import messageController from './controllers/message.controller';
 import chatController from './controllers/chat.controller';
 import gameController from './controllers/game.controller';
+import { getMostRecentQuestionTags } from './services/tag.service';
 
 dotenv.config();
 
@@ -36,8 +37,12 @@ function connectDatabase() {
 }
 
 function startServer() {
-  connectDatabase();
+  connectDatabase(); // note: comment out this line and uncomment other lines to retest tag fetching
   server.listen(port, () => {
+    // connectDatabase().then(()=> {
+      // console.log(getMostRecentQuestionTag('sama'))
+      // getMostRecentQuestionTags('sama').then((data)=> {console.log(data)})
+    // })
     console.log(`Server is running on port ${port}`);
   });
 }
