@@ -1,4 +1,3 @@
-import { text } from 'express';
 import { Schema } from 'mongoose';
 /**
  * Mongoose schema for the Notification collection.
@@ -14,15 +13,19 @@ import { Schema } from 'mongoose';
 const notificationSchema: Schema = new Schema({
   username: {
     type: String,
+    required: true,
   },
   text: {
     type: String,
+    required: true,
   },
   seen: {
     type: Boolean,
+    required: true,
   },
   type: {
     type: String,
+    required: true,
     enum: ['post', 'answer', 'follow', 'suggestion'],
   },
 });
