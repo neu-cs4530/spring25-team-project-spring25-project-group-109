@@ -100,10 +100,11 @@ A class diagram for the schema definition is shown below:
 
 ### `/badge`
 
-| Endpoint   | Method | Description           |
-| ---------- | ------ | --------------------- |
-| /addBadge  | POST   | Create a new badge    |
-| /getBadges | GET    | Gets all badges       |
+| Endpoint                | Method | Description                                  |
+| ----------------------- | ------ | -------------------------------------------- |
+| /addBadge               | POST   | Create a new badge                           |
+| /getBadges              | GET    | Gets all badges                              |
+| /updateBadges:/username | PATCH  | updated badges for user based on their stats |
 
 ### `/collection`
 
