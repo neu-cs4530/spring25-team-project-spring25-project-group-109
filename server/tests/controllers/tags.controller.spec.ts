@@ -1,9 +1,11 @@
 import supertest from 'supertest';
 import mongoose from 'mongoose';
+
 import { app } from '../../app';
-import * as tagUtil from '../../services/tag.service';
 import TagModel from '../../models/tags.model';
 import { DatabaseTag, Tag } from '../../types/types';
+
+import * as tagUtil from '../../services/tag.service';
 
 const getTagCountMapSpy: jest.SpyInstance = jest.spyOn(tagUtil, 'getTagCountMap');
 // Spy on the TagModel.findOne method
@@ -75,6 +77,86 @@ describe('Test tagController', () => {
       const response = await supertest(app).get('/tag/getTagsWithQuestionNumber');
 
       expect(response.status).toBe(500);
+    });
+  });
+});
+
+const getMostRecentQuestionTagsSpy = jest.spyOn(tagUtil, 'getMostRecentQuestionTags');
+const fetchYoutubeVideosSpy = jest.spyOn(tagUtil, 'fetchYoutubeVideos');
+
+describe('Test tagController', () => {
+  describe('GET /getMostRecentQuestionTags/:askedBy', () => {
+    it('should return tags when found', async () => {
+      const mockTags = ['tag1', 'tag2'];
+      getMostRecentQuestionTagsSpy.mockResolvedValueOnce(mockTags);
+
+      const response = await supertest(app).get('/tag/getMostRecentQuestionTags/user123');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockTags);
+    });
+
+    it('should return 404 if no tags are found', async () => {
+      getMostRecentQuestionTagsSpy.mockResolvedValueOnce(null);
+
+      const response = await supertest(app).get('/tag/getMostRecentQuestionTags/user123');
+
+      expect(response.status).toBe(404);
+      expect(response.text).toBe('No tags found for this user.');
+    });
+
+    it('should return 500 if an error occurs', async () => {
+      getMostRecentQuestionTagsSpy.mockRejectedValueOnce(new Error('Error fetching tags'));
+
+      const response = await supertest(app).get('/tag/getMostRecentQuestionTags/user123');
+
+      expect(response.status).toBe(500);
+      expect(response.text).toContain('Error fetching tags: Error fetching tags');
+    });
+  });
+
+  describe('GET /getYoutubeVideos/:askedBy', () => {
+    it('should return videos when found', async () => {
+      const mockVideos = [
+        {
+          title: 'Video1',
+          url: 'http://youtube.com/1',
+          thumbnail: 'http://youtube.com/thumbnail1.jpg',
+          channelTitle: 'Channel1',
+        },
+        {
+          title: 'Video2',
+          url: 'http://youtube.com/2',
+          thumbnail: 'http://youtube.com/thumbnail2.jpg',
+          channelTitle: 'Channel2',
+        },
+      ];
+      fetchYoutubeVideosSpy.mockResolvedValueOnce(mockVideos);
+
+      const response = await supertest(app).get('/tag/getYoutubeVideos/user123');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockVideos);
+    });
+
+    it('should return 404 if no videos are found', async () => {
+      fetchYoutubeVideosSpy.mockResolvedValueOnce([]);
+
+      const response = await supertest(app).get('/tag/getYoutubeVideos/user123');
+
+      expect(response.status).toBe(404);
+      expect(response.text).toBe('No YouTube videos found for these tags.');
+    });
+
+    it('should return 500 if an error occurs', async () => {
+      fetchYoutubeVideosSpy.mockRejectedValueOnce(new Error('Error fetching YouTube videos'));
+
+      const response = await supertest(app).get('/tag/getYoutubeVideos/user123');
+
+      expect(response.status).toBe(500);
+      expect(response.text).toContain(
+        'Error fetching YouTube videos: Error fetching YouTube videos',
+      );
     });
   });
 });

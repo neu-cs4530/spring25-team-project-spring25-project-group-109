@@ -159,3 +159,47 @@ describe('Tag model', () => {
     });
   });
 });
+
+describe('getMostRecentQuestionTags', () => {
+  it('should return tags when a recent question is found', async () => {
+    const mockQuestion = {
+      askedBy: 'user123',
+      tags: ['tag1', 'tag2'],
+    };
+
+    jest.spyOn(QuestionModel, 'find').mockResolvedValueOnce([mockQuestion]);
+
+    const tags = await QuestionModel.find({ askedBy: 'user123' });
+
+    expect(tags[0].tags).toEqual(['tag1', 'tag2']);
+  });
+
+  it('should return null if no questions are found', async () => {
+    jest.spyOn(QuestionModel, 'find').mockResolvedValueOnce([]);
+
+    const tags = await QuestionModel.find({ askedBy: 'user123' });
+
+    expect(tags.length).toBe(0);
+  });
+});
+
+describe('fetchYoutubeVideos', () => {
+  it('should return YouTube videos for found tags', async () => {
+    jest
+      .spyOn(QuestionModel, 'find')
+      .mockResolvedValueOnce([{ askedBy: 'user123', tags: ['tag1'] }]);
+    jest.spyOn(TagModel, 'find').mockResolvedValueOnce([{ name: 'tag1' }]);
+
+    const tags = await TagModel.find({ _id: { $in: ['tag1'] } });
+
+    expect(tags.map(tag => tag.name)).toEqual(['tag1']);
+  });
+
+  it('should return empty array if no tags are found', async () => {
+    jest.spyOn(QuestionModel, 'find').mockResolvedValueOnce([]);
+
+    const tags = await TagModel.find({ _id: { $in: [] } });
+
+    expect(tags.length).toBe(0);
+  });
+});

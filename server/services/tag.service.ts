@@ -182,17 +182,26 @@ export async function fetchYoutubeVideos(askedBy: string): Promise<YouTubeVideo[
         );
         const data = await response.json();
 
-        (data.items || []).forEach((video: any) => {
-          const { videoId } = video.id;
-          if (!videoSet.has(videoId)) {
-            videoSet.set(videoId, {
-              title: video.snippet.title,
-              url: `https://www.youtube.com/watch?v=${videoId}`,
-              thumbnail: video.snippet.thumbnails.high.url,
-              channelTitle: video.snippet.channelTitle,
-            });
-          }
-        });
+        (data.items || []).forEach(
+          (video: {
+            id: { videoId: string };
+            snippet: {
+              title: string;
+              thumbnails: { high: { url: string } };
+              channelTitle: string;
+            }; // this is taking all the fields from the api call and then assigning them to our custom YoutubeVideo type
+          }) => {
+            const { videoId } = video.id;
+            if (!videoSet.has(videoId)) {
+              videoSet.set(videoId, {
+                title: video.snippet.title,
+                url: `https://www.youtube.com/watch?v=${videoId}`,
+                thumbnail: video.snippet.thumbnails.high.url,
+                channelTitle: video.snippet.channelTitle,
+              });
+            }
+          },
+        );
       }),
     );
 
