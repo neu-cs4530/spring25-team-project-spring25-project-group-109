@@ -35,6 +35,8 @@ const ProfileSettings: React.FC = () => {
     handleUpdateProfilePhoto,
   } = useProfileSettings();
 
+  const numEarnedBadges = userData?.badgesEarned ? userData.badgesEarned.length : 0;
+
   if (loading) {
     return (
       <div className='page-container'>
@@ -138,7 +140,14 @@ const ProfileSettings: React.FC = () => {
 
             {/* ---- Badges Section ---- */}
             {/* Future work will render only earned badges in color. Can be accessed from useData.earnedBadges */}
-            <h4>Badges</h4>
+            <h4>
+              Badges
+              {canEditProfile && numEarnedBadges > 0 && (
+                <span className='badge-count'>
+                  You have earned {numEarnedBadges} badge{numEarnedBadges > 1 ? 's' : ''}!
+                </span>
+              )}
+            </h4>
             <div className='badges-grid'>
               {allBadges && allBadges.length > 0 ? (
                 allBadges.map(badge => (

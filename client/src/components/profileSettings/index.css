@@ -107,13 +107,14 @@
 .badge {
   display: flex;
   flex-direction: column;
+  opacity: 0.3;
 }
 
 .badge-image {
   width: 90px;
   height: 90px;
   object-fit: cover;
-  filter: grayscale(100%);
+  filter: grayscale();
 }
 
 .badge-description {
@@ -174,4 +175,15 @@
 .avatar-option.selected {
   border: 3px solid #007bff;
   padding: 2px;
+}
+
+.badge-count {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 5px 10px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  background-color: #28a745; 
+  border-radius: 15px;
 }
