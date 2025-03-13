@@ -135,19 +135,21 @@ export const getTagCountMap = async (): Promise<Map<string, number> | null | { e
  * @returns Promise<string[] | null>, where the string array is the array of tag names
  */
 
-export async function getMostRecentQuestionTags(askedBy: string): Promise<string[] | null> {
+export async function getMostRecentQuestionTags(
+  askedBy: string,
+): Promise<string[] | { error: string }> {
   try {
     // Query the database for all questions asked by the user
     const questions = await QuestionModel.find({ askedBy }).sort({ askDateTime: -1 }); // Sort by askDateTime descending (most recent first)
 
-    if (questions.length === 0) return null;
+    if (questions.length === 0) throw new Error('No questions found for the user');
 
     // Take the most recent question
     const mostRecentQuestion = questions[0];
 
     const mostRecentQTags = mostRecentQuestion.tags;
     if (!mostRecentQTags) {
-      return null;
+      throw Error("Most recent question doesn't have tags");
     }
 
     // Return the tag of the most recent question
@@ -155,8 +157,7 @@ export async function getMostRecentQuestionTags(askedBy: string): Promise<string
     const tagNames = tags.map(tag => tag.name);
     return tagNames;
   } catch (error) {
-    console.error('Error fetching questions:', error);
-    return null;
+    return { error: 'Error when fetching tags' };
   }
 }
 
@@ -165,10 +166,12 @@ export async function getMostRecentQuestionTags(askedBy: string): Promise<string
  * @param askedBy
  * @returns
  */
-export async function fetchYoutubeVideos(askedBy: string): Promise<YouTubeVideo[]> {
+export async function fetchYoutubeVideos(
+  askedBy: string,
+): Promise<YouTubeVideo[] | { error: string }> {
   try {
     const tagNames = await getMostRecentQuestionTags(askedBy);
-    if (!tagNames || tagNames.length === 0) {
+    if (!tagNames || 'error' in tagNames || tagNames.length === 0) {
       return []; // Return an empty array if no tags are found
     }
 
@@ -198,7 +201,6 @@ export async function fetchYoutubeVideos(askedBy: string): Promise<YouTubeVideo[
 
     return Array.from(videoSet.values()); // Return unique videos as an array
   } catch (error) {
-    console.error('Error fetching YouTube videos:', error);
-    return [];
+    return { error: 'Error fetching YouTube videos' };
   }
 }
