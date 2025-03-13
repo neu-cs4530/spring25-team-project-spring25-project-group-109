@@ -226,11 +226,15 @@ export const mockDatabaseNotification: DatabaseNotification = {
   text: 'notification1',
   seen: false,
   type: 'badge',
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 export const mockNotificationJSONResponse = {
   ...mockDatabaseNotification,
   _id: mockDatabaseNotification._id.toString(),
+  createdAt: mockDatabaseNotification.createdAt.toISOString(),
+  updatedAt: mockDatabaseNotification.updatedAt.toISOString(),
 };
 
 export const mockDatabaseStore: DatabaseStore = {
