@@ -12,7 +12,7 @@ export interface Notification {
   username: string;
   text: string;
   seen: boolean;
-  type: 'post' | 'answer' | 'follow' | 'suggestion';
+  type: 'badge' | 'answer' | 'follow' | 'comment';
 }
 
 /**

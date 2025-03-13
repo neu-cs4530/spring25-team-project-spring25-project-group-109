@@ -5,9 +5,19 @@ import {
   deleteUser,
   resetPassword,
   updateBiography,
+  updateProfilePhoto,
 } from '../services/userService';
-import { SafeDatabaseUser } from '../types/types';
+import { getBadges } from '../services/badgeService';
+import { DatabaseBadge, SafeDatabaseUser } from '../types/types';
 import useUserContext from './useUserContext';
+
+const AVAILABLE_AVATARS = [
+  '/images/avatars/default-avatar.png',
+  '/images/avatars/avatar1.png',
+  '/images/avatars/avatar2.png',
+  '/images/avatars/avatar3.png',
+  '/images/avatars/avatar4.png',
+];
 
 /**
  * A custom hook to encapsulate all logic/state for the ProfileSettings component.
@@ -26,11 +36,13 @@ const useProfileSettings = () => {
   const [newBio, setNewBio] = useState('');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [editProfilePhotoMode, setEditProfilePhotoMode] = useState(false);
+  const [profilePhoto, setProfilePhoto] = useState<string>('/images/avatars/default-avatar.png');
+  const [allBadges, setAllBadges] = useState<DatabaseBadge[] | null>(null);
 
   // For delete-user confirmation modal
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-
   const [showPassword, setShowPassword] = useState(false);
 
   const canEditProfile =
@@ -44,6 +56,7 @@ const useProfileSettings = () => {
         setLoading(true);
         const data = await getUserByUsername(username);
         setUserData(data);
+        setProfilePhoto(data.profilePhoto || '/images/avatars/default-avatar.png');
       } catch (error) {
         setErrorMessage('Error fetching user profile');
         setUserData(null);
@@ -52,7 +65,18 @@ const useProfileSettings = () => {
       }
     };
 
+    const fetchBadges = async () => {
+      try {
+        const badgesData = await getBadges();
+        setAllBadges(badgesData);
+      } catch (error) {
+        setErrorMessage('Error fetching badges');
+        setAllBadges(null);
+      }
+    };
+
     fetchUserData();
+    fetchBadges();
   }, [username]);
 
   /**
@@ -118,6 +142,24 @@ const useProfileSettings = () => {
     }
   };
 
+  const handleUpdateProfilePhoto = async (avatar: string) => {
+    if (!username || !avatar) return;
+    try {
+      const updatedUser = await updateProfilePhoto(username, avatar);
+      await new Promise(resolve => {
+        setUserData(updatedUser);
+        setProfilePhoto(avatar);
+        setEditProfilePhotoMode(false);
+        resolve(null);
+      });
+      setSuccessMessage('Profile photo updated!');
+      setErrorMessage(null);
+    } catch (error) {
+      setErrorMessage('Failed to update profile photo.');
+      setSuccessMessage(null);
+    }
+  };
+
   /**
    * Handler for deleting the user (triggers confirmation modal)
    */
@@ -141,12 +183,18 @@ const useProfileSettings = () => {
 
   return {
     userData,
+    profilePhoto,
+    handleUpdateProfilePhoto,
+    availableAvatars: AVAILABLE_AVATARS,
+    editProfilePhotoMode,
+    setEditProfilePhotoMode,
     newPassword,
     confirmNewPassword,
     setNewPassword,
     setConfirmNewPassword,
     loading,
     editBioMode,
+    allBadges,
     setEditBioMode,
     newBio,
     setNewBio,
