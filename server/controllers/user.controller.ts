@@ -6,6 +6,7 @@ import {
   UserByUsernameRequest,
   FakeSOSocket,
   UpdateBiographyRequest,
+  UpdateProfilePhotoRequest,
 } from '../types/types';
 import {
   deleteUserByUsername,
@@ -14,6 +15,7 @@ import {
   loginUser,
   saveUser,
   saveUserStats,
+  saveUserStore,
   updateUser,
 } from '../services/user.service';
 
@@ -44,6 +46,17 @@ const userController = (socket: FakeSOSocket) => {
     req.body.biography !== undefined;
 
   /**
+   * Validates that the request body contains all required fields to update a biography.
+   * @param req The incoming request containing user data.
+   * @returns `true` if the body contains valid user fields; otherwise, `false`.
+   */
+  const isUpdateProfilePhotoBodyValid = (req: UpdateProfilePhotoRequest): boolean =>
+    req.body !== undefined &&
+    req.body.username !== undefined &&
+    req.body.username.trim() !== '' &&
+    req.body.profilePhoto !== undefined;
+
+  /**
    * Handles the creation of a new user account.
    * @param req The request containing username, email, and password in the body.
    * @param res The response, either returning the created user or an error.
@@ -61,6 +74,8 @@ const userController = (socket: FakeSOSocket) => {
       ...requestUser,
       dateJoined: new Date(),
       biography: requestUser.biography ?? '',
+      profilePhoto: requestUser.profilePhoto ?? '/images/avatars/default-avatar.png',
+      badgesEarned: [],
     };
 
     try {
@@ -71,16 +86,22 @@ const userController = (socket: FakeSOSocket) => {
       }
 
       // Create corresponding user stats object
-      const statsResult = await saveUserStats(result._id);
+      const statsResult = await saveUserStats(result.username);
       if ('error' in statsResult) {
         throw new Error(statsResult.error);
+      }
+
+      // Create corresponding user store object
+      const storeResult = await saveUserStore(result.username);
+      if ('error' in storeResult) {
+        throw new Error(storeResult.error);
       }
 
       socket.emit('userUpdate', {
         user: result,
         type: 'created',
       });
-      res.status(200).json({ user: result, userStats: statsResult });
+      res.status(200).json({ user: result, userStats: statsResult, userStore: storeResult });
     } catch (error) {
       res.status(500).send(`Error when saving user: ${error}`);
     }
@@ -243,6 +264,44 @@ const userController = (socket: FakeSOSocket) => {
     }
   };
 
+  /**
+   * Updates a user's profile photo.
+   * @param req The request containing the username and profile photo URL in the body.
+   * @param res The response, either confirming the update or returning an error.
+   * @returns A promise resolving to void.
+   */
+  const updateProfilePhoto = async (
+    req: UpdateProfilePhotoRequest,
+    res: Response,
+  ): Promise<void> => {
+    try {
+      if (!isUpdateProfilePhotoBodyValid(req)) {
+        res.status(400).send('Invalid user body');
+        return;
+      }
+
+      // Validate that request has username and profile photo
+      const { username, profilePhoto } = req.body;
+
+      // Call the same updateUser(...) service used by resetPassword
+      const updatedUser = await updateUser(username, { profilePhoto });
+
+      if ('error' in updatedUser) {
+        throw new Error(updatedUser.error);
+      }
+
+      // Emit socket event for real-time updates
+      socket.emit('userUpdate', {
+        user: updatedUser,
+        type: 'updated',
+      });
+
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      res.status(500).send(`Error when updating user profile photo: ${error}`);
+    }
+  };
+
   // Define routes for the user-related operations.
   router.post('/signup', createUser);
   router.post('/login', userLogin);
@@ -251,6 +310,7 @@ const userController = (socket: FakeSOSocket) => {
   router.get('/getUsers', getUsers);
   router.delete('/deleteUser/:username', deleteUser);
   router.patch('/updateBiography', updateBiography);
+  router.patch('/updateProfilePhoto', updateProfilePhoto);
   return router;
 };
 

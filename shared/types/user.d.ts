@@ -18,11 +18,15 @@ export interface UserCredentials {
  * - `dateJoined`: The date when the user registered.
  * - `biography`: A short description or bio of th e user (optional).
  * - 'following': A string[] of who the user is following
+ * - `profilePhoto`: A path to the user's profile photo.
+ * - `badgesEarned`: An array of objects containing badgeId and dateEarned.
  */
 export interface User extends UserCredentials {
   dateJoined: Date;
   biography?: string;
   following?: string[]; // An array of usernames the user is following
+  profilePhoto?: string;
+  badgesEarned: { badgeId: string; dateEarned: Date }[];
 }
 
 /**
@@ -42,13 +46,15 @@ export interface DatabaseUser extends User {
  * Express request for user login, containing user credentials.
  * - `username`: The username submitted in the request (body).
  * - `password`: The password submitted in the request (body).
- * - `biography`: Optiona  l field for biography information (body).
+ * - `biography`: Optional field for biography information (body).
+ * - `profilePhoto`: Optional field for path to the user's profile photo (body).
  */
 export interface UserRequest extends Request {
   body: {
     username: string;
     password: string;
     biography?: string;
+    profilePhoto?: string;
   };
 }
 
@@ -111,3 +117,15 @@ export interface FollowUserRequest extends Request {
  * - `error`: An optional error message if the follow action fails.
  */
 export type FollowUserResponse = { success: boolean } | { error: string };
+
+/**
+ * Express request for updating a user's profile photo.
+ * - `username`: The username whose biography is being updated (body).
+ * - `biography`: The new profile URL to be set (body).
+ */
+export interface UpdateProfilePhotoRequest extends Request {
+  body: {
+    username: string;
+    profilePhoto: string;
+  };
+}

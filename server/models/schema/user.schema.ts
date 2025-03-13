@@ -27,6 +27,16 @@ const userSchema: Schema = new Schema(
       default: '',
     },
     following: [{ type: String, required: true }], // the strings are usernames
+    profilePhoto: {
+      type: String,
+      default: '/images/avatars/default-avatar.png',
+    },
+    badgesEarned: [
+      {
+        badgeId: { type: Schema.Types.ObjectId, ref: 'Badge', required: true },
+        dateEarned: { type: Date, required: true, default: Date.now },
+      },
+    ],
   },
   { collection: 'User' },
 );
