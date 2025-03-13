@@ -22,7 +22,7 @@ export const saveStore = async (store: Store): Promise<StoreResponse> => {
     const result = await StoreModel.create(store);
     return result;
   } catch (error) {
-    return { error: `${(error as Error).message}` };
+    return { error: `Error occurred when saving store (${(error as Error).message})` };
   }
 };
 
@@ -49,7 +49,7 @@ export const getStore = async (username: string): Promise<StoreResponse> => {
 
     return store;
   } catch (error) {
-    return { error: `${(error as Error).message}` };
+    return { error: `Error occurred when fetching store (${(error as Error).message})` };
   }
 };
 
@@ -80,7 +80,7 @@ export const updateCoins = async (username: string, amount: number): Promise<Sto
 
     return result;
   } catch (error) {
-    return { error: `${(error as Error).message}` };
+    return { error: `Error occurred when updating coins (${(error as Error).message})` };
   }
 };
 
@@ -130,7 +130,7 @@ export const unlockFeature = async (
     }
     return updatedStore; // Store with deducted coins and new unlocked features
   } catch (error) {
-    return { error: `${(error as Error).message}` };
+    return { error: `Error occurred when unlocking (${(error as Error).message})` };
   }
 };
 

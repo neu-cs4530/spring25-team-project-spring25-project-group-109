@@ -59,7 +59,7 @@ describe('Test Store Service', () => {
 
       const result = await saveStore(store);
       expect('error' in result).toBe(true);
-      expect(result).toEqual({ error: 'User does not exist' });
+      expect(result).toEqual({ error: 'Error occurred when saving store (User does not exist)' });
     });
 
     it('should return an error if the store creation fails', async () => {
@@ -68,7 +68,7 @@ describe('Test Store Service', () => {
 
       const result = await saveStore(store);
       expect('error' in result).toBe(true);
-      expect(result).toEqual({ error: 'DB Error' });
+      expect(result).toEqual({ error: 'Error occurred when saving store (DB Error)' });
     });
   });
 
@@ -134,7 +134,7 @@ describe('Test Store Service', () => {
 
       const result = await updateCoins(user.username, 10);
       expect('error' in result).toBeTruthy();
-      expect(result).toEqual({ error: 'User does not exist' });
+      expect(result).toEqual({ error: 'Error occurred when updating coins (User does not exist)' });
     });
 
     it('should throw an error if find one and update fails', async () => {
@@ -143,7 +143,9 @@ describe('Test Store Service', () => {
 
       const result = await updateCoins(user.username, 10);
       expect('error' in result).toBeTruthy();
-      expect(result).toEqual({ error: 'Failed to update coins' });
+      expect(result).toEqual({
+        error: 'Error occurred when updating coins (Failed to update coins)',
+      });
     });
   });
 
@@ -162,7 +164,7 @@ describe('Test Store Service', () => {
 
       const result = await getStore(user.username);
       expect('error' in result).toBeTruthy();
-      expect(result).toEqual({ error: 'User does not exist' });
+      expect(result).toEqual({ error: 'Error occurred when fetching store (User does not exist)' });
     });
 
     it('should throw an error if the Store data is not found', async () => {
@@ -172,7 +174,7 @@ describe('Test Store Service', () => {
       const result = await getStore(user.username);
       expect('error' in result).toBeTruthy();
       expect(result).toEqual({
-        error: 'Store not found for the provided user',
+        error: 'Error occurred when fetching store (Store not found for the provided user)',
       });
     });
   });
@@ -250,7 +252,7 @@ describe('Test Store Service', () => {
       const result = await unlockFeature(user.username, 'Nim');
       expect('error' in result).toBeTruthy();
       expect(result).toEqual({
-        error: 'User coin data not found',
+        error: 'Error occurred when unlocking (User coin data not found)',
       });
     });
 
@@ -271,7 +273,7 @@ describe('Test Store Service', () => {
       const result = await unlockFeature(user.username, 'Nim');
       expect('error' in result).toBeTruthy();
       expect(result).toEqual({
-        error: 'Nim is already unlocked',
+        error: 'Error occurred when unlocking (Nim is already unlocked)',
       });
     });
 
@@ -292,7 +294,7 @@ describe('Test Store Service', () => {
       const result = await unlockFeature(user.username, 'Nim');
       expect('error' in result).toBeTruthy();
       expect(result).toEqual({
-        error: 'Insufficient coins to unlock Nim',
+        error: 'Error occurred when unlocking (Insufficient coins to unlock Nim)',
       });
     });
 
@@ -314,7 +316,7 @@ describe('Test Store Service', () => {
       const result = await unlockFeature(user.username, 'Nim');
       expect('error' in result).toBeTruthy();
       expect(result).toEqual({
-        error: 'Failed to update coins',
+        error: 'Error occurred when unlocking (Failed to update coins)',
       });
     });
 
@@ -344,7 +346,7 @@ describe('Test Store Service', () => {
       const result = await unlockFeature(user.username, 'Nim');
       expect('error' in result).toBeTruthy();
       expect(result).toEqual({
-        error: 'Failed to update features for Nim',
+        error: 'Error occurred when unlocking (Failed to update features for Nim)',
       });
     });
 
@@ -361,12 +363,12 @@ describe('Test Store Service', () => {
       mockingoose(UserModel).toReturn(user, 'findOne');
       mockingoose(StoreModel).toReturn(savedStore, 'findOne');
       mockingoose(FeatureModel).toReturn(nimDBFeature, 'findOne');
-      (updateCoins as jest.Mock).mockRejectedValue(new Error('Failed to update coins.'));
+      (updateCoins as jest.Mock).mockRejectedValue(new Error('Failed to update coins'));
 
       const result = await unlockFeature(user.username, 'Nim');
       expect('error' in result).toBeTruthy();
       expect(result).toEqual({
-        error: 'Failed to update coins.',
+        error: 'Error occurred when unlocking (Failed to update coins)',
       });
     });
   });
