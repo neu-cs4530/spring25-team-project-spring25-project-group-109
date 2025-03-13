@@ -11,4 +11,5 @@ export * from './store';
 export * from './feature';
 export * from './collection';
 export * from './userstats';
+export * from './notification';
 export * from './badge';
