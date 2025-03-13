@@ -34,7 +34,9 @@ const storeController = () => {
 
     try {
       const savedStore = await saveStore({ username, coinCount, unlockedFeatures });
-
+      if ('error' in savedStore) {
+        throw new Error(savedStore.error);
+      }
       res.status(200).json(savedStore);
     } catch (err: unknown) {
       res.status(500).send(`Error saving store: ${(err as Error).message}`);
@@ -53,7 +55,9 @@ const storeController = () => {
 
     try {
       const store = await getStore(username);
-
+      if ('error' in store) {
+        throw new Error(store.error);
+      }
       res.status(200).json(store);
     } catch (err: unknown) {
       res.status(500).send(`Error fetching store: ${(err as Error).message}`);
@@ -77,7 +81,9 @@ const storeController = () => {
 
     try {
       const response = await unlockFeature(username, featureName);
-
+      if ('error' in response) {
+        throw new Error(response.error);
+      }
       res.status(200).json(response);
     } catch (err: unknown) {
       res.status(500).send(`Error unlocking feature: ${(err as Error).message}`);

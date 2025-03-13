@@ -53,6 +53,17 @@ describe('POST /createStore', () => {
     expect(response.status).toBe(500);
     expect(response.text).toEqual('Error saving store: Test error');
   });
+
+  it('should return 500 for a returned error', async () => {
+    saveStoreSpy.mockResolvedValueOnce({ error: 'Test error' });
+
+    const response = await supertest(app)
+      .post('/store/createStore')
+      .send(mockCreateStoreRequestBody);
+
+    expect(response.status).toBe(500);
+    expect(response.text).toEqual('Error saving store: Test error');
+  });
 });
 
 describe('GET /getStoreByUser', () => {
@@ -70,6 +81,17 @@ describe('GET /getStoreByUser', () => {
 
   it('should return 500 for an error', async () => {
     getStoreSpy.mockRejectedValueOnce(new Error('Test error'));
+
+    const response = await supertest(app).get(
+      `/store/getStoreByUser/${mockDatabaseStore.username}`,
+    );
+
+    expect(response.status).toBe(500);
+    expect(response.text).toEqual('Error fetching store: Test error');
+  });
+
+  it('should return 500 for a returned error', async () => {
+    getStoreSpy.mockResolvedValueOnce({ error: 'Test error' });
 
     const response = await supertest(app).get(
       `/store/getStoreByUser/${mockDatabaseStore.username}`,
@@ -121,6 +143,15 @@ describe('POST /unlockFeature', () => {
 
   it('should return 500 for an error', async () => {
     unlockFeatureSpy.mockRejectedValueOnce(new Error('Test error'));
+
+    const response = await supertest(app).patch('/store/unlockFeature').send(mockUnlockRequestBody);
+
+    expect(response.status).toBe(500);
+    expect(response.text).toEqual('Error unlocking feature: Test error');
+  });
+
+  it('should return 500 for a returned error', async () => {
+    unlockFeatureSpy.mockResolvedValueOnce({ error: 'Test error' });
 
     const response = await supertest(app).patch('/store/unlockFeature').send(mockUnlockRequestBody);
 
