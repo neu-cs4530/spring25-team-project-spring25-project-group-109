@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import StoreModel from '../../models/store.model';
 import UserModel from '../../models/users.model';
-import { saveStore, unlockFeature, updateCoins } from '../../services/store.service';
+import { getStore, saveStore, unlockFeature, updateCoins } from '../../services/store.service';
 import * as storeService from '../../services/store.service';
 import { Store, DatabaseStore, Feature, DatabaseFeature } from '../../types/types';
 import { user } from '../mockData.models';
@@ -57,16 +57,18 @@ describe('Test Store Service', () => {
     it('should throw an error if the user does not exist', async () => {
       mockingoose(UserModel).toReturn(null, 'findOne');
 
-      await expect(saveStore(store)).rejects.toThrow('User does not exist.');
+      const result = await saveStore(store);
+      expect('error' in result).toBe(true);
+      expect(result).toEqual({ error: 'Error creating user store: User does not exist' });
     });
 
-    it('should throw an error if the store creation fails', async () => {
+    it('should return an error if the store creation fails', async () => {
       mockingoose(UserModel).toReturn(user, 'findOne');
       mockingoose(StoreModel).toReturn(new Error('DB Error'), '$save');
 
-      await expect(saveStore(store)).rejects.toThrow(
-        'Error occurred when saving store: Error: DB Error',
-      );
+      const result = await saveStore(store);
+      expect('error' in result).toBe(true);
+      expect(result).toEqual({ error: 'Error creating user store: DB Error' });
     });
   });
 
@@ -130,14 +132,18 @@ describe('Test Store Service', () => {
     it('should throw an error if the user does not exist', async () => {
       mockingoose(UserModel).toReturn(null, 'findOne');
 
-      await expect(updateCoins(user.username, 10)).rejects.toThrow('User does not exist.');
+      const result = await updateCoins(user.username, 10);
+      expect('error' in result).toBeTruthy();
+      expect(result).toEqual({ error: 'Error updating coins: User does not exist' });
     });
 
     it('should throw an error if find one and update fails', async () => {
       mockingoose(UserModel).toReturn(user, 'findOne');
       mockingoose(StoreModel).toReturn(null, 'findOneAndUpdate');
 
-      await expect(updateCoins(user.username, 10)).rejects.toThrow('Failed to update coins.');
+      const result = await updateCoins(user.username, 10);
+      expect('error' in result).toBeTruthy();
+      expect(result).toEqual({ error: 'Error updating coins: Failed to update coins' });
     });
   });
 
@@ -154,16 +160,20 @@ describe('Test Store Service', () => {
     it('should throw an error if the user does not exist', async () => {
       mockingoose(UserModel).toReturn(null, 'findOne');
 
-      await expect(storeService.getStore(user.username)).rejects.toThrow('User does not exist.');
+      const result = await getStore(user.username);
+      expect('error' in result).toBeTruthy();
+      expect(result).toEqual({ error: 'Error fetching store: User does not exist' });
     });
 
     it('should throw an error if the Store data is not found', async () => {
       mockingoose(UserModel).toReturn(user, 'findOne');
       mockingoose(StoreModel).toReturn(null, 'findOne');
 
-      await expect(storeService.getStore(user.username)).rejects.toThrow(
-        'Error occurred when fetching store: Error: Store not found for the provided user',
-      );
+      const result = await getStore(user.username);
+      expect('error' in result).toBeTruthy();
+      expect(result).toEqual({
+        error: 'Error fetching store: Store not found for the provided user',
+      });
     });
   });
 
@@ -198,8 +208,7 @@ describe('Test Store Service', () => {
       mockingoose(FeatureModel).toReturn(nimDBFeature, 'findOne');
       (updateCoins as jest.Mock).mockResolvedValue(updatedStore);
 
-      const result = await unlockFeature(user.username, feature);
-
+      const result = (await unlockFeature(user.username, feature)) as DatabaseStore;
       expect(result.coinCount).toBe(initialCoinCount - cost);
       expect(updateCoinsSpy).toHaveBeenCalledWith(user.username, -cost);
     });
@@ -228,7 +237,7 @@ describe('Test Store Service', () => {
       mockingoose(FeatureModel).toReturn(profileDBFeature, 'findOne');
       (updateCoins as jest.Mock).mockResolvedValue(updatedStore);
 
-      const result = await unlockFeature(user.username, feature);
+      const result = (await unlockFeature(user.username, feature)) as DatabaseStore;
 
       expect(result.unlockedFeatures).toEqual(['Custom Photo']);
       expect(result.coinCount).toBe(initialCoinCount - cost);
@@ -238,14 +247,15 @@ describe('Test Store Service', () => {
       mockingoose(UserModel).toReturn(user, 'findOne');
       mockingoose(StoreModel).toReturn(null, 'findOne');
 
-      await expect(unlockFeature(user.username, 'Nim')).rejects.toThrow(
-        'Error occurred when unlocking: Error: User coin data not found.',
-      );
+      const result = await unlockFeature(user.username, 'Nim');
+      expect('error' in result).toBeTruthy();
+      expect(result).toEqual({
+        error: 'Error unlocking feature: User coin data not found',
+      });
     });
 
     it('should throw an error if the feature is already unlocked', async () => {
       const initialCoinCount = 15;
-      const feature = 'Nim';
 
       const savedStore: DatabaseStore = {
         _id: new ObjectId(),
@@ -258,14 +268,15 @@ describe('Test Store Service', () => {
       mockingoose(StoreModel).toReturn(savedStore, 'findOne');
       mockingoose(FeatureModel).toReturn(nimDBFeature, 'findOne');
 
-      await expect(unlockFeature(user.username, feature)).rejects.toThrow(
-        `${feature} is already unlocked.`,
-      );
+      const result = await unlockFeature(user.username, 'Nim');
+      expect('error' in result).toBeTruthy();
+      expect(result).toEqual({
+        error: 'Error unlocking feature: Nim is already unlocked',
+      });
     });
 
     it('should throw an error if the user does not have enough coins', async () => {
       const initialCoinCount = 5;
-      const feature = 'Nim';
 
       const savedStore: DatabaseStore = {
         _id: new ObjectId(),
@@ -278,14 +289,15 @@ describe('Test Store Service', () => {
       mockingoose(StoreModel).toReturn(savedStore, 'findOne');
       mockingoose(FeatureModel).toReturn(nimDBFeature, 'findOne');
 
-      await expect(unlockFeature(user.username, feature)).rejects.toThrow(
-        `Insufficient coins to unlock ${feature}.`,
-      );
+      const result = await unlockFeature(user.username, 'Nim');
+      expect('error' in result).toBeTruthy();
+      expect(result).toEqual({
+        error: 'Error unlocking feature: Insufficient coins to unlock Nim',
+      });
     });
 
-    it('should throw an error if the updateCoins function returns null', async () => {
+    it('should return an error if the updateCoins function returns error', async () => {
       const initialCoinCount = 15;
-      const feature = 'Nim';
 
       const savedStore: DatabaseStore = {
         _id: new ObjectId(),
@@ -297,16 +309,17 @@ describe('Test Store Service', () => {
       mockingoose(UserModel).toReturn(user, 'findOne');
       mockingoose(StoreModel).toReturn(savedStore, 'findOne');
       mockingoose(FeatureModel).toReturn(nimDBFeature, 'findOne');
-      (updateCoins as jest.Mock).mockResolvedValue(null);
+      (updateCoins as jest.Mock).mockResolvedValue({ error: 'Failed to update coins' });
 
-      await expect(unlockFeature(user.username, feature)).rejects.toThrow(
-        `Failed to unlock ${feature}.`,
-      );
+      const result = await unlockFeature(user.username, 'Nim');
+      expect('error' in result).toBeTruthy();
+      expect(result).toEqual({
+        error: 'Error unlocking feature: Failed to update coins',
+      });
     });
 
-    it('should throw an error if the function fails to update feature field', async () => {
+    it('should return an error if the function fails to update feature field', async () => {
       const initialCoinCount = 15;
-      const feature = 'Nim';
       const cost = 5;
 
       const savedStore: DatabaseStore = {
@@ -328,14 +341,15 @@ describe('Test Store Service', () => {
       mockingoose(StoreModel).toReturn(null, 'findOneAndUpdate');
       mockingoose(FeatureModel).toReturn(nimDBFeature, 'findOne');
 
-      await expect(unlockFeature(user.username, feature)).rejects.toThrow(
-        `Error occurred when unlocking: Error: Failed to update features for Nim.`,
-      );
+      const result = await unlockFeature(user.username, 'Nim');
+      expect('error' in result).toBeTruthy();
+      expect(result).toEqual({
+        error: 'Error unlocking feature: Failed to update features for Nim',
+      });
     });
 
     it('should throw an error if the updateCoins function fails', async () => {
       const initialCoinCount = 15;
-      const feature = 'Nim';
 
       const savedStore: DatabaseStore = {
         _id: new ObjectId(),
@@ -349,9 +363,11 @@ describe('Test Store Service', () => {
       mockingoose(FeatureModel).toReturn(nimDBFeature, 'findOne');
       (updateCoins as jest.Mock).mockRejectedValue(new Error('Failed to update coins.'));
 
-      await expect(unlockFeature(user.username, feature)).rejects.toThrow(
-        'Failed to update coins.',
-      );
+      const result = await unlockFeature(user.username, 'Nim');
+      expect('error' in result).toBeTruthy();
+      expect(result).toEqual({
+        error: 'Error unlocking feature: Failed to update coins.',
+      });
     });
   });
 });
