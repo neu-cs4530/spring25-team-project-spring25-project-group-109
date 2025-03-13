@@ -21,6 +21,11 @@ const ProfileSettings: React.FC = () => {
     showPassword,
     togglePasswordVisibility,
     allBadges,
+    isFollowing,
+    showFollowers,
+    setShowFollowers,
+    showFollowing,
+    setShowFollowing,
 
     setEditBioMode,
     setEditProfilePhotoMode,
@@ -33,6 +38,8 @@ const ProfileSettings: React.FC = () => {
     handleUpdateBiography,
     handleDeleteUser,
     handleUpdateProfilePhoto,
+    handleFollowUser,
+    handleUnfollowUser,
   } = useProfileSettings();
 
   if (loading) {
@@ -80,6 +87,67 @@ const ProfileSettings: React.FC = () => {
                       }}
                     />
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* ---- Follower/Following Section ---- */}
+
+            <div className='follow-stats-container'>
+              <div className='follow-stats'>
+                <span className='follow-count' onClick={() => setShowFollowers(true)}>
+                  <strong>{userData.followers.length}</strong> Followers
+                </span>
+                <span className='follow-count' onClick={() => setShowFollowing(true)}>
+                  <strong>{userData.following.length}</strong> Following
+                </span>
+              </div>
+
+              {!canEditProfile && (
+                <button
+                  className={isFollowing ? 'unfollow-button' : 'follow-button'}
+                  onClick={isFollowing ? handleUnfollowUser : handleFollowUser}>
+                  {isFollowing ? 'Unfollow' : 'Follow'}
+                </button>
+              )}
+            </div>
+
+            {showFollowers && (
+              <div className='modal'>
+                <div className='modal-content'>
+                  <h3>Followers</h3>
+                  {userData.followers.length > 0 ? (
+                    <ul>
+                      {userData.followers.map(follower => (
+                        <li key={follower}>{follower}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No followers yet.</p>
+                  )}
+                  <button className='close-button' onClick={() => setShowFollowers(false)}>
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {showFollowing && (
+              <div className='modal'>
+                <div className='modal-content'>
+                  <h3>Following</h3>
+                  {userData.following.length > 0 ? (
+                    <ul>
+                      {userData.following.map(following => (
+                        <li key={following}>{following}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>Not following anyone yet.</p>
+                  )}
+                  <button className='close-button' onClick={() => setShowFollowing(false)}>
+                    Close
+                  </button>
                 </div>
               </div>
             )}

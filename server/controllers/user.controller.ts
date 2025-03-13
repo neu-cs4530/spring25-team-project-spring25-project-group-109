@@ -7,6 +7,7 @@ import {
   FakeSOSocket,
   UpdateBiographyRequest,
   UpdateProfilePhotoRequest,
+  ToggleFollowRequest,
 } from '../types/types';
 import {
   deleteUserByUsername,
@@ -17,6 +18,8 @@ import {
   saveUserStats,
   saveUserStore,
   updateUser,
+  followUser,
+  unfollowUser,
 } from '../services/user.service';
 
 const userController = (socket: FakeSOSocket) => {
@@ -76,6 +79,8 @@ const userController = (socket: FakeSOSocket) => {
       biography: requestUser.biography ?? '',
       profilePhoto: requestUser.profilePhoto ?? '/images/avatars/default-avatar.png',
       badgesEarned: [],
+      followers: [],
+      following: [],
     };
 
     try {
@@ -302,6 +307,60 @@ const userController = (socket: FakeSOSocket) => {
     }
   };
 
+  /**
+   * Adds a user to another user's followers and vice versa for following.
+   * @param req The request containing the two usernames in the body.
+   * @param res The response, either confirming the update or returning an error.
+   * @returns A promise resolving to void.
+   */
+  const follow = async (req: ToggleFollowRequest, res: Response): Promise<void> => {
+    try {
+      const { follower, followee } = req.body;
+
+      if (!follower || !followee) {
+        res.status(400).send('Invalid body');
+        return;
+      }
+
+      const result = await followUser(follower, followee);
+
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
+
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).send(`Error when following: ${error}`);
+    }
+  };
+
+  /**
+   * Removes a user from another user's followers and vice versa for following.
+   * @param req The request containing the two usernames in the body.
+   * @param res The response, either confirming the update or returning an error.
+   * @returns A promise resolving to void.
+   */
+  const unfollow = async (req: ToggleFollowRequest, res: Response): Promise<void> => {
+    try {
+      const { follower, followee } = req.body;
+
+      if (!follower || !followee) {
+        res.status(400).send('Invalid body');
+        return;
+      }
+
+      const result = await unfollowUser(follower, followee);
+
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
+
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).send(`Error when unfollowing: ${error}`);
+    }
+  };
+
   // Define routes for the user-related operations.
   router.post('/signup', createUser);
   router.post('/login', userLogin);
@@ -311,6 +370,8 @@ const userController = (socket: FakeSOSocket) => {
   router.delete('/deleteUser/:username', deleteUser);
   router.patch('/updateBiography', updateBiography);
   router.patch('/updateProfilePhoto', updateProfilePhoto);
+  router.patch('/follow', follow);
+  router.patch('/unfollow', unfollow);
   return router;
 };
 
