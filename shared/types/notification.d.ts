@@ -24,6 +24,8 @@ export type NotificationType = 'badge' | 'answer' | 'follow' | 'comment';
  */
 export interface DatabaseNotification extends Notification {
   _id: ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 /**

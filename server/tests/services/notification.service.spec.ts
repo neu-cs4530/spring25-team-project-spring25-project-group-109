@@ -20,11 +20,7 @@ describe('NotificationService', () => {
 
       const result = (await getNotificationsByUsername('testUser')) as DatabaseNotification[];
       expect(result.length).toBe(1);
-      expect(result[0]._id).toEqual(mockDatabaseNotification._id);
-      expect(result[0].seen).toEqual(mockDatabaseNotification.seen);
-      expect(result[0].text).toEqual(mockDatabaseNotification.text);
-      expect(result[0].type).toEqual(mockDatabaseNotification.type);
-      expect(result[0].username).toEqual(mockDatabaseNotification.username);
+      expect(result[0]).toEqual(mockDatabaseNotification);
     });
     it('should return an error if user does not exist', async () => {
       mockingoose(UserModel).toReturn(null, 'findOne');
