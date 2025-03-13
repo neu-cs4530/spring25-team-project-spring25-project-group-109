@@ -12,8 +12,10 @@ export interface Notification {
   username: string;
   text: string;
   seen: boolean;
-  type: 'badge' | 'answer' | 'follow' | 'comment';
+  type: NotificationType;
 }
+
+export type NotificationType = 'badge' | 'answer' | 'follow' | 'comment';
 
 /**
  * Represents an notification stored in the database.
@@ -36,8 +38,20 @@ export interface AddNotificationRequest extends Request {
   };
 }
 
+export interface GetNotificationsForUserRequest extends Request {
+  params: {
+    username: string;
+  };
+}
+
 /**
  * Type representing possible responses for an Notification-related operation.
  * - Either a `DatabaseNotification` object or an error message.
  */
-export type NotifcationResponse = DatabaseNotification | { error: string };
+export type NotificationResponse = DatabaseNotification | { error: string };
+
+/**
+ * Type representing possible responses for a multiple-Notification-related operation.
+ * - Either a list of `DatabaseNotification` objects or an error message.
+ */
+export type NotificationsResponse = DatabaseNotification[] | { error: string };
