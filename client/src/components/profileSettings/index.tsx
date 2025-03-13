@@ -60,7 +60,15 @@ const ProfileSettings: React.FC = () => {
                 className='profile-photo'
               />
               {canEditProfile && (
-                <button className='edit-button' onClick={() => setEditProfilePhotoMode(true)}>
+                <button
+                  className='edit-button'
+                  onClick={() => {
+                    if (editProfilePhotoMode) {
+                      setEditProfilePhotoMode(false);
+                    } else {
+                      setEditProfilePhotoMode(true);
+                    }
+                  }}>
                   {editProfilePhotoMode ? 'Cancel' : 'Edit'}
                 </button>
               )}
