@@ -285,93 +285,21 @@ const populate = async () => {
     await featureCreate('Nim', 5);
     await featureCreate('Custom Photo', 10);
 
-    const q1badge = await badgeCreate(
-      strings.BQ1_NAME,
-      strings.BQ1_DESCRIPTION,
-      'question',
-      1,
-      `/images/badges/question/1.png`,
-    );
-    await badgeCreate(
-      strings.BQ10_NAME,
-      strings.BQ10_DESCRIPTION,
-      'question',
-      10,
-      `/images/badges/question/10.png`,
-    );
-    await badgeCreate(
-      strings.BQ50_NAME,
-      strings.BQ50_DESCRIPTION,
-      'question',
-      50,
-      `/images/badges/question/50.png`,
-    );
+    const q1badge = await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
+    await badgeCreate(strings.BQ10_NAME, strings.BQ10_DESCRIPTION, 'question', 10, `/images/badges/question/10.png`);
+    await badgeCreate(strings.BQ50_NAME, strings.BQ50_DESCRIPTION, 'question', 50, `/images/badges/question/50.png`);
 
-    await badgeCreate(
-      strings.BA1_NAME,
-      strings.BA1_DESCRIPTION,
-      'answer',
-      1,
-      `/images/badges/answer/1.png`,
-    );
-    await badgeCreate(
-      strings.BA10_NAME,
-      strings.BA10_DESCRIPTION,
-      'answer',
-      10,
-      `/images/badges/answer/10.png`,
-    );
-    await badgeCreate(
-      strings.BA50_NAME,
-      strings.BA50_DESCRIPTION,
-      'answer',
-      50,
-      `/images/badges/answer/50.png`,
-    );
+    await badgeCreate(strings.BA1_NAME, strings.BA1_DESCRIPTION, 'answer', 1, `/images/badges/answer/1.png`);
+    await badgeCreate(strings.BA10_NAME, strings.BA10_DESCRIPTION, 'answer', 10, `/images/badges/answer/10.png`);
+    await badgeCreate(strings.BA50_NAME, strings.BA50_DESCRIPTION, 'answer', 50, `/images/badges/answer/50.png`);
 
-    await badgeCreate(
-      strings.BC1_NAME,
-      strings.BC1_DESCRIPTION,
-      'comment',
-      1,
-      `/images/badges/comment/1.png`,
-    );
-    await badgeCreate(
-      strings.BC10_NAME,
-      strings.BC10_DESCRIPTION,
-      'comment',
-      10,
-      `/images/badges/comment/10.png`,
-    );
-    await badgeCreate(
-      strings.BC50_NAME,
-      strings.BC50_DESCRIPTION,
-      'comment',
-      50,
-      `/images/badges/comment/50.png`,
-    );
+    await badgeCreate(strings.BC1_NAME, strings.BC1_DESCRIPTION, 'comment', 1, `/images/badges/comment/1.png`);
+    await badgeCreate(strings.BC10_NAME, strings.BC10_DESCRIPTION, 'comment', 10, `/images/badges/comment/10.png`);
+    await badgeCreate(strings.BC50_NAME, strings.BC50_DESCRIPTION, 'comment', 50, `/images/badges/comment/50.png`);
 
-    await badgeCreate(
-      strings.BN1_NAME,
-      strings.BN1_DESCRIPTION,
-      'nim',
-      1,
-      `/images/badges/nim/1.png`,
-    );
-    await badgeCreate(
-      strings.BN5_NAME,
-      strings.BN5_DESCRIPTION,
-      'nim',
-      5,
-      `/images/badges/nim/5.png`,
-    );
-    await badgeCreate(
-      strings.BN10_NAME,
-      strings.BN10_DESCRIPTION,
-      'nim',
-      10,
-      `/images/badges/nim/10.png`,
-    );
+    await badgeCreate(strings.BN1_NAME, strings.BN1_DESCRIPTION, 'nim', 1, `/images/badges/nim/1.png`);
+    await badgeCreate(strings.BN5_NAME, strings.BN5_DESCRIPTION, 'nim', 5, `/images/badges/nim/5.png`);
+    await badgeCreate(strings.BN10_NAME, strings.BN10_DESCRIPTION, 'nim', 10, `/images/badges/nim/10.png`);
 
     await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.');
     await userCreate('kyle', 'kyle', new Date('2022-12-11T03:30:00'), 'I am a software engineer.');
