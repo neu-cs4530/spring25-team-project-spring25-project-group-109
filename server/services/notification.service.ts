@@ -13,7 +13,7 @@ const getNotificationsByUsername = async (username: string): Promise<Notificatio
     const notifications: DatabaseNotification[] = await NotificationModel.find({ username }).lean();
     return notifications || [];
   } catch (error) {
-    return { error: `Error retrieving notifications: ${error}` };
+    return { error: `${(error as Error).message}` };
   }
 };
 

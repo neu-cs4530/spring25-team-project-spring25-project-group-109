@@ -26,14 +26,14 @@ describe('NotificationService', () => {
       mockingoose(UserModel).toReturn(null, 'findOne');
       const result = await getNotificationsByUsername('testUser');
       expect(result).toEqual({
-        error: 'Error retrieving notifications: Error: User testUser does not exist',
+        error: 'User testUser does not exist',
       });
     });
     it('should return an error if user model throws error', async () => {
       mockingoose(UserModel).toReturn(new Error('User model error'), 'findOne');
       const result = await getNotificationsByUsername('testUser');
       expect(result).toEqual({
-        error: 'Error retrieving notifications: Error: User model error',
+        error: 'User model error',
       });
     });
     it('should return empty list if notifications return null', async () => {
@@ -47,7 +47,7 @@ describe('NotificationService', () => {
       mockingoose(NotificationModel).toReturn(new Error('Notification model error'), 'find');
       const result = await getNotificationsByUsername('testUser');
       expect(result).toEqual({
-        error: 'Error retrieving notifications: Error: Notification model error',
+        error: 'Notification model error',
       });
     });
   });
