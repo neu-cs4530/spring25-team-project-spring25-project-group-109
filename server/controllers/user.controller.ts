@@ -18,8 +18,6 @@ import {
   saveUserStats,
   saveUserStore,
   updateUser,
-  followUser,
-  unfollowUser,
 } from '../services/user.service';
 
 const userController = (socket: FakeSOSocket) => {
@@ -322,13 +320,40 @@ const userController = (socket: FakeSOSocket) => {
         return;
       }
 
-      const result = await followUser(follower, followee);
-
-      if ('error' in result) {
-        throw new Error(result.error);
+      if (follower === followee) {
+        res.status(400).send('Cannot follow yourself');
+        return;
       }
 
-      res.status(200).json(result);
+      const followerUser = await getUserByUsername(follower);
+
+      if ('error' in followerUser) {
+        throw new Error(followerUser.error);
+      }
+
+      const followeeUser = await getUserByUsername(followee);
+
+      if ('error' in followeeUser) {
+        throw new Error(followeeUser.error);
+      }
+
+      const result1 = await updateUser(follower, {
+        following: [...followerUser.following, followee],
+      });
+
+      if ('error' in result1) {
+        throw new Error(result1.error);
+      }
+
+      const result2 = await updateUser(followee, {
+        followers: [...followeeUser.followers, follower],
+      });
+
+      if ('error' in result2) {
+        throw new Error(result2.error);
+      }
+
+      res.status(200).json([result1, result2]);
     } catch (error) {
       res.status(500).send(`Error when following: ${error}`);
     }
@@ -349,13 +374,39 @@ const userController = (socket: FakeSOSocket) => {
         return;
       }
 
-      const result = await unfollowUser(follower, followee);
-
-      if ('error' in result) {
-        throw new Error(result.error);
+      if (follower === followee) {
+        res.status(400).send('Cannot unfollow yourself');
+        return;
       }
 
-      res.status(200).json(result);
+      const followerUser = await getUserByUsername(follower);
+      const followeeUser = await getUserByUsername(followee);
+
+      if ('error' in followerUser) {
+        throw new Error(followerUser.error);
+      }
+
+      if ('error' in followeeUser) {
+        throw new Error(followeeUser.error);
+      }
+
+      const result1 = await updateUser(follower, {
+        following: followerUser.following.filter(user => user !== followee),
+      });
+
+      if ('error' in result1) {
+        throw new Error(result1.error);
+      }
+
+      const result2 = await updateUser(followee, {
+        followers: followeeUser.followers.filter(user => user !== follower),
+      });
+
+      if ('error' in result2) {
+        throw new Error(result2.error);
+      }
+
+      res.status(200).json([result1, result2]);
     } catch (error) {
       res.status(500).send(`Error when unfollowing: ${error}`);
     }
