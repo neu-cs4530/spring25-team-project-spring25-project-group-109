@@ -59,7 +59,7 @@ describe('Test Store Service', () => {
 
       const result = await saveStore(store);
       expect('error' in result).toBe(true);
-      expect(result).toEqual({ error: 'Error creating user store: User does not exist' });
+      expect(result).toEqual({ error: 'User does not exist' });
     });
 
     it('should return an error if the store creation fails', async () => {
@@ -68,7 +68,7 @@ describe('Test Store Service', () => {
 
       const result = await saveStore(store);
       expect('error' in result).toBe(true);
-      expect(result).toEqual({ error: 'Error creating user store: DB Error' });
+      expect(result).toEqual({ error: 'DB Error' });
     });
   });
 
@@ -134,7 +134,7 @@ describe('Test Store Service', () => {
 
       const result = await updateCoins(user.username, 10);
       expect('error' in result).toBeTruthy();
-      expect(result).toEqual({ error: 'Error updating coins: User does not exist' });
+      expect(result).toEqual({ error: 'User does not exist' });
     });
 
     it('should throw an error if find one and update fails', async () => {
@@ -143,7 +143,7 @@ describe('Test Store Service', () => {
 
       const result = await updateCoins(user.username, 10);
       expect('error' in result).toBeTruthy();
-      expect(result).toEqual({ error: 'Error updating coins: Failed to update coins' });
+      expect(result).toEqual({ error: 'Failed to update coins' });
     });
   });
 
@@ -162,7 +162,7 @@ describe('Test Store Service', () => {
 
       const result = await getStore(user.username);
       expect('error' in result).toBeTruthy();
-      expect(result).toEqual({ error: 'Error fetching store: User does not exist' });
+      expect(result).toEqual({ error: 'User does not exist' });
     });
 
     it('should throw an error if the Store data is not found', async () => {
@@ -172,7 +172,7 @@ describe('Test Store Service', () => {
       const result = await getStore(user.username);
       expect('error' in result).toBeTruthy();
       expect(result).toEqual({
-        error: 'Error fetching store: Store not found for the provided user',
+        error: 'Store not found for the provided user',
       });
     });
   });
@@ -250,7 +250,7 @@ describe('Test Store Service', () => {
       const result = await unlockFeature(user.username, 'Nim');
       expect('error' in result).toBeTruthy();
       expect(result).toEqual({
-        error: 'Error unlocking feature: User coin data not found',
+        error: 'User coin data not found',
       });
     });
 
@@ -271,7 +271,7 @@ describe('Test Store Service', () => {
       const result = await unlockFeature(user.username, 'Nim');
       expect('error' in result).toBeTruthy();
       expect(result).toEqual({
-        error: 'Error unlocking feature: Nim is already unlocked',
+        error: 'Nim is already unlocked',
       });
     });
 
@@ -292,7 +292,7 @@ describe('Test Store Service', () => {
       const result = await unlockFeature(user.username, 'Nim');
       expect('error' in result).toBeTruthy();
       expect(result).toEqual({
-        error: 'Error unlocking feature: Insufficient coins to unlock Nim',
+        error: 'Insufficient coins to unlock Nim',
       });
     });
 
@@ -314,7 +314,7 @@ describe('Test Store Service', () => {
       const result = await unlockFeature(user.username, 'Nim');
       expect('error' in result).toBeTruthy();
       expect(result).toEqual({
-        error: 'Error unlocking feature: Failed to update coins',
+        error: 'Failed to update coins',
       });
     });
 
@@ -344,7 +344,7 @@ describe('Test Store Service', () => {
       const result = await unlockFeature(user.username, 'Nim');
       expect('error' in result).toBeTruthy();
       expect(result).toEqual({
-        error: 'Error unlocking feature: Failed to update features for Nim',
+        error: 'Failed to update features for Nim',
       });
     });
 
@@ -366,7 +366,7 @@ describe('Test Store Service', () => {
       const result = await unlockFeature(user.username, 'Nim');
       expect('error' in result).toBeTruthy();
       expect(result).toEqual({
-        error: 'Error unlocking feature: Failed to update coins.',
+        error: 'Failed to update coins.',
       });
     });
   });
