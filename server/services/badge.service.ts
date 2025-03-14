@@ -23,7 +23,7 @@ export const saveBadge = async (badge: Badge): Promise<BadgeResponse> => {
     }
     return result;
   } catch (error) {
-    return { error: `Error creating user badge: ${error}` };
+    return { error: `Error creating user badge (${(error as Error).message})` };
   }
 };
 

@@ -32,13 +32,12 @@ describe('User model', () => {
     });
 
     it('should throw an error if error when saving to database', async () => {
-      jest
-        .spyOn(BadgeModel, 'create')
-        .mockRejectedValueOnce(() => new Error('Error saving document'));
+      mockingoose(BadgeModel).toReturn(new Error('Error saving document'), '$save');
 
       const saveError = await saveBadge(badge);
 
       expect('error' in saveError).toBe(true);
+      expect(saveError).toEqual({ error: 'Error creating user badge (Error saving document)' });
     });
   });
 

@@ -6,6 +6,8 @@ import {
   resetPassword,
   updateBiography,
   updateProfilePhoto,
+  follow,
+  unfollow,
 } from '../services/userService';
 import { getBadges } from '../services/badgeService';
 import { DatabaseBadge, SafeDatabaseUser } from '../types/types';
@@ -39,6 +41,9 @@ const useProfileSettings = () => {
   const [editProfilePhotoMode, setEditProfilePhotoMode] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState<string>('/images/avatars/default-avatar.png');
   const [allBadges, setAllBadges] = useState<DatabaseBadge[] | null>(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [showFollowers, setShowFollowers] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
 
   // For delete-user confirmation modal
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -78,6 +83,12 @@ const useProfileSettings = () => {
     fetchUserData();
     fetchBadges();
   }, [username]);
+
+  useEffect(() => {
+    if (userData) {
+      setIsFollowing(userData.followers.includes(currentUser.username));
+    }
+  }, [userData, currentUser.username]);
 
   /**
    * Toggles the visibility of the password fields.
@@ -160,6 +171,42 @@ const useProfileSettings = () => {
     }
   };
 
+  const handleFollowUser = async () => {
+    if (!username || !currentUser.username) return;
+    try {
+      await follow(currentUser.username, username);
+      setIsFollowing(true);
+      setUserData(prevUserData => {
+        if (!prevUserData) return null;
+        return {
+          ...prevUserData,
+          followers: [...prevUserData.followers, currentUser.username],
+        };
+      });
+      setSuccessMessage('User followed!');
+    } catch (error) {
+      setErrorMessage('Failed to follow user.');
+    }
+  };
+
+  const handleUnfollowUser = async () => {
+    if (!username || !currentUser.username) return;
+    try {
+      await unfollow(currentUser.username, username);
+      setIsFollowing(false);
+      setUserData(prevUserData => {
+        if (!prevUserData) return null;
+        return {
+          ...prevUserData,
+          followers: prevUserData.followers.filter(follower => follower !== currentUser.username),
+        };
+      });
+      setSuccessMessage('User unfollowed!');
+    } catch (error) {
+      setErrorMessage('Failed to unfollow user.');
+    }
+  };
+
   /**
    * Handler for deleting the user (triggers confirmation modal)
    */
@@ -188,6 +235,11 @@ const useProfileSettings = () => {
     availableAvatars: AVAILABLE_AVATARS,
     editProfilePhotoMode,
     setEditProfilePhotoMode,
+    isFollowing,
+    showFollowers,
+    setShowFollowers,
+    showFollowing,
+    setShowFollowing,
     newPassword,
     confirmNewPassword,
     setNewPassword,
@@ -210,6 +262,8 @@ const useProfileSettings = () => {
     handleResetPassword,
     handleUpdateBiography,
     handleDeleteUser,
+    handleFollowUser,
+    handleUnfollowUser,
   };
 };
 
