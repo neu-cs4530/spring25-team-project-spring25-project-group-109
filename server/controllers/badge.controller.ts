@@ -1,8 +1,8 @@
 import express, { Request, Response, Router } from 'express';
 import { getBadgesList, saveBadge } from '../services/badge.service';
-import { BadgeRequest, FakeSOSocket } from '../types/types';
+import { BadgeRequest } from '../types/types';
 
-const badgeController = (socket: FakeSOSocket) => {
+const badgeController = () => {
   const router: Router = express.Router();
 
   /**

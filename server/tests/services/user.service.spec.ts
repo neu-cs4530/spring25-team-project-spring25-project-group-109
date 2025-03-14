@@ -196,6 +196,8 @@ describe('updateUser', () => {
     username: user.username,
     dateJoined: user.dateJoined,
     badgesEarned: [],
+    followers: [],
+    following: [],
   };
 
   const updates: Partial<User> = {
@@ -258,6 +260,34 @@ describe('updateUser', () => {
     const newBio = 'No user found test';
     const biographyUpdates: Partial<User> = { biography: newBio };
     const updatedError = await updateUser(user.username, biographyUpdates);
+
+    expect('error' in updatedError).toBe(true);
+  });
+
+  it('should update the profile photo if the user is found', async () => {
+    const newPhoto = '/images/avatars/avatar1.png';
+    const profilePhotoUpdate: Partial<User> = { profilePhoto: newPhoto };
+
+    mockingoose(UserModel).toReturn(
+      { ...safeUpdatedUser, profilePhoto: newPhoto },
+      'findOneAndUpdate',
+    );
+
+    const result = await updateUser(user.username, profilePhotoUpdate);
+
+    if ('username' in result) {
+      expect(result.profilePhoto).toEqual(newPhoto);
+    } else {
+      throw new Error('Expected a safe user, got an error object.');
+    }
+  });
+
+  it('should return an error if profile photo update fails because user not found', async () => {
+    mockingoose(UserModel).toReturn(null, 'findOneAndUpdate');
+
+    const newPhoto = '/images/avatars/avatar1.png';
+    const profilePhotoUpdate: Partial<User> = { profilePhoto: newPhoto };
+    const updatedError = await updateUser(user.username, profilePhotoUpdate);
 
     expect('error' in updatedError).toBe(true);
   });

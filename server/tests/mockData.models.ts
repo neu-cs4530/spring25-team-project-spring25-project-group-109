@@ -6,6 +6,7 @@ import {
   DatabaseBadge,
   DatabaseComment,
   DatabaseFeature,
+  DatabaseNotification,
   DatabaseQuestion,
   DatabaseStore,
   DatabaseTag,
@@ -194,6 +195,8 @@ export const user: User = {
   password: 'password',
   dateJoined: new Date('2024-12-03'),
   badgesEarned: [],
+  followers: [],
+  following: [],
 };
 
 export const safeUser: SafeDatabaseUser = {
@@ -201,6 +204,8 @@ export const safeUser: SafeDatabaseUser = {
   username: 'user1',
   dateJoined: new Date('2024-12-03'),
   badgesEarned: [],
+  followers: [],
+  following: [],
 };
 
 export const badge: Badge = {
@@ -218,6 +223,23 @@ export const dbBadge: DatabaseBadge = {
   threshold: 5,
   imagePath: 'imagePath',
   _id: new ObjectId(),
+};
+
+export const mockDatabaseNotification: DatabaseNotification = {
+  _id: new ObjectId(),
+  username: 'user1',
+  text: 'notification1',
+  seen: false,
+  type: 'badge',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+export const mockNotificationJSONResponse = {
+  ...mockDatabaseNotification,
+  _id: mockDatabaseNotification._id.toString(),
+  createdAt: mockDatabaseNotification.createdAt.toISOString(),
+  updatedAt: mockDatabaseNotification.updatedAt.toISOString(),
 };
 
 export const mockDatabaseStore: DatabaseStore = {
