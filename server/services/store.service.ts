@@ -1,7 +1,7 @@
 import FeatureModel from '../models/feature.model';
 import StoreModel from '../models/store.model';
 import UserModel from '../models/users.model';
-import { Store, StoreResponse } from '../types/types';
+import { FeatureType, Store, StoreResponse } from '../types/types';
 
 /**
  * Save a new store to the database.
@@ -96,7 +96,7 @@ export const updateCoins = async (username: string, amount: number): Promise<Sto
 // removes coins from store and adds to unlocked feature
 export const unlockFeature = async (
   username: string,
-  featureName: 'Nim' | 'Custom Photo',
+  featureName: FeatureType,
 ): Promise<StoreResponse> => {
   try {
     const userStore = await StoreModel.findOne({ username });
