@@ -194,6 +194,8 @@ export const user: User = {
   password: 'password',
   dateJoined: new Date('2024-12-03'),
   badgesEarned: [],
+  followers: [],
+  following: [],
 };
 
 export const safeUser: SafeDatabaseUser = {
@@ -201,6 +203,8 @@ export const safeUser: SafeDatabaseUser = {
   username: 'user1',
   dateJoined: new Date('2024-12-03'),
   badgesEarned: [],
+  followers: [],
+  following: [],
 };
 
 export const badge: Badge = {

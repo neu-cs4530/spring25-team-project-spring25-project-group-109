@@ -225,6 +225,8 @@ async function userCreate(
     dateJoined,
     biography: biography ?? '',
     badgesEarned: [],
+    followers: [],
+    following: [],
   };
 
   const user = await UserModel.create(userDetail);
