@@ -23,10 +23,6 @@ export const saveUser = async (user: User): Promise<UserResponse> => {
   try {
     const result: DatabaseUser = await UserModel.create(user);
 
-    if (!result) {
-      throw Error('Failed to create user');
-    }
-
     // Remove password field from returned object
     const safeUser: SafeDatabaseUser = {
       _id: result._id,
@@ -62,9 +58,6 @@ export const saveUserStats = async (
       answersCount: 0,
       nimWinCount: 0,
     });
-    if (!result) {
-      throw Error('Failed to create user');
-    }
     return result;
   } catch (error) {
     return { error: `Error creating user stats: ${error}` };
@@ -86,9 +79,6 @@ export const saveUserStore = async (
       coinCount: 0,
       unlockedFeatures: [],
     });
-    if (!result) {
-      throw Error('Failed to create user store');
-    }
     return result;
   } catch (error) {
     return { error: `Error creating user store: ${error}` };

@@ -316,6 +316,24 @@ describe('Question model', () => {
       expect(result.views).toEqual([]);
       expect(result.answers.length).toEqual(0);
     });
+    it('should return error if there is an issue with saving the question', async () => {
+      mockingoose(QuestionModel).toReturn(new Error('Database error'), '$save');
+
+      const result = await saveQuestion({
+        title: 'New Question Title',
+        text: 'New Question Text',
+        tags: [tag1, tag2],
+        askedBy: 'question3_user',
+        askDateTime: new Date('2024-06-06'),
+        answers: [],
+        views: [],
+        upVotes: [],
+        downVotes: [],
+        comments: [],
+      });
+
+      expect(result).toEqual({ error: 'Error when saving question' });
+    });
   });
 
   describe('addVoteToQuestion', () => {

@@ -17,10 +17,6 @@ import { awardBadgeToUser } from './user.service';
 export const saveBadge = async (badge: Badge): Promise<BadgeResponse> => {
   try {
     const result: DatabaseBadge = await BadgeModel.create(badge);
-
-    if (!result) {
-      throw Error('Failed to create user badge');
-    }
     return result;
   } catch (error) {
     return { error: `Error creating user badge (${(error as Error).message})` };
