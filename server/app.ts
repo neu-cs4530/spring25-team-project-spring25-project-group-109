@@ -89,7 +89,7 @@ app.use('/chat', chatController(socket));
 app.use('/games', gameController(socket));
 app.use('/store', storeController());
 app.use('/badge', badgeController(socket));
-app.use('/collection', collectionController());
+app.use('/collection', collectionController(socket));
 
 // Export the app instance
 export { app, server, startServer };
