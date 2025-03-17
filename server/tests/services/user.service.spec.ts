@@ -1,6 +1,8 @@
+import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 import UserModel from '../../models/users.model';
 import {
+  awardBadgeToUser,
   deleteUserByUsername,
   getUserByUsername,
   getUsersList,
@@ -290,5 +292,31 @@ describe('updateUser', () => {
     const updatedError = await updateUser(user.username, profilePhotoUpdate);
 
     expect('error' in updatedError).toBe(true);
+  });
+});
+
+describe('awardBadgeToUser', () => {
+  it('should succesfully award badge', async () => {
+    mockingoose(UserModel).toReturn(user, 'findOneAndUpdate');
+
+    const badgeId = new ObjectId();
+    const result = (await awardBadgeToUser(user.username, [badgeId])) as SafeDatabaseUser;
+    expect(result.badgesEarned.some(badge => badge.badgeId === badgeId.toString()));
+    expect(result.username).toEqual(user.username);
+    expect(result.dateJoined).toEqual(user.dateJoined);
+  });
+
+  it('should return error if UserModel fails', async () => {
+    mockingoose(UserModel).toReturn(new Error('Error updating object'), 'findOneAndUpdate');
+
+    const result = await awardBadgeToUser(user.username, [new ObjectId()]);
+    expect('error' in result).toBe(true);
+  });
+
+  it('should return error if UserModel returns null', async () => {
+    mockingoose(UserModel).toReturn(null, 'findOneAndUpdate');
+
+    const result = await awardBadgeToUser(user.username, [new ObjectId()]);
+    expect('error' in result).toBe(true);
   });
 });

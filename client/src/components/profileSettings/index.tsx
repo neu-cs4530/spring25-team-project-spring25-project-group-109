@@ -42,6 +42,8 @@ const ProfileSettings: React.FC = () => {
     handleUnfollowUser,
   } = useProfileSettings();
 
+  const numEarnedBadges = userData?.badgesEarned ? userData.badgesEarned.length : 0;
+
   if (loading) {
     return (
       <div className='page-container'>
@@ -213,12 +215,20 @@ const ProfileSettings: React.FC = () => {
             </p>
 
             {/* ---- Badges Section ---- */}
-            <h4>Badges</h4>
+            {/* Future work will render only earned badges in color. Can be accessed from useData.earnedBadges */}
+            <h4>
+              Badges
+              {canEditProfile && numEarnedBadges > 0 && (
+                <span className='badge-count'>
+                  You have earned {numEarnedBadges} badge{numEarnedBadges > 1 ? 's' : ''}!
+                </span>
+              )}
+            </h4>
             <div className='badges-grid'>
               {allBadges && allBadges.length > 0 ? (
                 allBadges.map(badge => (
                   <div key={String(badge._id)} className='badge'>
-                    <img src={badge.imagePath} alt={badge.name} className='badge-image' />
+                    <img src={badge.imagePath} alt={badge.name} className={`badge-image`} />
                     <div className='badge-description'>{badge.description}</div>
                   </div>
                 ))

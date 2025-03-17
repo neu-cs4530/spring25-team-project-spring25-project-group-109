@@ -10,6 +10,7 @@ import {
 import useUserContext from './useUserContext';
 import addComment from '../services/commentService';
 import { getQuestionById } from '../services/questionService';
+import { updateBadges } from '../services/badgeService';
 
 /**
  * Custom hook for managing the answer page's state, navigation, and real-time updates.
@@ -61,6 +62,7 @@ const useAnswerPage = () => {
       }
 
       await addComment(targetId, targetType, comment);
+      await updateBadges(user.username);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error adding comment:', error);
