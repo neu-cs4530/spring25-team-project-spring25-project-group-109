@@ -44,7 +44,6 @@ if (!userArgs[0].startsWith('mongodb')) {
 }
 
 const mongoDB = userArgs[0];
-// const mongoDB = 'mongodb+srv://goldk:JNxme1fST4ICsoPq@db-cs4530-spring25-109.sn9ik.mongodb.net/?retryWrites=true&w=majority&appName=db-cs4530-spring25-109';
 mongoose.connect(mongoDB);
 const db = mongoose.connection;
 
@@ -226,10 +225,9 @@ async function userCreate(
     password,
     dateJoined,
     biography: biography ?? '',
-    following: following ?? [],
     badgesEarned: [],
     followers: [],
-    following: [],
+    following: following ?? [],
   };
 
   const user = await UserModel.create(userDetail);
