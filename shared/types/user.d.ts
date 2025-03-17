@@ -26,7 +26,6 @@ export interface UserCredentials {
 export interface User extends UserCredentials {
   dateJoined: Date;
   biography?: string;
-  following?: string[]; // An array of usernames the user is following
   profilePhoto?: string;
   badgesEarned: { badgeId: string; dateEarned: Date }[];
   followers: string[];
