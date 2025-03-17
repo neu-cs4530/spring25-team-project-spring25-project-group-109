@@ -129,3 +129,9 @@ export interface UpdateProfilePhotoRequest extends Request {
     profilePhoto: string;
   };
 }
+
+export interface RankedUser extends SafeDatabaseUser {
+  count: number; // counting the number of answers by the user
+}
+
+export type RankedUsersResponse = RankedUser[] | { error: string };

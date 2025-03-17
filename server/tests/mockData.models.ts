@@ -71,6 +71,30 @@ export const ans4: DatabaseAnswer = {
   comments: [],
 };
 
+export const ans5: DatabaseAnswer = {
+  _id: new ObjectId('65e9b58910afe6e94fc6e6ab'),
+  text: 'ans5',
+  ansBy: 'user1',
+  ansDateTime: new Date('2023-11-19T09:24:00'),
+  comments: [],
+};
+
+export const ans6: DatabaseAnswer = {
+  _id: new ObjectId('65e9b58910afe6e94fc6e6bc'),
+  text: 'ans6',
+  ansBy: 'user2',
+  ansDateTime: new Date('2023-11-19T09:24:00'),
+  comments: [],
+};
+
+export const ans7: DatabaseAnswer = {
+  _id: new ObjectId('65e9b58910afe6e94fc6e6bc'),
+  text: 'ans7',
+  ansBy: 'user2',
+  ansDateTime: new Date('2023-11-19T09:24:00'),
+  comments: [],
+};
+
 export const QUESTIONS: DatabaseQuestion[] = [
   {
     _id: new ObjectId('65e9b58910afe6e94fc6e6dc'),
@@ -198,6 +222,13 @@ export const user: User = {
 export const safeUser: SafeDatabaseUser = {
   _id: new ObjectId(),
   username: 'user1',
+  dateJoined: new Date('2024-12-03'),
+  badgesEarned: [],
+};
+
+export const safeUserTwo: SafeDatabaseUser = {
+  _id: new ObjectId(),
+  username: 'user2',
   dateJoined: new Date('2024-12-03'),
   badgesEarned: [],
 };

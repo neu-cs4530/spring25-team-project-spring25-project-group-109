@@ -7,9 +7,11 @@ import {
   loginUser,
   saveUser,
   updateUser,
+  getRankedUsersList,
 } from '../../services/user.service';
-import { SafeDatabaseUser, User, UserCredentials } from '../../types/types';
-import { user, safeUser } from '../mockData.models';
+import { RankedUser, SafeDatabaseUser, User, UserCredentials } from '../../types/types';
+import { user, safeUser, safeUserTwo, ans5, ans6, ans7 } from '../mockData.models';
+import AnswerModel from '../../models/answers.model';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
@@ -260,5 +262,42 @@ describe('updateUser', () => {
     const updatedError = await updateUser(user.username, biographyUpdates);
 
     expect('error' in updatedError).toBe(true);
+  });
+});
+
+describe('getRankedUsersList', () => {
+  beforeEach(() => {
+    mockingoose.resetAll();
+  });
+
+  it('should return the users', async () => {
+    const usersArray = [safeUser, safeUserTwo];
+    const answerArray = [
+      { _id: safeUserTwo.username, count: 2, user_info: { ...safeUserTwo } },
+      { _id: safeUser.username, count: 1, user_info: { ...safeUser } },
+    ];
+
+    mockingoose(UserModel).toReturn(usersArray, 'find');
+    mockingoose(AnswerModel).toReturn(answerArray, 'aggregate');
+
+    const retrievedUsers = (await getRankedUsersList()) as RankedUser[];
+    expect(retrievedUsers[0].username).toEqual(safeUserTwo.username);
+    expect(retrievedUsers[0].count).toEqual(2);
+  });
+
+  it('should throw an error if the users cannot be found', async () => {
+    mockingoose(AnswerModel).toReturn(null, 'aggregate');
+
+    const getUsersError = await getRankedUsersList();
+
+    expect('error' in getUsersError).toBe(true);
+  });
+
+  it('should throw an error if there is an error while searching the database', async () => {
+    mockingoose(AnswerModel).toReturn(new Error('Error finding document'), 'aggregate');
+
+    const getUsersError = await getRankedUsersList();
+
+    expect('error' in getUsersError).toBe(true);
   });
 });

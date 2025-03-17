@@ -10,6 +10,7 @@ import {
 } from '../types/types';
 import {
   deleteUserByUsername,
+  getRankedUsersList,
   getUserByUsername,
   getUsersList,
   loginUser,
@@ -302,6 +303,20 @@ const userController = (socket: FakeSOSocket) => {
     }
   };
 
+  const getRankedUsers = async (req: Request, res: Response) => {
+    try {
+      const users = await getRankedUsersList();
+
+      if ('error' in users) {
+        throw Error(users.error);
+      }
+
+      res.status(200).json(users);
+    } catch (error) {
+      res.status(500).send(`Error when getting ranked users: ${error}`);
+    }
+  };
+
   // Define routes for the user-related operations.
   router.post('/signup', createUser);
   router.post('/login', userLogin);
@@ -311,6 +326,7 @@ const userController = (socket: FakeSOSocket) => {
   router.delete('/deleteUser/:username', deleteUser);
   router.patch('/updateBiography', updateBiography);
   router.patch('/updateProfilePhoto', updateProfilePhoto);
+  router.get('/getUsers/ranking', getRankedUsers);
   return router;
 };
 
