@@ -20,7 +20,7 @@ export const saveBadge = async (badge: Badge): Promise<BadgeResponse> => {
     }
     return result;
   } catch (error) {
-    return { error: `Error creating user badge: ${error}` };
+    return { error: `Error creating user badge (${(error as Error).message})` };
   }
 };
 
@@ -36,6 +36,6 @@ export const getBadgesList = async (type?: BadgeType): Promise<BadgesResponse> =
     const badges: DatabaseBadge[] = await BadgeModel.find(query);
     return badges;
   } catch (error) {
-    throw new Error(`Error retrieving badges: ${error}`);
+    throw new Error(`Error retrieving badges: (${(error as Error).message})`);
   }
 };

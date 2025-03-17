@@ -8,6 +8,11 @@ import { Schema } from 'mongoose';
  * - `username`: The username of the user.
  * - `password`: The encrypted password securing the user's account.
  * - `dateJoined`: The date the user joined the platform.
+ * - `biography`: The biography of the user.
+ * - `profilePhoto`: A path to the URL of the profile photo of the user.
+ * - `badgesEarned`: A list of ids referencing the badges the user has earned and their dates.
+ * - `following`: A list of usernames representing the users this user is following.
+ * - `followers`: A list of usernames representing the users that follow this user.
  */
 const userSchema: Schema = new Schema(
   {
@@ -37,6 +42,8 @@ const userSchema: Schema = new Schema(
         dateEarned: { type: Date, required: true, default: Date.now },
       },
     ],
+    following: [{ type: String, required: true, default: [] }],
+    followers: [{ type: String, required: true, default: [] }],
   },
   { collection: 'User' },
 );

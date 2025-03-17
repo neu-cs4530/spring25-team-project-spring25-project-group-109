@@ -1,4 +1,4 @@
-import mongoose, { ObjectId } from 'mongoose';
+import mongoose from 'mongoose';
 import AnswerModel from './models/answers.model';
 import QuestionModel from './models/questions.model';
 import TagModel from './models/tags.model';
@@ -24,6 +24,9 @@ import {
   Feature,
   DatabaseFeature,
   FeatureType,
+  DatabaseNotification,
+  NotificationType,
+  Notification,
 } from './types/types';
 import * as strings from './data/posts_strings';
 import CommentModel from './models/comments.model';
@@ -31,6 +34,7 @@ import UserModel from './models/users.model';
 import BadgeModel from './models/badge.model';
 import StoreModel from './models/store.model';
 import FeatureModel from './models/feature.model';
+import NotificationModel from './models/notification.model';
 
 // Pass URL of your mongoDB instance as first argument(e.g., mongodb://127.0.0.1:27017/fake_so)
 const userArgs = process.argv.slice(2);
@@ -167,10 +171,7 @@ async function questionCreate(
  * @param imagePath (optional) The image path associated with the feature (if applicable).
  * @returns A Promise that resolves to the created Feature document.
  */
-async function featureCreate(
-  name: FeatureType,
-  price: number,
-): Promise<DatabaseFeature> {
+async function featureCreate(name: FeatureType, price: number): Promise<DatabaseFeature> {
   if (name === null || price <= 0) {
     throw new Error('Invalid Feature Format');
   }
@@ -196,7 +197,6 @@ async function badgeCreate(
   threshold: number,
   imagePath: string,
 ): Promise<DatabaseBadge> {
-  
   if (name === '' || description === '' || imagePath === '' || type === null || threshold === 0) {
     throw new Error('Invalid Badge Format');
   }
@@ -228,6 +228,8 @@ async function userCreate(
     biography: biography ?? '',
     following: following ?? [],
     badgesEarned: [],
+    followers: [],
+    following: [],
   };
 
   const user = await UserModel.create(userDetail);
@@ -244,11 +246,28 @@ async function userCreate(
   const userStore: Store = {
     username: user.username,
     coinCount: 0,
-    unlockedFeatures: []
+    unlockedFeatures: [],
   };
   await StoreModel.create(userStore);
-  
+
   return user;
+}
+
+async function notificationCreate(
+  username: string,
+  text: string,
+  seen: boolean,
+  type: NotificationType,
+): Promise<DatabaseNotification> {
+  if (username === '' || text === '' || seen === null || type === null)
+    throw new Error('Invalid Notification Format');
+  const notification: Notification = {
+    username,
+    text,
+    seen,
+    type,
+  };
+  return await NotificationModel.create(notification);
 }
 
 async function collectionCreate(
@@ -268,24 +287,24 @@ async function collectionCreate(
  */
 const populate = async () => {
   try {
-    await featureCreate("Nim", 5);
-    await featureCreate("Custom Photo", 10);
-    
-    await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
+    await featureCreate('Nim', 5);
+    await featureCreate('Custom Photo', 10);
+
+    const q1badge = await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
     await badgeCreate(strings.BQ10_NAME, strings.BQ10_DESCRIPTION, 'question', 10, `/images/badges/question/10.png`);
     await badgeCreate(strings.BQ50_NAME, strings.BQ50_DESCRIPTION, 'question', 50, `/images/badges/question/50.png`);
-    
+
     await badgeCreate(strings.BA1_NAME, strings.BA1_DESCRIPTION, 'answer', 1, `/images/badges/answer/1.png`);
     await badgeCreate(strings.BA10_NAME, strings.BA10_DESCRIPTION, 'answer', 10, `/images/badges/answer/10.png`);
     await badgeCreate(strings.BA50_NAME, strings.BA50_DESCRIPTION, 'answer', 50, `/images/badges/answer/50.png`);
-    
+
     await badgeCreate(strings.BC1_NAME, strings.BC1_DESCRIPTION, 'comment', 1, `/images/badges/comment/1.png`);
     await badgeCreate(strings.BC10_NAME, strings.BC10_DESCRIPTION, 'comment', 10, `/images/badges/comment/10.png`);
     await badgeCreate(strings.BC50_NAME, strings.BC50_DESCRIPTION, 'comment', 50, `/images/badges/comment/50.png`);
-    
+
     await badgeCreate(strings.BN1_NAME, strings.BN1_DESCRIPTION, 'nim', 1, `/images/badges/nim/1.png`);
     await badgeCreate(strings.BN5_NAME, strings.BN5_DESCRIPTION, 'nim', 5, `/images/badges/nim/5.png`);
-    await badgeCreate(strings.BN10_NAME, strings.BN10_DESCRIPTION, 'nim', 10, `/images/badges/nim/10.png`);    
+    await badgeCreate(strings.BN10_NAME, strings.BN10_DESCRIPTION, 'nim', 10, `/images/badges/nim/10.png`);
 
     await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.');
     await userCreate('kyle', 'kyle', new Date('2022-12-11T03:30:00'), 'I am a software engineer.');
@@ -303,7 +322,9 @@ const populate = async () => {
     const c2 = await commentCreate(strings.C2_TEXT, 'nitsa', new Date('2023-12-01T15:24:19'));
     const c3 = await commentCreate(strings.C3_TEXT, 'nitsa', new Date('2023-12-01T15:24:19'));
 
-    const a1 = await answerCreate(strings.A1_TXT, 'annabelle', new Date('2023-11-20T03:24:42'), [c1]);
+    const a1 = await answerCreate(strings.A1_TXT, 'annabelle', new Date('2023-11-20T03:24:42'), [
+      c1,
+    ]);
     const a2 = await answerCreate(strings.A2_TXT, 'kyle', new Date('2023-11-23T08:24:00'), [c2]);
     const a3 = await answerCreate(strings.A2_TXT, 'kyle', new Date('2023-11-23T08:24:00'), [c2]);
 
@@ -317,6 +338,8 @@ const populate = async () => {
       ['annabelle', 'kyle'],
       [c3],
     );
+
+    await notificationCreate('sama', `You have earned the badge ${q1badge.name}!`, false, 'badge');
 
     await collectionCreate('favorites', 'nitsa', 'private', [q1._id]);
     await collectionCreate('typescript', 'annabelle', 'public', []);

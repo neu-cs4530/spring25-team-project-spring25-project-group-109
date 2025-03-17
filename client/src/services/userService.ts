@@ -141,6 +141,42 @@ const updateProfilePhoto = async (username: string, newPhoto: string) => {
   return res.data;
 };
 
+/**
+ * Follows the user.
+ * @param follower - The username of the user who is following.
+ * @param followee - The username of the user who is being followed..
+ * @returns A promise resolving to the updated user
+ * @throws Error if the request fails
+ */
+const follow = async (follower: string, followee: string) => {
+  const res = await api.patch(`${USER_API_URL}/follow`, {
+    follower,
+    followee,
+  });
+  if (res.status !== 200) {
+    throw new Error('Error when following');
+  }
+  return res.data;
+};
+
+/**
+ * Unfllows the user.
+ * @param follower - The username of the user who is unfollowing.
+ * @param followee - The username of the user who is being unfollowed..
+ * @returns A promise resolving to the updated user
+ * @throws Error if the request fails
+ */
+const unfollow = async (follower: string, followee: string) => {
+  const res = await api.patch(`${USER_API_URL}/unfollow`, {
+    follower,
+    followee,
+  });
+  if (res.status !== 200) {
+    throw new Error('Error when unfollowing');
+  }
+  return res.data;
+};
+
 export {
   getUsers,
   getUserByUsername,
@@ -150,4 +186,6 @@ export {
   resetPassword,
   updateBiography,
   updateProfilePhoto,
+  follow,
+  unfollow,
 };

@@ -45,3 +45,5 @@ export interface UnlockFeatureRequest extends Request {
     featureName: FeatureType;
   };
 }
+
+export type StoreResponse = DatabaseStore | { error: string };
