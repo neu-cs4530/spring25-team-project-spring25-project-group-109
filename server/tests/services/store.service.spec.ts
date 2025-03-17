@@ -247,6 +247,18 @@ describe('Test Store Service', () => {
       expect(result.coinCount).toBe(initialCoinCount - cost);
     });
 
+    it('should throw an error if the feature is not found', async () => {
+      mockingoose(UserModel).toReturn(user, 'findOne');
+      mockingoose(StoreModel).toReturn(store, 'findOne');
+      mockingoose(FeatureModel).toReturn(null, 'findOne');
+
+      const result = await unlockFeature(user.username, 'Nim');
+      expect('error' in result).toBeTruthy();
+      expect(result).toEqual({
+        error: 'Error occurred when unlocking (Feature not found)',
+      });
+    });
+
     it('should throw an error if the user store data is not found', async () => {
       mockingoose(UserModel).toReturn(user, 'findOne');
       mockingoose(StoreModel).toReturn(null, 'findOne');

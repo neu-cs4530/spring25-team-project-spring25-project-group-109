@@ -10,9 +10,11 @@ import {
   DatabaseQuestion,
   DatabaseStore,
   DatabaseTag,
+  DatabaseUserStats,
   PopulatedDatabaseQuestion,
   SafeDatabaseUser,
   User,
+  UserStats,
 } from '../types/types';
 import { T1_DESC, T2_DESC, T3_DESC } from '../data/posts_strings';
 
@@ -266,4 +268,12 @@ export const mockFeature: DatabaseFeature = {
 export const mockFeatureJSONResponse: DatabaseFeature = {
   ...mockFeature,
   _id: mockFeature._id.toString(),
+};
+
+export const mockUserStats: UserStats = {
+  username: 'testUser',
+  questionsCount: 0,
+  commentsCount: 0,
+  answersCount: 0,
+  nimWinCount: 0,
 };
