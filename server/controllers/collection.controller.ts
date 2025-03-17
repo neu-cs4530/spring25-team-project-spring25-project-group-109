@@ -5,10 +5,10 @@ import { saveCollection, getCollectionsByUser } from '../services/collection.ser
 const collectionController = () => {
   const router = express.Router();
   /**
-   * Validates that the request body contains all required fields for a chat.
+   * Validates that the request body contains all required fields for a collection.
    *
-   * @param req The incoming request containing chat data.
-   * @returns `true` if the body contains valid chat fields; otherwise, `false`.
+   * @param req The incoming request containing collection data.
+   * @returns `true` if the body contains valid collection fields; otherwise, `false`.
    */
   const isCreateCollectionRequestValid = (req: CreateCollectionRequest): boolean => {
     const { name, username, questions } = req.body;

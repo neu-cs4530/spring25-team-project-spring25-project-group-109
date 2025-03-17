@@ -6,10 +6,12 @@ import {
   PopulatedDatabaseAnswer,
   PopulatedDatabaseQuestion,
   QuestionResponse,
+  Notification,
 } from '../types/types';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
 import { updateCoins } from './store.service';
+import { saveNotification } from './notification.service';
 
 /**
  * Records the most recent answer time for a given question based on its answers.
@@ -72,6 +74,15 @@ export const addAnswerToQuestion = async (
     if (result === null) {
       throw new Error('Error when adding answer to question');
     }
+
+    // send a notification to the question asker when this answer is added
+    await saveNotification({
+      username: result.askedBy,
+      text: `${ans.ansBy} answered your question: "${result.title}"`,
+      seen: false,
+      type: 'answer',
+    });
+
     return result;
   } catch (error) {
     return { error: 'Error when adding answer to question' };
