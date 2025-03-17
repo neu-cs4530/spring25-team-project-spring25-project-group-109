@@ -39,7 +39,6 @@ export const getMostRecentAnswerTime = (
 export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
   try {
     const result: DatabaseAnswer = await AnswerModel.create(answer);
-
     await updateCoins(answer.ansBy, 1);
 
     return result;
@@ -73,12 +72,14 @@ export const addAnswerToQuestion = async (
     if (result === null) {
       throw new Error('Error when adding answer to question');
     }
-
-    await UserStatsModel.findOneAndUpdate(
+    const userStats = await UserStatsModel.findOneAndUpdate(
       { username: ans.ansBy },
       { $inc: { answersCount: 1 } },
       { new: true },
     );
+    if (!userStats) {
+      throw new Error('Error updating user stats');
+    }
     return result;
   } catch (error) {
     return { error: 'Error when adding answer to question' };

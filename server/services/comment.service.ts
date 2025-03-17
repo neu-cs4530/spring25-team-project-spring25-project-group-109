@@ -51,26 +51,25 @@ export const addComment = async (
         { $push: { comments: { $each: [comment._id] } } },
         { new: true },
       );
-      await UserStatsModel.findOneAndUpdate(
-        { username: comment.commentBy },
-        { $inc: { commentsCount: 1 } },
-        { new: true },
-      );
     } else {
       result = await AnswerModel.findOneAndUpdate(
         { _id: id },
         { $push: { comments: { $each: [comment._id] } } },
         { new: true },
       );
-      await UserStatsModel.findOneAndUpdate(
-        { username: comment.commentBy },
-        { $inc: { commentsCount: 1 } },
-        { new: true },
-      );
     }
 
     if (result === null) {
       throw new Error('Failed to add comment');
+    }
+
+    const userStats = await UserStatsModel.findOneAndUpdate(
+      { username: comment.commentBy },
+      { $inc: { commentsCount: 1 } },
+      { new: true },
+    );
+    if (!userStats) {
+      throw new Error('Error updating user stats');
     }
 
     return result;

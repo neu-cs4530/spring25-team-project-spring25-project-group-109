@@ -1,7 +1,7 @@
 import { DatabaseBadge } from '@fake-stack-overflow/shared';
 import BadgeModel from '../../models/badge.model';
 import { checkAndAwardBadges, getBadgesList, saveBadge } from '../../services/badge.service';
-import { badge, mockUserStatsFull, user } from '../mockData.models';
+import { badge, dbBadge, mockUserStatsFull, user } from '../mockData.models';
 import UserModel from '../../models/users.model';
 import UserStatsModel from '../../models/userstats.model';
 
@@ -68,6 +68,18 @@ describe('User model', () => {
 
       expect(badges).toEqual([]);
     });
+
+    it('should return badges only of a specific type', async () => {
+      mockingoose(BadgeModel).toReturn([badge], 'find');
+
+      const badges = (await getBadgesList('question')) as DatabaseBadge[];
+      expect(badges.length).toBe(1);
+      expect(badges[0].name).toEqual(badge.name);
+      expect(badges[0].description).toEqual(badge.description);
+      expect(badges[0].imagePath).toEqual(badge.imagePath);
+      expect(badges[0].threshold).toEqual(badge.threshold);
+      expect(badges[0].type).toEqual(badge.type);
+    });
   });
 
   describe('checkAndAwardBadges', () => {
@@ -131,6 +143,19 @@ describe('User model', () => {
 
       const badges = await checkAndAwardBadges('user1');
       expect('error' in badges).toBe(true);
+    });
+
+    it('should not add badge if user already has badge', async () => {
+      // the only badge you can get are for asking 5 questions
+      // user already has badge for asking 5 questions
+      // check that if we call checkAndAwardBadges, it doesn't return the badge as a new badge to add to user
+      const userWithBadge = { ...user, badgesEarned: [{ badgeId: dbBadge._id }] };
+      mockingoose(UserModel).toReturn(userWithBadge, 'findOne');
+      mockingoose(UserStatsModel).toReturn({ ...mockUserStatsFull, questionsCount: 8 }, 'findOne');
+      mockingoose(BadgeModel).toReturn([dbBadge], 'find');
+
+      const badges = await checkAndAwardBadges('user1');
+      expect(badges).toEqual([]);
     });
   });
 });

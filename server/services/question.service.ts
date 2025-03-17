@@ -160,11 +160,15 @@ export const fetchAndIncrementQuestionViewsById = async (
 export const saveQuestion = async (question: Question): Promise<QuestionResponse> => {
   try {
     const result: DatabaseQuestion = await QuestionModel.create(question);
-    await UserStatsModel.findOneAndUpdate(
+
+    const userStats = await UserStatsModel.findOneAndUpdate(
       { username: question.askedBy },
       { $inc: { questionsCount: 1 } },
       { new: true },
     );
+    if (!userStats) {
+      throw new Error('Error updating user stats');
+    }
 
     await updateCoins(question.askedBy, 1);
 
