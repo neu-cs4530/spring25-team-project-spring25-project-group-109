@@ -305,6 +305,7 @@ const populate = async () => {
 
     const a1 = await answerCreate(strings.A1_TXT, 'annabelle', new Date('2023-11-20T03:24:42'), [c1]);
     const a2 = await answerCreate(strings.A2_TXT, 'kyle', new Date('2023-11-23T08:24:00'), [c2]);
+    const a3 = await answerCreate(strings.A2_TXT, 'kyle', new Date('2023-11-23T08:24:00'), [c2]);
 
     const q1 = await questionCreate(
       strings.Q1_DESC,
