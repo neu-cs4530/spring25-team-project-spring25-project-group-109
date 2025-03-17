@@ -33,7 +33,9 @@ const AllGamesPage = () => {
           <div className='locked-modal'>
             <h2>You have not purchased any games.</h2>
             <p>Visit the store to unlock games like Nim and more!</p>
-            <button onClick={e => navigate('/store')}>Go to Store</button>
+            <button className='btn-create-game' onClick={e => navigate('/store')}>
+              Go to Store
+            </button>
           </div>
         </div>
       )}
