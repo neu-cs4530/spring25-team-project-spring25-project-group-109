@@ -3,8 +3,6 @@ import './index.css';
 import {
   Box,
   Button,
-  Checkbox,
-  FormControlLabel,
   Link,
   TextField,
   Typography,

@@ -18,7 +18,7 @@ const Header = () => {
     <AppBar position='static' color='primary'>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
         <Typography variant='h3' sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-          Fake Stack Overflow
+          Stack Overflow
         </Typography>
 
         <TextField

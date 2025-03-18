@@ -19,7 +19,7 @@ const QuestionPage = () => {
         qcnt={qlist.length}
         setQuestionOrder={setQuestionOrder}
       />
-      <div id='question_list' className='question_list'>
+      <div id='question_list'>
         {qlist.map(q => (
           <QuestionView question={q} key={String(q._id)} />
         ))}

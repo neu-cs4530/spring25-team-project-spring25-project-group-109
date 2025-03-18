@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import './index.css';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import { Box, List, ListItem, Button, Collapse, Typography } from '@mui/material';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
 /**
  * The SideBarNav component has four menu items: "Questions", "Tags", "Messaging", and "Users".
@@ -9,63 +10,136 @@ import { NavLink, useLocation } from 'react-router-dom';
  */
 const SideBarNav = () => {
   const [showOptions, setShowOptions] = useState<boolean>(false);
-  const location = useLocation();
 
   const toggleOptions = () => {
     setShowOptions(!showOptions);
   };
 
-  const isActiveOption = (path: string) =>
-    location.pathname === path ? 'message-option-selected ' : '';
-
   return (
-    <div id='sideBarNav' className='sideBarNav'>
-      <NavLink
-        to='/home'
-        id='menu_questions'
-        className={({ isActive }) => `menu_button ${isActive ? 'menu_selected' : ''}`}>
-        Questions
-      </NavLink>
-      <NavLink
-        to='/tags'
-        id='menu_tag'
-        className={({ isActive }) => `menu_button ${isActive ? 'menu_selected' : ''}`}>
-        Tags
-      </NavLink>
-      <NavLink
-        to='/messaging'
-        id='menu_messaging'
-        className={({ isActive }) => `menu_button ${isActive ? 'menu_selected' : ''}`}
-        onClick={toggleOptions}>
-        Messaging
-      </NavLink>
-      {showOptions && (
-        <div className='additional-options'>
+    <Box
+      sx={{
+        width: 250,
+        backgroundColor: '#f5f5f5',
+        padding: 2,
+        boxShadow: 2,
+      }}>
+      <List>
+        <ListItem disablePadding>
+          <NavLink
+            to='/home'
+            style={({ isActive }) => ({
+              textDecoration: 'none',
+              color: isActive ? '#1976d2' : '#333',
+              backgroundColor: isActive ? '#e3f2fd' : 'transparent', // Background highlight for active item
+              padding: '8px 16px',
+              borderRadius: '4px',
+            })}>
+            <Button fullWidth>
+              <Typography variant='body1'>Questions</Typography>
+            </Button>
+          </NavLink>
+        </ListItem>
+        <ListItem disablePadding>
+          <NavLink
+            to='/tags'
+            style={({ isActive }) => ({
+              textDecoration: 'none',
+              color: isActive ? '#1976d2' : '#333',
+              backgroundColor: isActive ? '#e3f2fd' : 'transparent',
+              padding: '8px 16px',
+              borderRadius: '4px',
+            })}>
+            <Button fullWidth>
+              <Typography variant='body1'>Tags</Typography>
+            </Button>
+          </NavLink>
+        </ListItem>
+        <ListItem disablePadding>
           <NavLink
             to='/messaging'
-            className={`menu_button message-options ${isActiveOption('/messaging')}`}>
-            Global Messages
+            style={({ isActive }) => ({
+              textDecoration: 'none',
+              color: isActive ? '#1976d2' : '#333',
+              backgroundColor: isActive ? '#e3f2fd' : 'transparent',
+              padding: '8px 16px',
+              borderRadius: '4px',
+            })}>
+            <Button fullWidth onClick={toggleOptions}>
+              <Typography variant='body1'>Messaging</Typography>
+              {showOptions ? <ExpandLess /> : <ExpandMore />}
+            </Button>
           </NavLink>
+        </ListItem>
+        <Collapse in={showOptions} timeout='auto' unmountOnExit>
+          <List component='div' disablePadding>
+            <ListItem disablePadding>
+              <NavLink
+                to='/messaging'
+                style={({ isActive }) => ({
+                  textDecoration: 'none',
+                  color: isActive ? '#1976d2' : '#333',
+                  backgroundColor: isActive ? '#e3f2fd' : 'transparent',
+                  padding: '8px 16px',
+                  borderRadius: '4px',
+                })}>
+                <Button fullWidth>
+                  <Typography variant='body2' sx={{ pl: 4 }}>
+                    Global Messages
+                  </Typography>
+                </Button>
+              </NavLink>
+            </ListItem>
+            <ListItem disablePadding>
+              <NavLink
+                to='/messaging/direct-message'
+                style={({ isActive }) => ({
+                  textDecoration: 'none',
+                  color: isActive ? '#1976d2' : '#333',
+                  backgroundColor: isActive ? '#e3f2fd' : 'transparent',
+                  padding: '8px 16px',
+                  borderRadius: '4px',
+                })}>
+                <Button fullWidth>
+                  <Typography variant='body2' sx={{ pl: 4 }}>
+                    Direct Messages
+                  </Typography>
+                </Button>
+              </NavLink>
+            </ListItem>
+          </List>
+        </Collapse>
+        <ListItem disablePadding>
           <NavLink
-            to='/messaging/direct-message'
-            className={`menu_button message-options ${isActiveOption('/messaging/direct-message')}`}>
-            Direct Messages
+            to='/users'
+            style={({ isActive }) => ({
+              textDecoration: 'none',
+              color: isActive ? '#1976d2' : '#333',
+              backgroundColor: isActive ? '#e3f2fd' : 'transparent',
+              padding: '8px 16px',
+              borderRadius: '4px',
+            })}>
+            <Button fullWidth>
+              <Typography variant='body1'>Users</Typography>
+            </Button>
           </NavLink>
-        </div>
-      )}
-      <NavLink
-        to='/users'
-        id='menu_users'
-        className={({ isActive }) => `menu_button ${isActive ? 'menu_selected' : ''}`}>
-        Users
-      </NavLink>
-      <NavLink
-        to='/games'
-        id='menu_games'
-        className={({ isActive }) => `menu_button ${isActive ? 'menu_selected' : ''}`}>
-        Games
-      </NavLink>
-    </div>
+        </ListItem>
+        <ListItem disablePadding>
+          <NavLink
+            to='/games'
+            style={({ isActive }) => ({
+              textDecoration: 'none',
+              color: isActive ? '#1976d2' : '#333',
+              backgroundColor: isActive ? '#e3f2fd' : 'transparent',
+              padding: '8px 16px',
+              borderRadius: '4px',
+            })}>
+            <Button fullWidth>
+              <Typography variant='body1'>Games</Typography>
+            </Button>
+          </NavLink>
+        </ListItem>
+      </List>
+    </Box>
   );
 };
 
