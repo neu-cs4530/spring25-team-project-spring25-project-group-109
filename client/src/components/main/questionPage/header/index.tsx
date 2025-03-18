@@ -1,5 +1,6 @@
 import React from 'react';
 import './index.css';
+import { Typography } from '@mui/material';
 import OrderButton from './orderButton';
 import { OrderType } from '../../../../types/types';
 import { orderTypeDisplayName } from '../../../../types/constants';
@@ -30,7 +31,9 @@ interface QuestionHeaderProps {
 const QuestionHeader = ({ titleText, qcnt, setQuestionOrder }: QuestionHeaderProps) => (
   <div>
     <div className='space_between right_padding'>
-      <div className='bold_title'>{titleText}</div>
+      <Typography variant='h4' className='bold_title'>
+        {titleText}
+      </Typography>
       <AskQuestionButton />
     </div>
     <div className='space_between right_padding'>

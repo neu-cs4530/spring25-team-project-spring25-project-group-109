@@ -42,10 +42,10 @@ const useAuth = (authType: 'login' | 'signup') => {
    * @param field - The field being updated ('username', 'password', or 'confirmPassword').
    */
   const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement>,
-    field: 'username' | 'password' | 'confirmPassword',
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    field: string,
   ) => {
-    const fieldText = e.target.value.trim();
+    const fieldText = event.target.value.trim();
 
     if (field === 'username') {
       setUsername(fieldText);

@@ -1,5 +1,7 @@
 import React from 'react';
 import './index.css';
+import { Button, Input, Typography } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 import useProfileSettings from '../../hooks/useProfileSettings';
 
 const ProfileSettings: React.FC = () => {
@@ -44,6 +46,10 @@ const ProfileSettings: React.FC = () => {
 
   const numEarnedBadges = userData?.badgesEarned ? userData.badgesEarned.length : 0;
 
+  const handleButtonClick = () => {
+    setEditProfilePhotoMode(!editProfilePhotoMode);
+  };
+
   if (loading) {
     return (
       <div className='page-container'>
@@ -57,9 +63,17 @@ const ProfileSettings: React.FC = () => {
   return (
     <div className='page-container'>
       <div className='profile-card'>
-        <h2>Profile</h2>
-        {successMessage && <p className='success-message'>{successMessage}</p>}
-        {errorMessage && <p className='error-message'>{errorMessage}</p>}
+        <Typography variant='h2'>Profile</Typography>
+        {successMessage && (
+          <Typography style={{ fontWeight: 'bold' }} variant='subtitle1' color='success.main'>
+            {successMessage}
+          </Typography>
+        )}
+        {errorMessage && (
+          <Typography style={{ fontWeight: 'bold' }} variant='subtitle1' color='error.main'>
+            {errorMessage}
+          </Typography>
+        )}
         {userData ? (
           <>
             {/* ---- Profile Photo ---- */}
@@ -69,17 +83,9 @@ const ProfileSettings: React.FC = () => {
                 className='profile-photo'
               />
               {canEditProfile && (
-                <button
-                  className='edit-button'
-                  onClick={() => {
-                    if (editProfilePhotoMode) {
-                      setEditProfilePhotoMode(false);
-                    } else {
-                      setEditProfilePhotoMode(true);
-                    }
-                  }}>
-                  {editProfilePhotoMode ? 'Cancel' : 'Edit'}
-                </button>
+                <Button variant='contained' color='primary' onClick={handleButtonClick}>
+                  {editProfilePhotoMode ? 'Cancel' : 'Change Photo'}
+                </Button>
               )}
             </div>
 
@@ -106,10 +112,16 @@ const ProfileSettings: React.FC = () => {
             <div className='follow-stats-container'>
               <div className='follow-stats'>
                 <span className='follow-count' onClick={() => setShowFollowers(true)}>
-                  <strong>{userData.followers.length}</strong> Followers
+                  <Typography variant='subtitle1'>
+                    <span style={{ fontWeight: 'bold' }}>{userData.followers.length}</span>{' '}
+                    Followers
+                  </Typography>
                 </span>
                 <span className='follow-count' onClick={() => setShowFollowing(true)}>
-                  <strong>{userData.following.length}</strong> Following
+                  <Typography variant='subtitle1'>
+                    <span style={{ fontWeight: 'bold' }}>{userData.following.length}</span>{' '}
+                    Following
+                  </Typography>
                 </span>
               </div>
 
@@ -155,64 +167,68 @@ const ProfileSettings: React.FC = () => {
                   ) : (
                     <p>Not following anyone yet.</p>
                   )}
-                  <button className='close-button' onClick={() => setShowFollowing(false)}>
+                  <Button variant='contained' onClick={() => setShowFollowing(false)}>
                     Close
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
 
             {/* ---- General Information ---- */}
-            <h4>General Information</h4>
-            <p>
-              <strong>Username:</strong> {userData.username}
-            </p>
+            <Typography variant='h4'>General Information</Typography>
+            <Typography variant='subtitle1'>
+              <span style={{ fontWeight: 'bold' }}>Username:</span> {userData.username}
+            </Typography>
 
             {/* ---- Biography Section ---- */}
             {!editBioMode && (
-              <p>
-                <strong>Biography:</strong> {userData.biography || 'No biography yet.'}
+              <div className='bio-container'>
+                <Typography variant='subtitle1'>
+                  <span style={{ fontWeight: 'bold' }}>Biography:</span>{' '}
+                  {userData.biography || 'No biography yet'}
+                </Typography>
                 {canEditProfile && (
-                  <button
-                    className='login-button'
-                    style={{ marginLeft: '1rem' }}
+                  <Button
                     onClick={() => {
                       setEditBioMode(true);
                       setNewBio(userData.biography || '');
+                    }}
+                    sx={{
+                      padding: 0,
+                      minWidth: 'auto',
                     }}>
-                    Edit
-                  </button>
+                    <EditIcon sx={{ fontSize: 20, marginLeft: 1 }} />{' '}
+                  </Button>
                 )}
-              </p>
+              </div>
             )}
 
             {editBioMode && canEditProfile && (
               <div style={{ margin: '1rem 0' }}>
-                <input
+                <Input
                   className='input-text'
                   type='text'
                   value={newBio}
                   onChange={e => setNewBio(e.target.value)}
                 />
-                <button
+                <Button
                   className='login-button'
-                  style={{ marginLeft: '1rem' }}
+                  variant='contained'
                   onClick={handleUpdateBiography}>
                   Save
-                </button>
-                <button
+                </Button>
+                <Button
                   className='delete-button'
                   style={{ marginLeft: '1rem' }}
                   onClick={() => setEditBioMode(false)}>
                   Cancel
-                </button>
+                </Button>
               </div>
             )}
-
-            <p>
-              <strong>Date Joined:</strong>{' '}
+            <Typography variant='subtitle1'>
+              <span style={{ fontWeight: 'bold' }}>Date Joined:</span>{' '}
               {userData.dateJoined ? new Date(userData.dateJoined).toLocaleDateString() : 'N/A'}
-            </p>
+            </Typography>
 
             {/* ---- Badges Section ---- */}
             {/* Future work will render only earned badges in color. Can be accessed from useData.earnedBadges */}
