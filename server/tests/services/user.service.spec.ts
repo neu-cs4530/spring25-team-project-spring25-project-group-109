@@ -1,6 +1,8 @@
+import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 import UserModel from '../../models/users.model';
 import {
+  awardBadgeToUser,
   deleteUserByUsername,
   getUserByUsername,
   getUsersList,
@@ -198,6 +200,8 @@ describe('updateUser', () => {
     username: user.username,
     dateJoined: user.dateJoined,
     badgesEarned: [],
+    followers: [],
+    following: [],
   };
 
   const updates: Partial<User> = {
@@ -262,6 +266,60 @@ describe('updateUser', () => {
     const updatedError = await updateUser(user.username, biographyUpdates);
 
     expect('error' in updatedError).toBe(true);
+  });
+
+  it('should update the profile photo if the user is found', async () => {
+    const newPhoto = '/images/avatars/avatar1.png';
+    const profilePhotoUpdate: Partial<User> = { profilePhoto: newPhoto };
+
+    mockingoose(UserModel).toReturn(
+      { ...safeUpdatedUser, profilePhoto: newPhoto },
+      'findOneAndUpdate',
+    );
+
+    const result = await updateUser(user.username, profilePhotoUpdate);
+
+    if ('username' in result) {
+      expect(result.profilePhoto).toEqual(newPhoto);
+    } else {
+      throw new Error('Expected a safe user, got an error object.');
+    }
+  });
+
+  it('should return an error if profile photo update fails because user not found', async () => {
+    mockingoose(UserModel).toReturn(null, 'findOneAndUpdate');
+
+    const newPhoto = '/images/avatars/avatar1.png';
+    const profilePhotoUpdate: Partial<User> = { profilePhoto: newPhoto };
+    const updatedError = await updateUser(user.username, profilePhotoUpdate);
+
+    expect('error' in updatedError).toBe(true);
+  });
+});
+
+describe('awardBadgeToUser', () => {
+  it('should succesfully award badge', async () => {
+    mockingoose(UserModel).toReturn(user, 'findOneAndUpdate');
+
+    const badgeId = new ObjectId();
+    const result = (await awardBadgeToUser(user.username, [badgeId])) as SafeDatabaseUser;
+    expect(result.badgesEarned.some(badge => badge.badgeId === badgeId.toString()));
+    expect(result.username).toEqual(user.username);
+    expect(result.dateJoined).toEqual(user.dateJoined);
+  });
+
+  it('should return error if UserModel fails', async () => {
+    mockingoose(UserModel).toReturn(new Error('Error updating object'), 'findOneAndUpdate');
+
+    const result = await awardBadgeToUser(user.username, [new ObjectId()]);
+    expect('error' in result).toBe(true);
+  });
+
+  it('should return error if UserModel returns null', async () => {
+    mockingoose(UserModel).toReturn(null, 'findOneAndUpdate');
+
+    const result = await awardBadgeToUser(user.username, [new ObjectId()]);
+    expect('error' in result).toBe(true);
   });
 });
 

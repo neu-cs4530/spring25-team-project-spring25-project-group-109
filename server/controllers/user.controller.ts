@@ -7,6 +7,7 @@ import {
   FakeSOSocket,
   UpdateBiographyRequest,
   UpdateProfilePhotoRequest,
+  ToggleFollowRequest,
 } from '../types/types';
 import {
   deleteUserByUsername,
@@ -77,6 +78,8 @@ const userController = (socket: FakeSOSocket) => {
       biography: requestUser.biography ?? '',
       profilePhoto: requestUser.profilePhoto ?? '/images/avatars/default-avatar.png',
       badgesEarned: [],
+      followers: [],
+      following: [],
     };
 
     try {
@@ -317,6 +320,113 @@ const userController = (socket: FakeSOSocket) => {
     }
   };
 
+  /**
+   * Adds a user to another user's followers and vice versa for following.
+   * @param req The request containing the two usernames in the body.
+   * @param res The response, either confirming the update or returning an error.
+   * @returns A promise resolving to void.
+   */
+  const follow = async (req: ToggleFollowRequest, res: Response): Promise<void> => {
+    try {
+      const { follower, followee } = req.body;
+
+      if (!follower || !followee) {
+        res.status(400).send('Invalid body');
+        return;
+      }
+
+      if (follower === followee) {
+        res.status(400).send('Cannot follow yourself');
+        return;
+      }
+
+      const followerUser = await getUserByUsername(follower);
+
+      if ('error' in followerUser) {
+        throw new Error(followerUser.error);
+      }
+
+      const followeeUser = await getUserByUsername(followee);
+
+      if ('error' in followeeUser) {
+        throw new Error(followeeUser.error);
+      }
+
+      const result1 = await updateUser(follower, {
+        following: [...(followerUser.following || []), followee],
+      });
+
+      if ('error' in result1) {
+        throw new Error(result1.error);
+      }
+
+      const result2 = await updateUser(followee, {
+        followers: [...followeeUser.followers, follower],
+      });
+
+      if ('error' in result2) {
+        throw new Error(result2.error);
+      }
+
+      res.status(200).json([result1, result2]);
+    } catch (error) {
+      res.status(500).send(`Error when following: ${error}`);
+    }
+  };
+
+  /**
+   * Removes a user from another user's followers and vice versa for following.
+   * @param req The request containing the two usernames in the body.
+   * @param res The response, either confirming the update or returning an error.
+   * @returns A promise resolving to void.
+   */
+  const unfollow = async (req: ToggleFollowRequest, res: Response): Promise<void> => {
+    try {
+      const { follower, followee } = req.body;
+
+      if (!follower || !followee) {
+        res.status(400).send('Invalid body');
+        return;
+      }
+
+      if (follower === followee) {
+        res.status(400).send('Cannot unfollow yourself');
+        return;
+      }
+
+      const followerUser = await getUserByUsername(follower);
+      const followeeUser = await getUserByUsername(followee);
+
+      if ('error' in followerUser) {
+        throw new Error(followerUser.error);
+      }
+
+      if ('error' in followeeUser) {
+        throw new Error(followeeUser.error);
+      }
+
+      const result1 = await updateUser(follower, {
+        following: (followerUser.following || []).filter(user => user !== followee),
+      });
+
+      if ('error' in result1) {
+        throw new Error(result1.error);
+      }
+
+      const result2 = await updateUser(followee, {
+        followers: followeeUser.followers.filter(user => user !== follower),
+      });
+
+      if ('error' in result2) {
+        throw new Error(result2.error);
+      }
+
+      res.status(200).json([result1, result2]);
+    } catch (error) {
+      res.status(500).send(`Error when unfollowing: ${error}`);
+    }
+  };
+
   // Define routes for the user-related operations.
   router.post('/signup', createUser);
   router.post('/login', userLogin);
@@ -327,6 +437,8 @@ const userController = (socket: FakeSOSocket) => {
   router.patch('/updateBiography', updateBiography);
   router.patch('/updateProfilePhoto', updateProfilePhoto);
   router.get('/getUsers/ranking', getRankedUsers);
+  router.patch('/follow', follow);
+  router.patch('/unfollow', unfollow);
   return router;
 };
 

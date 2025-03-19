@@ -1,10 +1,11 @@
 import supertest from 'supertest';
 import { app } from '../../app';
-import { badge, dbBadge } from '../mockData.models';
+import { badge, dbBadge, user } from '../mockData.models';
 import * as util from '../../services/badge.service';
 
 const saveBadgeSpy = jest.spyOn(util, 'saveBadge');
 const getBadgeSpy = jest.spyOn(util, 'getBadgesList');
+const checkAndAwardBadgesSpy = jest.spyOn(util, 'checkAndAwardBadges');
 
 const mockBadgeJSONResponse = {
   ...dbBadge,
@@ -177,6 +178,30 @@ describe('Test userController', () => {
       const response = await supertest(app).get(`/badge/getBadges`);
 
       expect(response.status).toBe(500);
+    });
+  });
+  describe('PATCH /getBadges', () => {
+    it('should return the users updated badges', async () => {
+      checkAndAwardBadgesSpy.mockResolvedValueOnce([dbBadge]);
+
+      const response = await supertest(app).patch(`/badge/updateBadges/${user.username}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({ badges: [mockBadgeJSONResponse] });
+      expect(checkAndAwardBadgesSpy).toHaveBeenCalled();
+    });
+
+    it('should return 500 if database error while updating badges', async () => {
+      checkAndAwardBadgesSpy.mockResolvedValueOnce({ error: 'Error finding users' });
+      const response = await supertest(app).patch(`/badge/updateBadges/${user.username}`);
+
+      expect(response.status).toBe(500);
+    });
+
+    it('should return 404 if username not found', async () => {
+      const response = await supertest(app).put(`/badge/updateBadges`);
+
+      expect(response.status).toBe(404);
     });
   });
 });

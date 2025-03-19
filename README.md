@@ -60,16 +60,18 @@ A class diagram for the schema definition is shown below:
 
 ### `/user`
 
-| Endpoint            | Method | Description                    |
-| ------------------- | ------ | ------------------------------ |
-| /signup             | POST   | Create a new user account      |
-| /login              | POST   | Log in as a user               |
-| /resetPassword      | PATCH  | Reset user password            |
-| /getUser/           | GET    | Fetch user details by username |
-| /getUsers           | GET    | Fetch all users                |
-| /deleteUser/        | DELETE | Delete a user by username      |
-| /updateBiography    | PATCH  | Update user biography          |
-| /updateProfilePhoto | PATCH  | Update user profile photo      |
+| Endpoint            | Method | Description                           |
+| ------------------- | ------ | ------------------------------------- |
+| /signup             | POST   | Create a new user account             |
+| /login              | POST   | Log in as a user                      |
+| /resetPassword      | PATCH  | Reset user password                   |
+| /getUser/           | GET    | Fetch user details by username        |
+| /getUsers           | GET    | Fetch all users                       |
+| /deleteUser/        | DELETE | Delete a user by username             |
+| /updateBiography    | PATCH  | Update user biography                 |
+| /updateProfilePhoto | PATCH  | Update user profile photo             |
+| /follow             | PATCH  | Update user's following (add item)    |
+| /unfollow           | PATCH  | Update user's following (remove item) |
 
 ### `/chat`
 
@@ -92,18 +94,19 @@ A class diagram for the schema definition is shown below:
 
 ### `/store`
 
-| Endpoint                     | Method | Description                 |
-| ---------------------------- | ------ | --------------------------- |
-| /createStore                 | POST   | Create a store object       |
-| /getStoreByUser/:username    | GET    | Get a user's store data     |
-| /unlockFeature               | POST   | Unlock a feature with coins |
+| Endpoint                  | Method | Description                 |
+| ------------------------- | ------ | --------------------------- |
+| /createStore              | POST   | Create a store object       |
+| /getStoreByUser/:username | GET    | Get a user's store data     |
+| /unlockFeature            | POST   | Unlock a feature with coins |
 
 ### `/badge`
 
-| Endpoint   | Method | Description           |
-| ---------- | ------ | --------------------- |
-| /addBadge  | POST   | Create a new badge    |
-| /getBadges | GET    | Gets all badges       |
+| Endpoint                | Method | Description                                  |
+| ----------------------- | ------ | -------------------------------------------- |
+| /addBadge               | POST   | Create a new badge                           |
+| /getBadges              | GET    | Gets all badges                              |
+| /updateBadges:/username | PATCH  | updated badges for user based on their stats |
 
 ### `/collection`
 
@@ -111,6 +114,12 @@ A class diagram for the schema definition is shown below:
 | ------------------------------- | ------ | -------------------------------------------------------------------- |
 | /createCollection               | POST   | Create a new collection                                              |
 | /getCollectionsByUser/:username | GET    | Retrieve all collections for a specific user based on their username |
+
+### `/notification `
+
+| Endpoint                    | Method | Description                     |
+| --------------------------- | ------ | ------------------------------- |
+| /getNotifications/:username | GET    | Gets all notifications for user |
 
 ## Running Stryker Mutation Testing
 

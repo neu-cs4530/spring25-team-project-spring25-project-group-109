@@ -4,6 +4,7 @@ import { validateHyperlink } from '../tool';
 import { addQuestion } from '../services/questionService';
 import useUserContext from './useUserContext';
 import { Question } from '../types/types';
+import { updateBadges } from '../services/badgeService';
 
 /**
  * Custom hook to handle question submission and form validation
@@ -105,6 +106,7 @@ const useNewQuestion = () => {
     };
 
     const res = await addQuestion(question);
+    await updateBadges(user.username);
 
     if (res && res._id) {
       navigate('/home');

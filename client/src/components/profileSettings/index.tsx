@@ -21,6 +21,11 @@ const ProfileSettings: React.FC = () => {
     showPassword,
     togglePasswordVisibility,
     allBadges,
+    isFollowing,
+    showFollowers,
+    setShowFollowers,
+    showFollowing,
+    setShowFollowing,
 
     setEditBioMode,
     setEditProfilePhotoMode,
@@ -33,7 +38,11 @@ const ProfileSettings: React.FC = () => {
     handleUpdateBiography,
     handleDeleteUser,
     handleUpdateProfilePhoto,
+    handleFollowUser,
+    handleUnfollowUser,
   } = useProfileSettings();
+
+  const numEarnedBadges = userData?.badgesEarned ? userData.badgesEarned.length : 0;
 
   if (loading) {
     return (
@@ -60,7 +69,15 @@ const ProfileSettings: React.FC = () => {
                 className='profile-photo'
               />
               {canEditProfile && (
-                <button className='edit-button' onClick={() => setEditProfilePhotoMode(true)}>
+                <button
+                  className='edit-button'
+                  onClick={() => {
+                    if (editProfilePhotoMode) {
+                      setEditProfilePhotoMode(false);
+                    } else {
+                      setEditProfilePhotoMode(true);
+                    }
+                  }}>
                   {editProfilePhotoMode ? 'Cancel' : 'Edit'}
                 </button>
               )}
@@ -80,6 +97,67 @@ const ProfileSettings: React.FC = () => {
                       }}
                     />
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* ---- Follower/Following Section ---- */}
+
+            <div className='follow-stats-container'>
+              <div className='follow-stats'>
+                <span className='follow-count' onClick={() => setShowFollowers(true)}>
+                  <strong>{userData.followers.length}</strong> Followers
+                </span>
+                <span className='follow-count' onClick={() => setShowFollowing(true)}>
+                  <strong>{userData.following.length}</strong> Following
+                </span>
+              </div>
+
+              {!canEditProfile && (
+                <button
+                  className={isFollowing ? 'unfollow-button' : 'follow-button'}
+                  onClick={isFollowing ? handleUnfollowUser : handleFollowUser}>
+                  {isFollowing ? 'Unfollow' : 'Follow'}
+                </button>
+              )}
+            </div>
+
+            {showFollowers && (
+              <div className='modal'>
+                <div className='modal-content'>
+                  <h3>Followers</h3>
+                  {userData.followers.length > 0 ? (
+                    <ul>
+                      {userData.followers.map(follower => (
+                        <li key={follower}>{follower}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No followers yet.</p>
+                  )}
+                  <button className='close-button' onClick={() => setShowFollowers(false)}>
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {showFollowing && (
+              <div className='modal'>
+                <div className='modal-content'>
+                  <h3>Following</h3>
+                  {userData.following.length > 0 ? (
+                    <ul>
+                      {userData.following.map(following => (
+                        <li key={following}>{following}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>Not following anyone yet.</p>
+                  )}
+                  <button className='close-button' onClick={() => setShowFollowing(false)}>
+                    Close
+                  </button>
                 </div>
               </div>
             )}
@@ -137,12 +215,20 @@ const ProfileSettings: React.FC = () => {
             </p>
 
             {/* ---- Badges Section ---- */}
-            <h4>Badges</h4>
+            {/* Future work will render only earned badges in color. Can be accessed from useData.earnedBadges */}
+            <h4>
+              Badges
+              {canEditProfile && numEarnedBadges > 0 && (
+                <span className='badge-count'>
+                  You have earned {numEarnedBadges} badge{numEarnedBadges > 1 ? 's' : ''}!
+                </span>
+              )}
+            </h4>
             <div className='badges-grid'>
               {allBadges && allBadges.length > 0 ? (
                 allBadges.map(badge => (
                   <div key={String(badge._id)} className='badge'>
-                    <img src={badge.imagePath} alt={badge.name} className='badge-image' />
+                    <img src={badge.imagePath} alt={badge.name} className={`badge-image`} />
                     <div className='badge-description'>{badge.description}</div>
                   </div>
                 ))

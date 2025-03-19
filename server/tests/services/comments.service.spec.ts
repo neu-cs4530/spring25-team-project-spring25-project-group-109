@@ -3,7 +3,8 @@ import QuestionModel from '../../models/questions.model';
 import { saveComment, addComment } from '../../services/comment.service';
 import { DatabaseComment, DatabaseQuestion, DatabaseAnswer } from '../../types/types';
 import AnswerModel from '../../models/answers.model';
-import { QUESTIONS, ans1, com1 } from '../mockData.models';
+import { QUESTIONS, ans1, com1, mockUserStats } from '../mockData.models';
+import UserStatsModel from '../../models/userstats.model';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
@@ -26,6 +27,8 @@ describe('Comment model', () => {
   describe('addComment', () => {
     test('addComment should return the updated question when given `question`', async () => {
       // copy the question to avoid modifying the original
+      mockingoose(UserStatsModel).toReturn(mockUserStats, 'findOneAndUpdate');
+
       const question = { ...QUESTIONS[0], comments: [com1] };
       mockingoose(QuestionModel).toReturn(question, 'findOneAndUpdate');
 
@@ -41,6 +44,8 @@ describe('Comment model', () => {
 
     test('addComment should return the updated answer when given `answer`', async () => {
       // copy the answer to avoid modifying the original
+      mockingoose(UserStatsModel).toReturn(mockUserStats, 'findOneAndUpdate');
+
       const answer: DatabaseAnswer = { ...ans1, comments: [com1._id] };
       mockingoose(AnswerModel).toReturn(answer, 'findOneAndUpdate');
 
@@ -51,6 +56,8 @@ describe('Comment model', () => {
     });
 
     test('addComment should return an object with error if findOneAndUpdate throws an error', async () => {
+      mockingoose(UserStatsModel).toReturn(mockUserStats, 'findOneAndUpdate');
+
       const question = QUESTIONS[0];
       mockingoose(QuestionModel).toReturn(
         new Error('Error from findOneAndUpdate'),
@@ -61,6 +68,8 @@ describe('Comment model', () => {
     });
 
     test('addComment should return an object with error if findOneAndUpdate returns null', async () => {
+      mockingoose(UserStatsModel).toReturn(mockUserStats, 'findOneAndUpdate');
+
       const answer: DatabaseAnswer = { ...ans1 };
       mockingoose(AnswerModel).toReturn(null, 'findOneAndUpdate');
 

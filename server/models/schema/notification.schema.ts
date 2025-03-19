@@ -10,24 +10,30 @@ import { Schema } from 'mongoose';
  * - `type`: The notification type.
 
  */
-const notificationSchema: Schema = new Schema({
-  username: {
-    type: String,
-    required: true,
+const notificationSchema: Schema = new Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+    },
+    text: {
+      type: String,
+      required: true,
+    },
+    seen: {
+      type: Boolean,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+      enum: ['badge', 'answer', 'follow', 'comment'],
+    },
   },
-  text: {
-    type: String,
-    required: true,
+  {
+    collection: 'Notification',
+    timestamps: true,
   },
-  seen: {
-    type: Boolean,
-    required: true,
-  },
-  type: {
-    type: String,
-    required: true,
-    enum: ['badge', 'answer', 'follow', 'comment'],
-  },
-});
+);
 
 export default notificationSchema;
