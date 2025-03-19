@@ -1,5 +1,6 @@
 import React from 'react';
 import './index.css';
+import { Box, Typography } from '@mui/material';
 import QuestionHeader from './header';
 import QuestionView from './question';
 import useQuestionPage from '../../../hooks/useQuestionPage';
@@ -13,21 +14,23 @@ const QuestionPage = () => {
   const { titleText, qlist, setQuestionOrder } = useQuestionPage();
 
   return (
-    <>
+    <Box sx={{ p: 4 }}>
       <QuestionHeader
         titleText={titleText}
         qcnt={qlist.length}
         setQuestionOrder={setQuestionOrder}
       />
-      <div id='question_list'>
+      <Box sx={{ mt: 2 }}>
         {qlist.map(q => (
           <QuestionView question={q} key={String(q._id)} />
         ))}
-      </div>
+      </Box>
       {titleText === 'Search Results' && !qlist.length && (
-        <div className='bold_title right_padding'>No Questions Found</div>
+        <Typography variant='h6' fontWeight='bold' sx={{ mt: 2 }}>
+          No Questions Found
+        </Typography>
       )}
-    </>
+    </Box>
   );
 };
 

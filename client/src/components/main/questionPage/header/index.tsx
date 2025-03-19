@@ -27,7 +27,7 @@ interface QuestionHeaderProps {
  * @param setQuestionOrder - Function to set the order of questions based on input message.
  */
 const QuestionHeader = ({ titleText, qcnt, setQuestionOrder }: QuestionHeaderProps) => (
-  <Box sx={{ mb: 3, px: 2, mt: 2 }}>
+  <Box>
     <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
       <Typography variant='h4' fontWeight='bold'>
         {titleText}

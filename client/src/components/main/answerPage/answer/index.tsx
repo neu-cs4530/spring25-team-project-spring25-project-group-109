@@ -1,5 +1,5 @@
 import React from 'react';
-import { handleHyperlink } from '../../../../tool';
+import { Card, CardContent, Paper, Stack, Typography } from '@mui/material';
 import CommentSection from '../../commentSection';
 import './index.css';
 import { Comment, DatabaseComment } from '../../../../types/types';
@@ -32,16 +32,26 @@ interface AnswerProps {
  * @param handleAddComment Function to handle adding a new comment.
  */
 const AnswerView = ({ text, ansBy, meta, comments, handleAddComment }: AnswerProps) => (
-  <div className='answer right_padding'>
-    <div id='answerText' className='answerText'>
-      {handleHyperlink(text)}
-    </div>
-    <div className='answerAuthor'>
-      <div className='answer_author'>{ansBy}</div>
-      <div className='answer_question_meta'>{meta}</div>
-    </div>
-    <CommentSection comments={comments} handleAddComment={handleAddComment} />
-  </div>
+  <Paper elevation={1} sx={{ p: 1, borderRadius: 2 }}>
+    <Card sx={{ boxShadow: 'none' }}>
+      <CardContent>
+        <Stack spacing={2}>
+          <Typography variant='body1' sx={{ mb: 2 }}>
+            {text}
+          </Typography>
+          <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mt: 1 }}>
+            <Typography variant='subtitle2' color='primary'>
+              {ansBy}
+            </Typography>
+            <Typography variant='caption' color='text.secondary'>
+              {meta}
+            </Typography>
+          </Stack>
+          <CommentSection comments={comments} handleAddComment={handleAddComment} />
+        </Stack>
+      </CardContent>
+    </Card>
+  </Paper>
 );
 
 export default AnswerView;

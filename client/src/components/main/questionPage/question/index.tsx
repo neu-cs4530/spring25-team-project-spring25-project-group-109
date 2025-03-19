@@ -49,8 +49,8 @@ const QuestionView = ({ question }: QuestionProps) => {
   return (
     <Card
       sx={{
-        'margin': 2,
         'padding': 2,
+        'marginBottom': 2,
         'borderRadius': 2,
         'cursor': 'pointer',
         'transition': '0.3s',
