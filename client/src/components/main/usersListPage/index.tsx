@@ -38,7 +38,7 @@ const UsersListPage = (props: UserListPageProps) => {
     }
   };
   return (
-    <Box sx={{ padding: 3 }}>
+    <Box sx={{ padding: 2 }}>
       <UsersListHeader userCount={userList.length} setUserFilter={setUserFilter} />
       <List>
         {userList.map(user => (
