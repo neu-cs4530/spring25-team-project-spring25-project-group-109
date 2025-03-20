@@ -1,6 +1,6 @@
 import express, { Request, Response, Router } from 'express';
-import { getBadgesList, saveBadge } from '../services/badge.service';
-import { BadgeRequest } from '../types/types';
+import { checkAndAwardBadges, getBadgesList, saveBadge } from '../services/badge.service';
+import { BadgeRequest, UpdateBadgeByUsernameRequest } from '../types/types';
 
 const badgeController = () => {
   const router: Router = express.Router();
@@ -69,8 +69,23 @@ const badgeController = () => {
     }
   };
 
+  // todo
+  const updateBadges = async (req: UpdateBadgeByUsernameRequest, res: Response): Promise<void> => {
+    try {
+      const { username } = req.params;
+      const badges = await checkAndAwardBadges(username);
+      if ('error' in badges) {
+        throw Error(badges.error);
+      }
+      res.status(200).json({ badges });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to update badges' });
+    }
+  };
+
   router.post('/addBadge', createBadge);
   router.get('/getBadges', getBadges);
+  router.patch('/updateBadges/:username', updateBadges);
   return router;
 };
 

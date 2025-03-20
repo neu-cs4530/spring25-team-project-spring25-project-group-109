@@ -20,6 +20,7 @@ import {
   User,
   UserStats,
   BadgeType,
+  EarnedBadge,
   Store,
   Feature,
   DatabaseFeature,
@@ -32,6 +33,7 @@ import * as strings from './data/posts_strings';
 import CommentModel from './models/comments.model';
 import UserModel from './models/users.model';
 import BadgeModel from './models/badge.model';
+import { checkAndAwardBadges } from './services/badge.service';
 import StoreModel from './models/store.model';
 import FeatureModel from './models/feature.model';
 import NotificationModel from './models/notification.model';
@@ -84,7 +86,16 @@ async function commentCreate(
     commentBy: commentBy,
     commentDateTime: commentDateTime,
   };
-  return await CommentModel.create(commentDetail);
+  const comment = await CommentModel.create(commentDetail);
+  const stats  = await UserStatsModel.findOneAndUpdate(
+    { username: commentBy },
+    { $inc: { commentsCount: 1 } },
+    { new: true }
+  );
+  if (stats) {
+    await checkAndAwardBadges(commentBy);
+  }
+  return comment;
 }
 
 /**
@@ -111,7 +122,16 @@ async function answerCreate(
     ansDateTime: ansDateTime,
     comments: comments,
   };
-  return await AnswerModel.create(answerDetail);
+  const answer = await AnswerModel.create(answerDetail);
+  const stats  = await UserStatsModel.findOneAndUpdate(
+    { username: ansBy },
+    { $inc: { answersCount: 1 } },
+    { new: true }
+  );
+  if (stats) {
+    await checkAndAwardBadges(ansBy);
+  }
+  return answer;
 }
 
 /**
@@ -147,7 +167,7 @@ async function questionCreate(
     comments == null
   )
     throw new Error('Invalid Question Format');
-  return await QuestionModel.create({
+  const question = await QuestionModel.create({
     title: title,
     text: text,
     tags: tags,
@@ -159,6 +179,15 @@ async function questionCreate(
     downVotes: [],
     comments: comments,
   });
+  const stats  = await UserStatsModel.findOneAndUpdate(
+    { username: question.askedBy },
+    { $inc: { questionsCount: 1 } },
+    { new: true }
+  );
+  if (stats) {
+    await checkAndAwardBadges(question.askedBy);
+  }
+  return question;
 }
 
 /**
@@ -170,14 +199,19 @@ async function questionCreate(
  * @param imagePath (optional) The image path associated with the feature (if applicable).
  * @returns A Promise that resolves to the created Feature document.
  */
-async function featureCreate(name: FeatureType, price: number): Promise<DatabaseFeature> {
+async function featureCreate(
+  name: FeatureType,
+  description: string,
+  price: number,
+): Promise<DatabaseFeature> {
   if (name === null || price <= 0) {
     throw new Error('Invalid Feature Format');
   }
 
   const feature: Feature = {
-    name: name,
-    price: price,
+    name,
+    description,
+    price,
   };
   return await FeatureModel.create(feature);
 }
@@ -284,9 +318,9 @@ async function collectionCreate(
  */
 const populate = async () => {
   try {
-    await featureCreate('Nim', 5);
-    await featureCreate('Custom Photo', 10);
-
+    await featureCreate("Nim", strings.NIM_FEATURE_DESCRIPTION, 5);
+    await featureCreate("Custom Profile Photo", strings.PROFILE_FEATURE_DESCRIPTION, 10);
+    
     const q1badge = await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
     await badgeCreate(strings.BQ10_NAME, strings.BQ10_DESCRIPTION, 'question', 10, `/images/badges/question/10.png`);
     await badgeCreate(strings.BQ50_NAME, strings.BQ50_DESCRIPTION, 'question', 50, `/images/badges/question/50.png`);

@@ -102,10 +102,11 @@ A class diagram for the schema definition is shown below:
 
 ### `/badge`
 
-| Endpoint   | Method | Description        |
-| ---------- | ------ | ------------------ |
-| /addBadge  | POST   | Create a new badge |
-| /getBadges | GET    | Gets all badges    |
+| Endpoint                | Method | Description                                  |
+| ----------------------- | ------ | -------------------------------------------- |
+| /addBadge               | POST   | Create a new badge                           |
+| /getBadges              | GET    | Gets all badges                              |
+| /updateBadges:/username | PATCH  | updated badges for user based on their stats |
 
 ### `/collection`
 
@@ -113,6 +114,12 @@ A class diagram for the schema definition is shown below:
 | ------------------------------- | ------ | -------------------------------------------------------------------- |
 | /createCollection               | POST   | Create a new collection                                              |
 | /getCollectionsByUser/:username | GET    | Retrieve all collections for a specific user based on their username |
+
+### `/features`
+
+| Endpoint     | Method | Description           |
+| ------------ | ------ | --------------------- |
+| /getFeatures | GET    | Gets all features     |
 
 ### `/notification `
 

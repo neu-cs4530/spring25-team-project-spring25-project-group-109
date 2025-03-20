@@ -5,13 +5,16 @@ import {
   DatabaseAnswer,
   DatabaseBadge,
   DatabaseComment,
+  DatabaseFeature,
   DatabaseNotification,
   DatabaseQuestion,
   DatabaseStore,
   DatabaseTag,
+  DatabaseUserStats,
   PopulatedDatabaseQuestion,
   SafeDatabaseUser,
   User,
+  UserStats,
 } from '../types/types';
 import { T1_DESC, T2_DESC, T3_DESC } from '../data/posts_strings';
 
@@ -207,6 +210,27 @@ export const safeUser: SafeDatabaseUser = {
   following: [],
 };
 
+export const mockUserStatsFull: UserStats = {
+  username: 'user1',
+  questionsCount: 10,
+  commentsCount: 0,
+  answersCount: 0,
+  nimWinCount: 0,
+};
+
+export const mockUserStats: UserStats = {
+  username: 'user1',
+  questionsCount: 0,
+  commentsCount: 0,
+  answersCount: 0,
+  nimWinCount: 0,
+};
+
+export const mockDBUserStats: DatabaseUserStats = {
+  ...mockUserStats,
+  _id: new ObjectId(),
+};
+
 export const badge: Badge = {
   name: 'Inquisitive',
   description: 'Asked 5 Questions',
@@ -253,4 +277,16 @@ export const mockStoreJSONResponse = {
   username: 'user1',
   coinCount: 0,
   unlockedFeatures: [],
+};
+
+export const mockFeature: DatabaseFeature = {
+  _id: new mongoose.Types.ObjectId(),
+  name: 'Nim',
+  description: 'description',
+  price: 0,
+};
+
+export const mockFeatureJSONResponse: DatabaseFeature = {
+  ...mockFeature,
+  _id: mockFeature._id.toString(),
 };

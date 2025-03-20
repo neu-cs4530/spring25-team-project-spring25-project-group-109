@@ -1,7 +1,7 @@
 import FeatureModel from '../models/feature.model';
 import StoreModel from '../models/store.model';
 import UserModel from '../models/users.model';
-import { Store, StoreResponse } from '../types/types';
+import { FeatureType, Store, StoreResponse } from '../types/types';
 
 /**
  * Save a new store to the database.
@@ -56,9 +56,10 @@ export const getStore = async (username: string): Promise<StoreResponse> => {
 /**
  * Updates the coin count for a user.
  *
- * @param username user to update
- * @param amount number of coins to add or subtract
+ * @param {string} username - The username of the user.
+ * @param {number} amount - The number of coins to add (positive) or subtract (negative).
  * @returns {Promise<DatabaseStore | null>} - The updated store object or an error message.
+ * @throws {Error} - If the user does not exist or the update fails.
  */
 export const updateCoins = async (username: string, amount: number): Promise<StoreResponse> => {
   try {
@@ -95,7 +96,7 @@ export const updateCoins = async (username: string, amount: number): Promise<Sto
 // removes coins from store and adds to unlocked feature
 export const unlockFeature = async (
   username: string,
-  featureName: 'Nim' | 'Custom Photo',
+  featureName: FeatureType,
 ): Promise<StoreResponse> => {
   try {
     const userStore = await StoreModel.findOne({ username });

@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import UserModel from '../models/users.model';
 import UserStatsModel from '../models/userstats.model';
 import {
@@ -21,10 +22,6 @@ import StoreModel from '../models/store.model';
 export const saveUser = async (user: User): Promise<UserResponse> => {
   try {
     const result: DatabaseUser = await UserModel.create(user);
-
-    if (!result) {
-      throw Error('Failed to create user');
-    }
 
     // Remove password field from returned object
     const safeUser: SafeDatabaseUser = {
@@ -61,9 +58,6 @@ export const saveUserStats = async (
       answersCount: 0,
       nimWinCount: 0,
     });
-    if (!result) {
-      throw Error('Failed to create user');
-    }
     return result;
   } catch (error) {
     return { error: `Error creating user stats: ${error}` };
@@ -85,9 +79,6 @@ export const saveUserStore = async (
       coinCount: 0,
       unlockedFeatures: [],
     });
-    if (!result) {
-      throw Error('Failed to create user store');
-    }
     return result;
   } catch (error) {
     return { error: `Error creating user store: ${error}` };
@@ -205,5 +196,39 @@ export const updateUser = async (
     return updatedUser;
   } catch (error) {
     return { error: `Error occurred when updating user: ${error}` };
+  }
+};
+
+/**
+ * Award one or more badges to a user.
+ *
+ * @param userId - The ID of the user to award the badges to.
+ * @param badgeIds - The IDs of the badges to award.
+ * @returns {Promise<UserResponse>} - The updated user object after badges are awarded.
+ */
+export const awardBadgeToUser = async (
+  username: string,
+  badgeIds: ObjectId[],
+): Promise<UserResponse> => {
+  try {
+    // create badge objects with badgeId and dateEarned for each badgeId
+    const badgesToAward = badgeIds.map(badgeId => ({
+      badgeId,
+      dateEarned: new Date(),
+    }));
+
+    // add badges to the user's badgesEarned array
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { username },
+      { $push: { badgesEarned: { $each: badgesToAward } } },
+      { new: true },
+    ).select('-password');
+
+    if (!updatedUser) {
+      throw new Error('User not found');
+    }
+    return updatedUser;
+  } catch (error) {
+    return { error: `Error occurred when updating badges: ${error}` };
   }
 };

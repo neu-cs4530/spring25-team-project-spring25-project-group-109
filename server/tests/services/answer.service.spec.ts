@@ -3,7 +3,8 @@ import AnswerModel from '../../models/answers.model';
 import QuestionModel from '../../models/questions.model';
 import { saveAnswer, addAnswerToQuestion } from '../../services/answer.service';
 import { DatabaseAnswer, DatabaseQuestion } from '../../types/types';
-import { QUESTIONS, ans1, ans4 } from '../mockData.models';
+import { QUESTIONS, ans1, ans4, mockUserStats } from '../mockData.models';
+import UserStatsModel from '../../models/userstats.model';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
@@ -18,18 +19,17 @@ describe('Answer model', () => {
   });
 
   describe('saveAnswer', () => {
+    const mockAnswer = {
+      text: 'This is a test answer',
+      ansBy: 'dummyUserId',
+      ansDateTime: new Date('2024-06-06'),
+      comments: [],
+    };
+    const mockDBAnswer = {
+      ...mockAnswer,
+      _id: new mongoose.Types.ObjectId(),
+    };
     test('saveAnswer should return the saved answer', async () => {
-      const mockAnswer = {
-        text: 'This is a test answer',
-        ansBy: 'dummyUserId',
-        ansDateTime: new Date('2024-06-06'),
-        comments: [],
-      };
-      const mockDBAnswer = {
-        ...mockAnswer,
-        _id: new mongoose.Types.ObjectId(),
-      };
-
       mockingoose(AnswerModel, 'create').toReturn(mockDBAnswer);
 
       const result = (await saveAnswer(mockAnswer)) as DatabaseAnswer;
@@ -38,6 +38,13 @@ describe('Answer model', () => {
       expect(result.text).toEqual(mockAnswer.text);
       expect(result.ansBy).toEqual(mockAnswer.ansBy);
       expect(result.ansDateTime).toEqual(mockAnswer.ansDateTime);
+    });
+    it('should return an object with error if AnswerModel.create throws an error', async () => {
+      jest.spyOn(AnswerModel, 'create').mockRejectedValueOnce(new Error(''));
+
+      const result = await saveAnswer(mockAnswer);
+
+      expect(result).toHaveProperty('error');
     });
   });
 
@@ -50,6 +57,7 @@ describe('Answer model', () => {
       jest
         .spyOn(QuestionModel, 'findOneAndUpdate')
         .mockResolvedValueOnce({ ...question, answers: [...question.answers, ans4._id] });
+      mockingoose(UserStatsModel).toReturn(mockUserStats, 'findOneAndUpdate');
 
       const result = (await addAnswerToQuestion(
         '65e9b5a995b6c7045a30d823',
@@ -60,8 +68,27 @@ describe('Answer model', () => {
       expect(result.answers).toContain(ans4._id);
     });
 
+    test('addAnswerToQuestion should return an object with error if user stats findOneAndUpdate throws an error', async () => {
+      mockingoose(QuestionModel).toReturn(QUESTIONS[0], 'findOneAndUpdate');
+      mockingoose(UserStatsModel).toReturn(new Error('error'), 'findOneAndUpdate');
+
+      const result = await addAnswerToQuestion('65e9b5a995b6c7045a30d823', ans1);
+
+      expect(result).toHaveProperty('error');
+    });
+
+    test('addAnswerToQuestion should return an object with error if user stats findOneAndUpdate returns null', async () => {
+      mockingoose(QuestionModel).toReturn(QUESTIONS[0], 'findOneAndUpdate');
+      mockingoose(UserStatsModel).toReturn(null, 'findOneAndUpdate');
+
+      const result = await addAnswerToQuestion('65e9b5a995b6c7045a30d823', ans1);
+
+      expect(result).toHaveProperty('error');
+    });
+
     test('addAnswerToQuestion should return an object with error if findOneAndUpdate throws an error', async () => {
       mockingoose(QuestionModel).toReturn(new Error('error'), 'findOneAndUpdate');
+      mockingoose(UserStatsModel).toReturn(mockUserStats, 'findOneAndUpdate');
 
       const result = await addAnswerToQuestion('65e9b5a995b6c7045a30d823', ans1);
 
@@ -70,6 +97,7 @@ describe('Answer model', () => {
 
     test('addAnswerToQuestion should return an object with error if findOneAndUpdate returns null', async () => {
       mockingoose(QuestionModel).toReturn(null, 'findOneAndUpdate');
+      mockingoose(UserStatsModel).toReturn(mockUserStats, 'findOneAndUpdate');
 
       const result = await addAnswerToQuestion('65e9b5a995b6c7045a30d823', ans1);
 

@@ -9,6 +9,7 @@ import {
 } from '../types/types';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
+import UserStatsModel from '../models/userstats.model';
 import { updateCoins } from './store.service';
 
 /**
@@ -38,7 +39,6 @@ export const getMostRecentAnswerTime = (
 export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
   try {
     const result: DatabaseAnswer = await AnswerModel.create(answer);
-
     await updateCoins(answer.ansBy, 1);
 
     return result;
@@ -71,6 +71,14 @@ export const addAnswerToQuestion = async (
 
     if (result === null) {
       throw new Error('Error when adding answer to question');
+    }
+    const userStats = await UserStatsModel.findOneAndUpdate(
+      { username: ans.ansBy },
+      { $inc: { answersCount: 1 } },
+      { new: true },
+    );
+    if (!userStats) {
+      throw new Error('Error updating user stats');
     }
     return result;
   } catch (error) {
