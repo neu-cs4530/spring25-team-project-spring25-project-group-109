@@ -290,11 +290,3 @@ export const mockFeatureJSONResponse: DatabaseFeature = {
   ...mockFeature,
   _id: mockFeature._id.toString(),
 };
-
-export const mockUserStats: UserStats = {
-  username: 'testUser',
-  questionsCount: 0,
-  commentsCount: 0,
-  answersCount: 0,
-  nimWinCount: 0,
-};

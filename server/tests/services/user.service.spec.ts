@@ -345,6 +345,8 @@ describe('saveUserStore', () => {
     const saveError = await saveUserStore('testUser');
 
     expect('error' in saveError).toBe(true);
+  });
+});
 
 describe('awardBadgeToUser', () => {
   it('should succesfully award badge', async () => {
