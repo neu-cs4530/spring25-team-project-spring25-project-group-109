@@ -1,16 +1,47 @@
-import { DatabaseNotification } from '@fake-stack-overflow/shared';
+import { DatabaseNotification, Notification } from '@fake-stack-overflow/shared';
 import NotificationModel from '../../models/notification.model';
-import getNotificationsByUsername from '../../services/notification.service';
+import { getNotificationsByUsername, saveNotification } from '../../services/notification.service';
 import { mockDatabaseNotification, user } from '../mockData.models';
 import UserModel from '../../models/users.model';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
 
+const notification: Notification = {
+  username: 'user1',
+  text: 'notification1',
+  seen: false,
+  type: 'badge',
+};
+
 describe('NotificationService', () => {
   beforeEach(() => {
     mockingoose.resetAll();
     jest.clearAllMocks();
+  });
+
+  describe('saveNotification', () => {
+    it('should return the saved notification', async () => {
+      mockingoose(NotificationModel).toReturn(mockDatabaseNotification, 'create');
+
+      const result = (await saveNotification(notification)) as DatabaseNotification;
+
+      expect(result._id).toBeDefined();
+      expect(result.username).toEqual(notification.username);
+      expect(result.text).toEqual(notification.text);
+      expect(result.seen).toEqual(notification.seen);
+      expect(result.type).toEqual(notification.type);
+    });
+
+    it('should throw an error if error when saving to database', async () => {
+      jest
+        .spyOn(NotificationModel, 'create')
+        .mockRejectedValueOnce(() => new Error('Error saving document'));
+
+      const saveError = await saveNotification(notification);
+
+      expect('error' in saveError).toBe(true);
+    });
   });
 
   describe('getNotificationsByUsername', () => {

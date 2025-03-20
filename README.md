@@ -125,6 +125,7 @@ A class diagram for the schema definition is shown below:
 
 | Endpoint                    | Method | Description                     |
 | --------------------------- | ------ | ------------------------------- |
+| /createNotification         | POST   | Create a new notification       |
 | /getNotifications/:username | GET    | Gets all notifications for user |
 
 ## Running Stryker Mutation Testing
