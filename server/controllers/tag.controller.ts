@@ -115,6 +115,10 @@ const tagController = () => {
       const { askedBy } = req.params; // Get the user ID from the request parameters
       const videos = await fetchYoutubeVideos(askedBy);
 
+      if ('error' in videos) {
+        throw new Error(videos.error);
+      }
+
       if (videos.length === 0) {
         res.status(404).send('No YouTube videos found for these tags.');
         return;

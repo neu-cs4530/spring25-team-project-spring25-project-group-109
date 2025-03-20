@@ -137,16 +137,14 @@ export const getTagCountMap = async (): Promise<Map<string, number> | null | { e
 
 export async function getMostRecentQuestionTags(
   askedBy: string,
-): Promise<string[] | { error: string }> {
+): Promise<DatabaseTag[] | { error: string }> {
   try {
     // Query the database for all questions asked by the user
     const questions = await QuestionModel.find({ askedBy }).sort({ askDateTime: -1 }); // Sort by askDateTime descending (most recent first)
-
     if (questions.length === 0) throw new Error('No questions found for the user');
 
     // Take the most recent question
     const mostRecentQuestion = questions[0];
-
     const mostRecentQTags = mostRecentQuestion.tags;
     if (!mostRecentQTags) {
       throw Error("Most recent question doesn't have tags");
@@ -154,8 +152,7 @@ export async function getMostRecentQuestionTags(
 
     // Return the tag of the most recent question
     const tags = await TagModel.find({ _id: { $in: mostRecentQTags } });
-    const tagNames = tags.map(tag => tag.name);
-    return tagNames;
+    return tags;
   } catch (error) {
     return { error: 'Error when fetching tags' };
   }
@@ -170,10 +167,12 @@ export async function fetchYoutubeVideos(
   askedBy: string,
 ): Promise<YouTubeVideo[] | { error: string }> {
   try {
-    const tagNames = await getMostRecentQuestionTags(askedBy);
-    if (!tagNames || 'error' in tagNames || tagNames.length === 0) {
+    const tags = await getMostRecentQuestionTags(askedBy);
+    if (!tags || 'error' in tags || tags.length === 0) {
       return []; // Return an empty array if no tags are found
     }
+
+    const tagNames = tags.map(tag => tag.name);
 
     const videoSet = new Map<string, YouTubeVideo>(); // To store unique videos
 
@@ -182,7 +181,12 @@ export async function fetchYoutubeVideos(
         const query = `intitle:${encodeURIComponent(tag)}`;
         const response = await fetch(
           `${YOUTUBE_SEARCH_URL}?part=snippet&q=${query}&key=${YOUTUBE_API_KEY}&maxResults=5`,
-        );
+        ).catch(e => ({ error: 'Error fetching YouTube videos' }));
+        // console.log Promise.all block
+        if ('error' in response) {
+          throw new Error(response.error);
+        }
+
         const data = await response.json();
 
         (data.items || []).forEach(
@@ -206,7 +210,8 @@ export async function fetchYoutubeVideos(
           },
         );
       }),
-    );
+    ); // .catch(e => ({ error: 'Error fetching YouTube videos' }));
+    console.log(Promise.all);
 
     return Array.from(videoSet.values()); // Return unique videos as an array
   } catch (error) {
