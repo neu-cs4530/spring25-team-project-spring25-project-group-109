@@ -25,7 +25,6 @@ export interface DatabaseStore extends Store {
  * Interface extending the request body for creating a store object.
  * - `body`: the store object being created.
  */
-// todo create when we create a user
 export interface CreateStoreRequest extends Request {
   body: Store;
 }

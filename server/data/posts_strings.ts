@@ -108,3 +108,9 @@ export const BN5_NAME = 'Nim Strategist';
 export const BN5_DESCRIPTION = 'Won 5 Games of Nim';
 export const BN10_NAME = 'Nim Legend';
 export const BN10_DESCRIPTION = 'Won 10 Games of Nim';
+
+export const NIM_FEATURE_DESCRIPTION =
+  'Nim is a two-player strategy game where players take turns removing objects from piles. Interact with other users and earn badges along the way!';
+
+export const PROFILE_FEATURE_DESCRIPTION =
+  'Make your profile truly yours and upload your own photo instead of picking from the default avatars!';

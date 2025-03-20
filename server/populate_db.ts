@@ -199,14 +199,19 @@ async function questionCreate(
  * @param imagePath (optional) The image path associated with the feature (if applicable).
  * @returns A Promise that resolves to the created Feature document.
  */
-async function featureCreate(name: FeatureType, price: number): Promise<DatabaseFeature> {
+async function featureCreate(
+  name: FeatureType,
+  description: string,
+  price: number,
+): Promise<DatabaseFeature> {
   if (name === null || price <= 0) {
     throw new Error('Invalid Feature Format');
   }
 
   const feature: Feature = {
-    name: name,
-    price: price,
+    name,
+    description,
+    price,
   };
   return await FeatureModel.create(feature);
 }
@@ -314,9 +319,9 @@ async function collectionCreate(
  */
 const populate = async () => {
   try {
-    await featureCreate('Nim', 5);
-    await featureCreate('Custom Photo', 10);
-
+    await featureCreate("Nim", strings.NIM_FEATURE_DESCRIPTION, 5);
+    await featureCreate("Custom Profile Photo", strings.PROFILE_FEATURE_DESCRIPTION, 10);
+    
     const q1badge = await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
     await badgeCreate(strings.BQ10_NAME, strings.BQ10_DESCRIPTION, 'question', 10, `/images/badges/question/10.png`);
     await badgeCreate(strings.BQ50_NAME, strings.BQ50_DESCRIPTION, 'question', 50, `/images/badges/question/50.png`);
