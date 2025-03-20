@@ -291,11 +291,11 @@ const populate = async () => {
     await badgeCreate(strings.BQ10_NAME, strings.BQ10_DESCRIPTION, 'question', 10, `/images/badges/question/10.png`);
     await badgeCreate(strings.BQ50_NAME, strings.BQ50_DESCRIPTION, 'question', 50, `/images/badges/question/50.png`);
 
-    await badgeCreate(strings.BA1_NAME, strings.BA1_DESCRIPTION, 'answer', 1, `/images/badges/answer/1.png`);
+    const a1badge = await badgeCreate(strings.BA1_NAME, strings.BA1_DESCRIPTION, 'answer', 1, `/images/badges/answer/1.png`);
     await badgeCreate(strings.BA10_NAME, strings.BA10_DESCRIPTION, 'answer', 10, `/images/badges/answer/10.png`);
     await badgeCreate(strings.BA50_NAME, strings.BA50_DESCRIPTION, 'answer', 50, `/images/badges/answer/50.png`);
 
-    await badgeCreate(strings.BC1_NAME, strings.BC1_DESCRIPTION, 'comment', 1, `/images/badges/comment/1.png`);
+    const c1badge = await badgeCreate(strings.BC1_NAME, strings.BC1_DESCRIPTION, 'comment', 1, `/images/badges/comment/1.png`);
     await badgeCreate(strings.BC10_NAME, strings.BC10_DESCRIPTION, 'comment', 10, `/images/badges/comment/10.png`);
     await badgeCreate(strings.BC50_NAME, strings.BC50_DESCRIPTION, 'comment', 50, `/images/badges/comment/50.png`);
 
@@ -336,6 +336,15 @@ const populate = async () => {
     );
 
     await notificationCreate('sama', `You have earned the badge ${q1badge.name}!`, false, 'badge');
+    await notificationCreate('sama', `annabelle answered your question: "${q1.title}"`, false, 'answer');
+    await notificationCreate('annabelle', `You have earned the badge ${a1badge.name}!`, false, 'badge');
+    await notificationCreate('sama', `kyle answered your question: "${q1.title}"`, false, 'answer');
+    await notificationCreate('kyle', `You have earned the badge ${a1badge.name}!`, false, 'badge');
+    await notificationCreate('sama', `nitsa commented on your question: "${q1.title}"`, false, 'comment');
+    await notificationCreate('nitsa', `You have earned the badge ${c1badge.name}!`, false, 'badge');
+    await notificationCreate('annabelle', `sama commented on your answer!`, false, 'comment');
+    await notificationCreate('sama', `You have earned the badge ${c1badge.name}!`, false, 'badge');
+    await notificationCreate('kyle', `nitsa commented on your answer!`, false, 'comment');
 
     await collectionCreate('favorites', 'nitsa', 'private', [q1._id]);
     await collectionCreate('typescript', 'annabelle', 'public', []);

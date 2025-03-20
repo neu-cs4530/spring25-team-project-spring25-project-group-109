@@ -1,9 +1,94 @@
 import supertest from 'supertest';
+import { NotificationType } from '@fake-stack-overflow/shared';
 import { app } from '../../app';
 import * as util from '../../services/notification.service';
 import { mockDatabaseNotification, mockNotificationJSONResponse } from '../mockData.models';
 
-const getNotificationsByUsernameSpy = jest.spyOn(util, 'default');
+const createNotificationSpy = jest.spyOn(util, 'saveNotification');
+const getNotificationsByUsernameSpy = jest.spyOn(util, 'getNotificationsByUsername');
+
+describe('POST /createNotification', () => {
+  it('should create a new notification given correct arguments', async () => {
+    const mockReqBody = {
+      username: 'user1',
+      text: 'notification1',
+      seen: false,
+      type: 'badge' as NotificationType,
+    };
+
+    createNotificationSpy.mockResolvedValueOnce({ ...mockDatabaseNotification });
+
+    const response = await supertest(app)
+      .post('/notification/createNotification')
+      .send(mockReqBody);
+    expect(response.status).toBe(200);
+    expect(createNotificationSpy).toHaveBeenCalledWith({
+      ...mockReqBody,
+    });
+  });
+
+  it('should return 400 for request missing username', async () => {
+    const mockReqBody = {
+      text: 'notification1',
+      seen: false,
+      type: 'badge' as NotificationType,
+    };
+
+    const response = await supertest(app)
+      .post('/notification/createNotification')
+      .send(mockReqBody);
+
+    expect(response.status).toBe(400);
+    expect(response.text).toEqual('Invalid notification creation request');
+  });
+
+  it('should return 400 for request with empty username', async () => {
+    const mockReqBody = {
+      username: '',
+      text: 'notification1',
+      seen: false,
+      type: 'badge' as NotificationType,
+    };
+
+    const response = await supertest(app)
+      .post('/notification/createNotification')
+      .send(mockReqBody);
+
+    expect(response.status).toBe(400);
+    expect(response.text).toEqual('Invalid notification creation request');
+  });
+
+  it('should return 400 for request missing text', async () => {
+    const mockReqBody = {
+      username: 'user1',
+      seen: false,
+      type: 'badge' as NotificationType,
+    };
+
+    const response = await supertest(app)
+      .post('/notification/createNotification')
+      .send(mockReqBody);
+
+    expect(response.status).toBe(400);
+    expect(response.text).toEqual('Invalid notification creation request');
+  });
+
+  it('should return 500 for a database error while saving user', async () => {
+    const mockReqBody = {
+      username: 'user1',
+      text: 'notification1',
+      seen: false,
+      type: 'badge' as NotificationType,
+    };
+
+    createNotificationSpy.mockResolvedValueOnce({ error: 'Error saving notification' });
+
+    const response = await supertest(app)
+      .post('/notification/createNotification')
+      .send(mockReqBody);
+    expect(response.status).toBe(500);
+  });
+});
 
 describe('GET /getNotificationsByUser', () => {
   it('should return a notification object given a valid username', async () => {

@@ -1,5 +1,5 @@
 import express, { Response, Router } from 'express';
-import getNotificationsByUsername, { saveNotification } from '../services/notification.service';
+import { getNotificationsByUsername, saveNotification } from '../services/notification.service';
 import { CreateNotificationRequest, GetNotificationsForUserRequest } from '../types/types';
 
 const notificationController = () => {
@@ -12,8 +12,8 @@ const notificationController = () => {
    * @returns `true` if the body contains valid notification fields; otherwise, `false`.
    */
   const isCreateNotificationRequestValid = (req: CreateNotificationRequest): boolean => {
-    const { username, text, seen, type } = req.body;
-    return !!username && !!text && !!seen && !!type;
+    const { username, text, type } = req.body;
+    return !!username && !!text && !!type;
   };
 
   /**
@@ -28,7 +28,7 @@ const notificationController = () => {
     res: Response,
   ): Promise<void> => {
     if (!req.body || !isCreateNotificationRequestValid(req)) {
-      res.status(400).send('Invalid collection creation request');
+      res.status(400).send('Invalid notification creation request');
       return;
     }
 
