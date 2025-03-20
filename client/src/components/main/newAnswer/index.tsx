@@ -1,7 +1,5 @@
-import './index.css';
 import React from 'react';
-import Form from '../baseComponents/form';
-import TextArea from '../baseComponents/textarea';
+import { TextField, Button, Box, Stack, Typography } from '@mui/material';
 import useAnswerForm from '../../../hooks/useAnswerForm';
 
 /**
@@ -11,21 +9,34 @@ const NewAnswerPage = () => {
   const { text, textErr, setText, postAnswer } = useAnswerForm();
 
   return (
-    <Form>
-      <TextArea
-        title={'Answer Text'}
-        id={'answerTextInput'}
-        val={text}
-        setState={setText}
-        err={textErr}
-      />
-      <div className='btn_indicator_container'>
-        <button className='form_postBtn' onClick={postAnswer}>
+    <Box sx={{ maxWidth: 600, margin: '0 auto', padding: 4 }}>
+      <Stack spacing={3}>
+        <Typography variant='h4' gutterBottom>
+          Submit Your Answer
+        </Typography>
+
+        <TextField
+          fullWidth
+          label='Answer Text'
+          placeholder='Write your answer here...'
+          id='answerTextInput'
+          value={text}
+          onChange={e => setText(e.target.value)}
+          error={Boolean(textErr)}
+          helperText={textErr}
+          multiline
+          rows={4}
+        />
+
+        <Button variant='contained' fullWidth onClick={postAnswer}>
           Post Answer
-        </button>
-        <div className='mandatory_indicator'>* indicates mandatory fields</div>
-      </div>
-    </Form>
+        </Button>
+
+        <Typography variant='body2' color='textSecondary' textAlign='center'>
+          <strong>*</strong> indicates mandatory fields
+        </Typography>
+      </Stack>
+    </Box>
   );
 };
 

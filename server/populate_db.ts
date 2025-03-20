@@ -248,6 +248,7 @@ async function userCreate(
   password: string,
   dateJoined: Date,
   biography?: string,
+  unlockedFeatures?: FeatureType[],
 ): Promise<DatabaseUser> {
   if (username === '' || password === '' || dateJoined === null) {
     throw new Error('Invalid User Format');
@@ -277,7 +278,7 @@ async function userCreate(
   const userStore: Store = {
     username: user.username,
     coinCount: 0,
-    unlockedFeatures: [],
+    unlockedFeatures: unlockedFeatures ?? [],
   };
   await StoreModel.create(userStore);
 
@@ -321,7 +322,7 @@ const populate = async () => {
     await featureCreate("Nim", strings.NIM_FEATURE_DESCRIPTION, 5);
     await featureCreate("Custom Profile Photo", strings.PROFILE_FEATURE_DESCRIPTION, 10);
     
-    const q1badge = await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
+    await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
     await badgeCreate(strings.BQ10_NAME, strings.BQ10_DESCRIPTION, 'question', 10, `/images/badges/question/10.png`);
     await badgeCreate(strings.BQ50_NAME, strings.BQ50_DESCRIPTION, 'question', 50, `/images/badges/question/50.png`);
 
@@ -337,8 +338,8 @@ const populate = async () => {
     await badgeCreate(strings.BN5_NAME, strings.BN5_DESCRIPTION, 'nim', 5, `/images/badges/nim/5.png`);
     await badgeCreate(strings.BN10_NAME, strings.BN10_DESCRIPTION, 'nim', 10, `/images/badges/nim/10.png`);
 
-    await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.');
-    await userCreate('kyle', 'kyle', new Date('2022-12-11T03:30:00'), 'I am a software engineer.');
+    await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.', ['Nim']);
+    await userCreate('kyle', 'kyle', new Date('2022-12-11T03:30:00'), 'I am a software engineer.', ['Nim']);
     await userCreate('nitsa', 'nitsa', new Date('2023-12-11T03:30:00'), 'I am a designer.');
     await userCreate('annabelle', 'annabelle', new Date('2022-12-11T03:30:00'), 'I am a manager.');
 
@@ -391,7 +392,11 @@ const populate = async () => {
       [],
     );
 
-    await notificationCreate('sama', `You have earned the badge ${q1badge.name}!`, false, 'badge');
+    await notificationCreate('sama', `annabelle answered your question: "${q1.title}"`, false, 'answer');
+    await notificationCreate('sama', `kyle answered your question: "${q1.title}"`, false, 'answer');
+    await notificationCreate('sama', `nitsa commented on your question: "${q1.title}"`, false, 'comment');
+    await notificationCreate('annabelle', `sama commented on your answer!`, false, 'comment');
+    await notificationCreate('kyle', `nitsa commented on your answer!`, false, 'comment');
 
     await collectionCreate('favorites', 'nitsa', 'private', [q1._id]);
     await collectionCreate('typescript', 'annabelle', 'public', []);

@@ -1,6 +1,27 @@
 import React from 'react';
-import './index.css';
+import {
+  Alert,
+  Avatar,
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Container,
+  Dialog,
+  DialogContent,
+  IconButton,
+  Input,
+  InputAdornment,
+  Modal,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import EditIcon from '@mui/icons-material/Edit';
 import useProfileSettings from '../../hooks/useProfileSettings';
+import modalStyle from './styles';
 
 const ProfileSettings: React.FC = () => {
   const {
@@ -44,51 +65,73 @@ const ProfileSettings: React.FC = () => {
 
   const numEarnedBadges = userData?.badgesEarned ? userData.badgesEarned.length : 0;
 
+  const handleButtonClick = () => {
+    setEditProfilePhotoMode(!editProfilePhotoMode);
+  };
+
   if (loading) {
     return (
-      <div className='page-container'>
-        <div className='profile-card'>
-          <h2>Loading user data...</h2>
-        </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '80vh',
+          width: '80vw',
+        }}>
+        <CircularProgress />
       </div>
     );
   }
 
   return (
-    <div className='page-container'>
-      <div className='profile-card'>
-        <h2>Profile</h2>
-        {successMessage && <p className='success-message'>{successMessage}</p>}
-        {errorMessage && <p className='error-message'>{errorMessage}</p>}
+    <Box sx={{ padding: 4, maxWidth: 800, margin: 'auto' }}>
+      <Typography variant='h2'>Profile</Typography>
+      {(successMessage || errorMessage) && (
+        <Alert sx={{ mb: 2 }} severity={successMessage ? 'success' : 'error'}>
+          {successMessage}
+        </Alert>
+      )}
+      <Stack spacing={4}>
         {userData ? (
           <>
-            {/* ---- Profile Photo ---- */}
-            <div className='profile-photo-container'>
-              <img
-                src={profilePhoto || '/images/avatars/default-avatar.png'}
-                className='profile-photo'
-              />
-              {canEditProfile && (
-                <button
-                  className='edit-button'
-                  onClick={() => {
-                    if (editProfilePhotoMode) {
-                      setEditProfilePhotoMode(false);
-                    } else {
-                      setEditProfilePhotoMode(true);
-                    }
-                  }}>
-                  {editProfilePhotoMode ? 'Cancel' : 'Edit'}
-                </button>
-              )}
-            </div>
+            {/* ---- Profile ---- */}
+            <Box>
+              {/* ---- Profile Photo ---- */}
+              <Stack
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  direction: 'column',
+                }}>
+                <Avatar
+                  sx={{ width: 120, height: 120 }}
+                  src={profilePhoto || '/images/avatars/default-avatar.png'}
+                />
+                {canEditProfile && (
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    onClick={handleButtonClick}
+                    sx={{ mt: 2 }}>
+                    {editProfilePhotoMode ? 'Cancel' : 'Change Photo'}
+                  </Button>
+                )}
+              </Stack>
 
-            {/* ---- Avatar Selection ---- */}
-            {editProfilePhotoMode && canEditProfile && (
-              <div className='avatar-selection'>
-                <div className='avatar-grid'>
+              {/* ---- Avatar Selection ---- */}
+              {editProfilePhotoMode && canEditProfile && (
+                <Container
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    flexWrap: 'wrap',
+                    gap: 1,
+                    mt: 2,
+                  }}>
                   {availableAvatars.map(avatar => (
-                    <img
+                    <Avatar
                       key={avatar}
                       src={avatar}
                       className={`avatar-option ${profilePhoto === avatar ? 'selected' : ''}`}
@@ -97,35 +140,49 @@ const ProfileSettings: React.FC = () => {
                       }}
                     />
                   ))}
-                </div>
-              </div>
-            )}
-
-            {/* ---- Follower/Following Section ---- */}
-
-            <div className='follow-stats-container'>
-              <div className='follow-stats'>
-                <span className='follow-count' onClick={() => setShowFollowers(true)}>
-                  <strong>{userData.followers.length}</strong> Followers
-                </span>
-                <span className='follow-count' onClick={() => setShowFollowing(true)}>
-                  <strong>{userData.following.length}</strong> Following
-                </span>
-              </div>
-
-              {!canEditProfile && (
-                <button
-                  className={isFollowing ? 'unfollow-button' : 'follow-button'}
-                  onClick={isFollowing ? handleUnfollowUser : handleFollowUser}>
-                  {isFollowing ? 'Unfollow' : 'Follow'}
-                </button>
+                </Container>
               )}
-            </div>
 
-            {showFollowers && (
-              <div className='modal'>
-                <div className='modal-content'>
-                  <h3>Followers</h3>
+              {/* ---- Follower/Following Section ---- */}
+
+              <Box display={'flex'} flexDirection={'column'} mt={2} alignItems='center'>
+                <Box display='flex' justifyContent='center'>
+                  <Button
+                    className='follow-count'
+                    variant='text'
+                    onClick={() => setShowFollowers(true)}
+                    sx={{ textAlign: 'center' }}>
+                    <Typography variant='subtitle1'>
+                      <span style={{ fontWeight: 'bold' }}>{userData.followers.length}</span>{' '}
+                      Followers
+                    </Typography>
+                  </Button>
+                  <Button
+                    className='follow-count'
+                    variant='text'
+                    onClick={() => setShowFollowing(true)}
+                    sx={{ textAlign: 'center' }}>
+                    <Typography variant='subtitle1'>
+                      <span style={{ fontWeight: 'bold' }}>{userData.following.length}</span>{' '}
+                      Following
+                    </Typography>
+                  </Button>
+                </Box>
+
+                {!canEditProfile && (
+                  <Button
+                    variant='contained'
+                    color={isFollowing ? 'error' : 'primary'}
+                    onClick={isFollowing ? handleUnfollowUser : handleFollowUser}
+                    sx={{ maxWidth: 200, mt: 1 }}>
+                    {isFollowing ? 'Unfollow' : 'Follow'}
+                  </Button>
+                )}
+              </Box>
+
+              <Modal open={showFollowers} onClose={() => setShowFollowers(false)}>
+                <Box sx={modalStyle}>
+                  <Typography variant='h4'>Followers</Typography>
                   {userData.followers.length > 0 ? (
                     <ul>
                       {userData.followers.map(follower => (
@@ -135,17 +192,18 @@ const ProfileSettings: React.FC = () => {
                   ) : (
                     <p>No followers yet.</p>
                   )}
-                  <button className='close-button' onClick={() => setShowFollowers(false)}>
+                  <Button
+                    variant='contained'
+                    onClick={() => setShowFollowers(false)}
+                    sx={{ marginTop: 2 }}>
                     Close
-                  </button>
-                </div>
-              </div>
-            )}
+                  </Button>
+                </Box>
+              </Modal>
 
-            {showFollowing && (
-              <div className='modal'>
-                <div className='modal-content'>
-                  <h3>Following</h3>
+              <Modal open={showFollowing} onClose={() => setShowFollowing(false)}>
+                <Box sx={modalStyle}>
+                  <Typography variant='h4'>Following</Typography>
                   {userData.following.length > 0 ? (
                     <ul>
                       {userData.following.map(following => (
@@ -155,148 +213,207 @@ const ProfileSettings: React.FC = () => {
                   ) : (
                     <p>Not following anyone yet.</p>
                   )}
-                  <button className='close-button' onClick={() => setShowFollowing(false)}>
+                  <Button
+                    variant='contained'
+                    onClick={() => setShowFollowing(false)}
+                    sx={{ marginTop: 2 }}>
                     Close
-                  </button>
-                </div>
-              </div>
-            )}
+                  </Button>
+                </Box>
+              </Modal>
+            </Box>
 
             {/* ---- General Information ---- */}
-            <h4>General Information</h4>
-            <p>
-              <strong>Username:</strong> {userData.username}
-            </p>
+            <Box>
+              <Paper variant='outlined' sx={{ padding: 2, borderRadius: 4 }}>
+                <Typography variant='h4'>General Information</Typography>
+                <Stack spacing={2} mt={1}>
+                  <Typography variant='subtitle1'>
+                    <span style={{ fontWeight: 'bold' }}>Username:</span> {userData.username}
+                  </Typography>
 
-            {/* ---- Biography Section ---- */}
-            {!editBioMode && (
-              <p>
-                <strong>Biography:</strong> {userData.biography || 'No biography yet.'}
-                {canEditProfile && (
-                  <button
-                    className='login-button'
-                    style={{ marginLeft: '1rem' }}
-                    onClick={() => {
-                      setEditBioMode(true);
-                      setNewBio(userData.biography || '');
-                    }}>
-                    Edit
-                  </button>
-                )}
-              </p>
-            )}
+                  {/* ---- Biography Section ---- */}
+                  {!editBioMode && (
+                    <Box display={'flex'} flexDirection={'row'}>
+                      <Typography variant='subtitle1'>
+                        <span style={{ fontWeight: 'bold' }}>Biography:</span>{' '}
+                        {userData.biography || 'No biography yet'}
+                      </Typography>
+                      {canEditProfile && (
+                        <Button
+                          onClick={() => {
+                            setEditBioMode(true);
+                            setNewBio(userData.biography || '');
+                          }}
+                          sx={{
+                            padding: 0,
+                            minWidth: 'auto',
+                          }}>
+                          <EditIcon sx={{ fontSize: 20, marginLeft: 1 }} />{' '}
+                        </Button>
+                      )}
+                    </Box>
+                  )}
 
-            {editBioMode && canEditProfile && (
-              <div style={{ margin: '1rem 0' }}>
-                <input
-                  className='input-text'
-                  type='text'
-                  value={newBio}
-                  onChange={e => setNewBio(e.target.value)}
-                />
-                <button
-                  className='login-button'
-                  style={{ marginLeft: '1rem' }}
-                  onClick={handleUpdateBiography}>
-                  Save
-                </button>
-                <button
-                  className='delete-button'
-                  style={{ marginLeft: '1rem' }}
-                  onClick={() => setEditBioMode(false)}>
-                  Cancel
-                </button>
-              </div>
-            )}
-
-            <p>
-              <strong>Date Joined:</strong>{' '}
-              {userData.dateJoined ? new Date(userData.dateJoined).toLocaleDateString() : 'N/A'}
-            </p>
+                  {editBioMode && canEditProfile && (
+                    <Box display='flex' alignItems='center' gap={2}>
+                      <Input type='text' value={newBio} onChange={e => setNewBio(e.target.value)} />
+                      <Button variant='contained' onClick={handleUpdateBiography}>
+                        Save
+                      </Button>
+                      <Button variant='outlined' onClick={() => setEditBioMode(false)}>
+                        Cancel
+                      </Button>
+                    </Box>
+                  )}
+                  <Typography variant='subtitle1'>
+                    <span style={{ fontWeight: 'bold' }}>Date Joined:</span>{' '}
+                    {userData.dateJoined
+                      ? new Date(userData.dateJoined).toLocaleDateString()
+                      : 'N/A'}
+                  </Typography>
+                </Stack>
+              </Paper>
+            </Box>
 
             {/* ---- Badges Section ---- */}
             {/* Future work will render only earned badges in color. Can be accessed from useData.earnedBadges */}
-            <h4>
-              Badges
-              {canEditProfile && numEarnedBadges > 0 && (
-                <span className='badge-count'>
-                  You have earned {numEarnedBadges} badge{numEarnedBadges > 1 ? 's' : ''}!
-                </span>
-              )}
-            </h4>
-            <div className='badges-grid'>
-              {allBadges && allBadges.length > 0 ? (
-                allBadges.map(badge => (
-                  <div key={String(badge._id)} className='badge'>
-                    <img src={badge.imagePath} alt={badge.name} className={`badge-image`} />
-                    <div className='badge-description'>{badge.description}</div>
-                  </div>
-                ))
-              ) : (
-                <p>No badges available yet.</p>
-              )}
-            </div>
+            <Box>
+              <Paper variant='outlined' sx={{ padding: 2, borderRadius: 4 }}>
+                <Box mb={2} gap={1} display='flex' alignItems='center'>
+                  <Typography variant='h4'>Badges </Typography>
+                  {canEditProfile && numEarnedBadges > 0 && (
+                    <Chip
+                      color='success'
+                      sx={{ color: 'white', fontWeight: 'bold' }}
+                      label={`You have earned ${numEarnedBadges} badge${numEarnedBadges > 1 ? 's' : ''}!`}></Chip>
+                  )}
+                </Box>
+                <Box display='flex' flexWrap='wrap' gap={3} justifyContent={'center'}>
+                  {allBadges && allBadges.length > 0 ? (
+                    allBadges.map(badge => (
+                      <Box
+                        key={String(badge._id)}
+                        display='flex'
+                        flexDirection='column'
+                        alignItems='center'
+                        textAlign='center'
+                        sx={{ filter: 'grayscale(100%)', opacity: 0.3 }}>
+                        <Box
+                          component='img'
+                          src={badge.imagePath}
+                          alt={badge.name}
+                          sx={{ width: 95, height: 95, borderRadius: '50%' }}
+                        />
+                        <Typography width={90} mt={1} variant='body2'>
+                          {badge.description}
+                        </Typography>
+                      </Box>
+                    ))
+                  ) : (
+                    <Typography>No badges available yet.</Typography>
+                  )}
+                </Box>
+              </Paper>
+            </Box>
 
             {/* ---- Reset Password Section ---- */}
-            {canEditProfile && (
-              <>
-                <h4>Reset Password</h4>
-                <input
-                  className='input-text'
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder='New Password'
-                  value={newPassword}
-                  onChange={e => setNewPassword(e.target.value)}
-                />
-                <input
-                  className='input-text'
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder='Confirm New Password'
-                  value={confirmNewPassword}
-                  onChange={e => setConfirmNewPassword(e.target.value)}
-                />
-                <button className='toggle-password-button' onClick={togglePasswordVisibility}>
-                  {showPassword ? 'Hide Passwords' : 'Show Passwords'}
-                </button>
-                <button className='login-button' onClick={handleResetPassword}>
-                  Reset
-                </button>
-              </>
-            )}
+            <Box>
+              {canEditProfile && (
+                <Paper variant='outlined' sx={{ padding: 2, borderRadius: 4 }}>
+                  <Typography variant='h4'>Reset Password</Typography>
+                  <Stack gap={2} mt={1}>
+                    <TextField
+                      type={showPassword ? 'text' : 'password'}
+                      value={newPassword}
+                      onChange={event => setNewPassword(event.target.value)}
+                      required
+                      label='New Password'
+                      fullWidth
+                      slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position='end'>
+                              <IconButton
+                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                onClick={togglePasswordVisibility}
+                                edge='end'>
+                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        },
+                      }}
+                    />
+                    <TextField
+                      type={showPassword ? 'text' : 'password'}
+                      value={confirmNewPassword}
+                      onChange={event => setConfirmNewPassword(event.target.value)}
+                      required
+                      label='Confirm New Password'
+                      fullWidth
+                      slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position='end'>
+                              <IconButton
+                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                onClick={togglePasswordVisibility}
+                                edge='end'>
+                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        },
+                      }}
+                    />
+                    <Button variant='contained' onClick={handleResetPassword}>
+                      Reset
+                    </Button>
+                  </Stack>
+                </Paper>
+              )}
+            </Box>
 
             {/* ---- Danger Zone (Delete User) ---- */}
-            {canEditProfile && (
-              <>
-                <h4>Danger Zone</h4>
-                <button className='delete-button' onClick={handleDeleteUser}>
-                  Delete This User
-                </button>
-              </>
-            )}
+            <Box>
+              {canEditProfile && (
+                <Paper variant='outlined' sx={{ padding: 2, borderRadius: 4 }}>
+                  <Typography variant='h4'>Danger Zone</Typography>
+                  <Button
+                    sx={{ mt: 1 }}
+                    variant='contained'
+                    color='error'
+                    onClick={handleDeleteUser}>
+                    Delete This User
+                  </Button>
+                </Paper>
+              )}
+            </Box>
           </>
         ) : (
-          <p>No user data found. Make sure the username parameter is correct.</p>
+          <Typography>No user data found. Make sure the username parameter is correct.</Typography>
         )}
 
         {/* ---- Confirmation Modal for Delete ---- */}
-        {showConfirmation && (
-          <div className='modal'>
-            <div className='modal-content'>
-              <p>
-                Are you sure you want to delete user <strong>{userData?.username}</strong>? This
-                action cannot be undone.
-              </p>
-              <button className='delete-button' onClick={() => pendingAction && pendingAction()}>
+        <Dialog open={showConfirmation} onClose={() => setShowConfirmation(false)}>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to delete user <strong>{userData?.username}</strong>? This
+              action cannot be undone.
+            </Typography>
+            <Box mt={2} display='flex' justifyContent='right' gap={2}>
+              <Button variant='outlined' onClick={() => pendingAction && pendingAction()}>
                 Confirm
-              </button>
-              <button className='cancel-button' onClick={() => setShowConfirmation(false)}>
+              </Button>
+              <Button variant='contained' onClick={() => setShowConfirmation(false)}>
                 Cancel
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+              </Button>
+            </Box>
+          </DialogContent>
+        </Dialog>
+      </Stack>
+    </Box>
   );
 };
 

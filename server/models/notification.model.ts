@@ -7,7 +7,7 @@ import notificationSchema from './schema/notification.schema';
  *
  * This model is created using the `Notification` interface and the `notificationSchema`, representing the
  * `Notification` collection in the MongoDB database, and provides an interface for interacting with
- * the notifications answers.
+ * the notifications.
  *
  * @type {Model<DatabaseNotification>}
  */
