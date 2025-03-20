@@ -72,8 +72,8 @@ export const checkAndAwardBadges = async (username: string): Promise<BadgesRespo
       );
 
       // send a notification for each badge earned
-      for (let badge of newBadges) {
-        await saveNotification({
+      for (const badge of newBadges) {
+        saveNotification({
           username: user.username,
           text: `You have earned the badge ${badge.name}!`,
           seen: false,
