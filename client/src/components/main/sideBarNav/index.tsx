@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { Box, List, ListItem, Button, Collapse, Typography } from '@mui/material';
+import { NavLink, useLocation } from 'react-router-dom';
+import { Box, List, ListItem, Button, Collapse, Typography, useTheme } from '@mui/material';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
-/**
- * The SideBarNav component has four menu items: "Questions", "Tags", "Messaging", and "Users".
- * It highlights the currently selected item based on the active page and
- * triggers corresponding functions when the menu items are clicked.
- */
 const SideBarNav = () => {
   const [showOptions, setShowOptions] = useState<boolean>(false);
+  const location = useLocation(); // get current URL path
+  const theme = useTheme();
+
+  const isGlobalActive = location.pathname === '/messaging';
+  const isDirectActive = location.pathname === '/messaging/direct-message';
+  const isMessagingActive = isGlobalActive || isDirectActive; // messaging should highlight if any sub-tab is active
 
   const toggleOptions = () => {
     setShowOptions(!showOptions);
@@ -19,7 +20,7 @@ const SideBarNav = () => {
     <Box
       sx={{
         width: 250,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: theme.palette.background.default,
         padding: 2,
         boxShadow: 2,
       }}>
@@ -29,8 +30,7 @@ const SideBarNav = () => {
             to='/home'
             style={({ isActive }) => ({
               textDecoration: 'none',
-              color: isActive ? '#1976d2' : '#333',
-              backgroundColor: isActive ? '#e3f2fd' : 'transparent', // Background highlight for active item
+              backgroundColor: isActive ? theme.palette.secondary.main : 'transparent',
               padding: '8px 16px',
               borderRadius: '4px',
             })}>
@@ -44,8 +44,7 @@ const SideBarNav = () => {
             to='/tags'
             style={({ isActive }) => ({
               textDecoration: 'none',
-              color: isActive ? '#1976d2' : '#333',
-              backgroundColor: isActive ? '#e3f2fd' : 'transparent',
+              backgroundColor: isActive ? theme.palette.secondary.main : 'transparent',
               padding: '8px 16px',
               borderRadius: '4px',
             })}>
@@ -55,54 +54,51 @@ const SideBarNav = () => {
           </NavLink>
         </ListItem>
         <ListItem disablePadding>
-          <NavLink
-            to='/messaging'
-            style={({ isActive }) => ({
-              textDecoration: 'none',
-              color: isActive ? '#1976d2' : '#333',
-              backgroundColor: isActive ? '#e3f2fd' : 'transparent',
-              padding: '8px 16px',
+          <Button
+            onClick={toggleOptions}
+            sx={{
+              backgroundColor: isMessagingActive ? theme.palette.secondary.main : 'transparent',
+              textAlign: 'left',
+              padding: '12px 30px',
               borderRadius: '4px',
-            })}>
-            <Button fullWidth onClick={toggleOptions}>
-              <Typography variant='body1'>Messaging</Typography>
-              {showOptions ? <ExpandLess /> : <ExpandMore />}
-            </Button>
-          </NavLink>
+            }}>
+            <Typography variant='body1'>Messaging</Typography>
+            {showOptions ? <ExpandLess /> : <ExpandMore />}
+          </Button>
         </ListItem>
         <Collapse in={showOptions} timeout='auto' unmountOnExit>
           <List component='div' disablePadding>
             <ListItem disablePadding>
               <NavLink
                 to='/messaging'
-                style={({ isActive }) => ({
+                style={{
                   textDecoration: 'none',
-                  color: isActive ? '#1976d2' : '#333',
-                  backgroundColor: isActive ? '#e3f2fd' : 'transparent',
+                  backgroundColor: isGlobalActive ? theme.palette.secondary.main : 'transparent',
                   padding: '8px 16px',
                   borderRadius: '4px',
-                })}>
+                  display: 'block',
+                  width: '100%',
+                  paddingLeft: '24px',
+                }}>
                 <Button fullWidth>
-                  <Typography variant='body2' sx={{ pl: 4 }}>
-                    Global Messages
-                  </Typography>
+                  <Typography variant='body2'>Global Messages</Typography>
                 </Button>
               </NavLink>
             </ListItem>
             <ListItem disablePadding>
               <NavLink
                 to='/messaging/direct-message'
-                style={({ isActive }) => ({
+                style={{
                   textDecoration: 'none',
-                  color: isActive ? '#1976d2' : '#333',
-                  backgroundColor: isActive ? '#e3f2fd' : 'transparent',
+                  backgroundColor: isDirectActive ? theme.palette.secondary.main : 'transparent',
                   padding: '8px 16px',
                   borderRadius: '4px',
-                })}>
+                  display: 'block',
+                  width: '100%',
+                  paddingLeft: '24px',
+                }}>
                 <Button fullWidth>
-                  <Typography variant='body2' sx={{ pl: 4 }}>
-                    Direct Messages
-                  </Typography>
+                  <Typography variant='body2'>Direct Messages</Typography>
                 </Button>
               </NavLink>
             </ListItem>
@@ -113,8 +109,7 @@ const SideBarNav = () => {
             to='/users'
             style={({ isActive }) => ({
               textDecoration: 'none',
-              color: isActive ? '#1976d2' : '#333',
-              backgroundColor: isActive ? '#e3f2fd' : 'transparent',
+              backgroundColor: isActive ? theme.palette.secondary.main : 'transparent',
               padding: '8px 16px',
               borderRadius: '4px',
             })}>
@@ -129,7 +124,7 @@ const SideBarNav = () => {
             style={({ isActive }) => ({
               textDecoration: 'none',
               color: isActive ? '#1976d2' : '#333',
-              backgroundColor: isActive ? '#e3f2fd' : 'transparent',
+              backgroundColor: isActive ? theme.palette.secondary.main : 'transparent',
               padding: '8px 16px',
               borderRadius: '4px',
             })}>

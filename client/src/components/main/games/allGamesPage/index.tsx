@@ -1,7 +1,9 @@
 import React from 'react';
 import './index.css';
+import { Alert, Box, Button, Modal, Stack, Typography } from '@mui/material';
 import useAllGamesPage from '../../../../hooks/useAllGamesPage';
 import GameCard from './gameCard';
+import modalStyle from '../../../profileSettings/styles';
 
 /**
  * Component to display the "All Games" page, which provides functionality to view, create, and join games.
@@ -24,54 +26,63 @@ const AllGamesPage = () => {
 
   const hasUnlockedGames = permissions.nim;
 
-  return (
-    <div className='game-page'>
-      {!hasUnlockedGames && (
-        <div className='overlay'>
-          <div className='locked-modal'>
-            <h2>You have not purchased any games.</h2>
-            <p>Visit the store to unlock games like Nim and more!</p>
-            {/* <button onClick={handleGoToStore}>Go to Store</button> */}
-          </div>
-        </div>
-      )}
+  // todo fix flash of modal when user does have permissions
 
-      <div className='game-controls'>
-        <button className='btn-create-game' onClick={handleToggleModal}>
-          Create Game
-        </button>
-      </div>
+  return (
+    <Box p={4}>
+      <Modal open={!hasUnlockedGames}>
+        <Box sx={modalStyle}>
+          <Typography sx={{ textAlign: 'center' }} variant='h4'>
+            You have not purchased any games yet
+          </Typography>
+          <Typography sx={{ textAlign: 'center' }} variant='body1'>
+            Visit the store to unlock Nim and more!
+          </Typography>
+          {/* <button onClick={handleGoToStore}>Go to Store</button> */}
+        </Box>
+      </Modal>
+
+      <Button variant={'contained'} onClick={handleToggleModal}>
+        Create Game
+      </Button>
 
       {isModalOpen && hasUnlockedGames && (
-        <div className='game-modal'>
-          <div className='modal-content'>
-            <h2>Select Game Type</h2>
-
-            {/* Check if nim permission is true */}
+        <Stack spacing={1} mt={2}>
+          <Typography variant='h5' fontWeight={'bold'}>
+            Select Game Type
+          </Typography>
+          <Box display={'flex'} gap={2}>
             {permissions.nim ? (
-              <button onClick={() => handleSelectGameType('Nim')}>Nim</button>
+              <Button variant='outlined' onClick={() => handleSelectGameType('Nim')}>
+                Nim
+              </Button>
             ) : null}
-
-            <button onClick={handleToggleModal}>Cancel</button>
-          </div>
-        </div>
+            <Button variant='outlined' onClick={handleToggleModal}>
+              Cancel
+            </Button>
+          </Box>
+        </Stack>
       )}
 
-      <div className='game-available'>
-        <div className='game-list'>
-          {error && <div className='game-error'>{error}</div>}
-          <h2>Available Games</h2>
-          <button className='btn-refresh-list' onClick={fetchGames}>
+      <Stack spacing={2} mt={2}>
+        {error && (
+          <Alert sx={{ mb: 2 }} severity={'error'}>
+            {error}
+          </Alert>
+        )}
+        <Typography variant='h5' fontWeight={'bold'}>
+          Available Games
+        </Typography>
+        <Box>
+          <Button variant={'outlined'} onClick={fetchGames}>
             Refresh List
-          </button>
-          <div className='game-items'>
-            {availableGames.map(game => (
-              <GameCard key={game.gameID} game={game} handleJoin={handleJoin} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </Box>
+        {availableGames.map(game => (
+          <GameCard key={game.gameID} game={game} handleJoin={handleJoin} />
+        ))}
+      </Stack>
+    </Box>
   );
 };
 

@@ -34,7 +34,7 @@ const UsersListHeader = ({ userCount, setUserFilter }: UserHeaderProps) => {
           alignItems: 'center',
           marginBottom: 2,
         }}>
-        <Typography variant='h5' sx={{ fontWeight: 'bold' }}>
+        <Typography variant='h4' sx={{ fontWeight: 'bold' }}>
           All Users
         </Typography>
 

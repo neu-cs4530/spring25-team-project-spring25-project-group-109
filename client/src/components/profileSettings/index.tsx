@@ -345,7 +345,7 @@ const ProfileSettings: React.FC = () => {
                       value={confirmNewPassword}
                       onChange={event => setConfirmNewPassword(event.target.value)}
                       required
-                      label='New Password'
+                      label='Confirm New Password'
                       fullWidth
                       slotProps={{
                         input: {

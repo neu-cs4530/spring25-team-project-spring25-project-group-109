@@ -28,6 +28,8 @@ const theme = createTheme({
     },
     grey: {
       500: '#6c757d',
+      200: '#999',
+      100: '#f9f9f9',
     },
   },
   typography: {
@@ -102,22 +104,13 @@ const theme = createTheme({
       lineHeight: 1.3,
     },
   },
-  spacing: 8, // Default spacing unit
-  breakpoints: {
-    values: {
-      xs: 0, // Small screens (phones)
-      sm: 600, // Small devices (tablets)
-      md: 960, // Medium devices (laptops)
-      lg: 1280, // Large devices (desktops)
-      xl: 1920, // Extra large devices (large screens)
-    },
-  },
+  spacing: 8,
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8, // Customize the button border radius
-          textTransform: 'none', // Prevent text from being uppercased
+          borderRadius: 8,
+          textTransform: 'none',
         },
         outlined: {
           'backgroundColor': '#FFFFFF',

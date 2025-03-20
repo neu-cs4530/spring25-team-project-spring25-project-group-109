@@ -1,5 +1,5 @@
 import React from 'react';
-import './index.css';
+import { Box, Button, List, ListItem, Paper, Typography } from '@mui/material';
 import { GameInstance, GameState } from '../../../../../types/types';
 
 /**
@@ -15,21 +15,26 @@ const GameCard = ({
   game: GameInstance<GameState>;
   handleJoin: (gameID: string) => void;
 }) => (
-  <div className='game-item'>
-    <p>
-      <strong>Game ID:</strong> {game.gameID} | <strong>Status:</strong> {game.state.status}
-    </p>
-    <ul className='game-players'>
-      {game.players.map((player: string) => (
-        <li key={`${game.gameID}-${player}`}>{player}</li>
-      ))}
-    </ul>
-    {game.state.status === 'WAITING_TO_START' && (
-      <button className='btn-join-game' onClick={() => handleJoin(game.gameID)}>
-        Join Game
-      </button>
-    )}
-  </div>
+  <Paper variant='outlined' sx={{ borderRadius: 2 }}>
+    <Box p={2}>
+      <Typography variant='body1'>
+        <strong>Game ID:</strong> {game.gameID}
+      </Typography>
+      <Typography variant='body1'>
+        <strong>Status:</strong> {game.state.status}
+      </Typography>
+      <List>
+        {game.players.map((player: string) => (
+          <ListItem key={`${game.gameID}-${player}`}>{player}</ListItem>
+        ))}
+      </List>
+      {game.state.status === 'WAITING_TO_START' && (
+        <Button variant='contained' onClick={() => handleJoin(game.gameID)}>
+          Join Game
+        </Button>
+      )}
+    </Box>
+  </Paper>
 );
 
 export default GameCard;
