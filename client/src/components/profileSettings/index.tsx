@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   Container,
   Dialog,
   DialogContent,
@@ -70,10 +71,15 @@ const ProfileSettings: React.FC = () => {
 
   if (loading) {
     return (
-      <div className='page-container'>
-        <div className='profile-card'>
-          <h2>Loading user data...</h2>
-        </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '80vh',
+          width: '80vw',
+        }}>
+        <CircularProgress />
       </div>
     );
   }
@@ -228,7 +234,7 @@ const ProfileSettings: React.FC = () => {
 
                   {/* ---- Biography Section ---- */}
                   {!editBioMode && (
-                    <Box className='bio-container'>
+                    <Box display={'flex'} flexDirection={'row'}>
                       <Typography variant='subtitle1'>
                         <span style={{ fontWeight: 'bold' }}>Biography:</span>{' '}
                         {userData.biography || 'No biography yet'}
