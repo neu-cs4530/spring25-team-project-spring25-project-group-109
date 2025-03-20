@@ -67,6 +67,16 @@ describe('Test Collection Service', () => {
       }
     });
 
+    it('should return an error if the collection already exists', async () => {
+      mockingoose(UserModel).toReturn(user, 'findOne');
+      mockingoose(CollectionModel).toReturn(savedCollection, 'findOne');
+      const result = (await saveCollection(collection)) as DatabaseCollection;
+      expect('error' in result).toBe(true);
+      if ('error' in result) {
+        expect(result.error).toContain('Collection with the same name already exists');
+      }
+    });
+
     it('should return an error if an exception occurs', async () => {
       mockingoose(UserModel).toReturn(user, 'findOne');
       jest.spyOn(CollectionModel, 'create').mockRejectedValueOnce(new Error('DB Error'));

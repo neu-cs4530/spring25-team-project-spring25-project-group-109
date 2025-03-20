@@ -26,6 +26,15 @@ export const saveCollection = async (collection: Collection): Promise<Collection
       throw new Error('User does not exist.');
     }
 
+    const existingCollection = await CollectionModel.findOne({
+      name: collection.name,
+      username: collection.username,
+    });
+
+    if (existingCollection) {
+      throw new Error('Collection with the same name already exists.');
+    }
+
     const result: DatabaseCollection = await CollectionModel.create(collection);
     return result;
   } catch (error) {

@@ -335,6 +335,28 @@ const populate = async () => {
       [c3],
     );
 
+    await questionCreate(
+      strings.Q2_DESC,
+      strings.Q2_TXT,
+      [t3, t4],
+      [],
+      'annabelle',
+      new Date('2023-11-20T03:24:42'),
+      [],
+      [],
+    );
+
+    await questionCreate(
+      strings.Q3_DESC,
+      strings.Q3_TXT,
+      [t5, t6],
+      [],
+      'nitsa',
+      new Date('2023-11-23T08:24:00'),
+      [],
+      [],
+    );
+
     await notificationCreate('sama', `You have earned the badge ${q1badge.name}!`, false, 'badge');
 
     await collectionCreate('favorites', 'nitsa', 'private', [q1._id]);

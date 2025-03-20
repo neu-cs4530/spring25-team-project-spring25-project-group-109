@@ -1,9 +1,10 @@
-import React from 'react';
+import { useState } from 'react';
 import { ObjectId } from 'mongodb';
 import { useNavigate } from 'react-router-dom';
 import './index.css';
 import { getMetaData } from '../../../../tool';
 import { PopulatedDatabaseQuestion } from '../../../../types/types';
+import SaveToCollection from '../../saveToCollection';
 
 /**
  * Interface representing the props for the Question component.
@@ -23,6 +24,7 @@ interface QuestionProps {
  */
 const QuestionView = ({ question }: QuestionProps) => {
   const navigate = useNavigate();
+  const [showSaveModal, setShowSaveModal] = useState(false);
 
   /**
    * Function to navigate to the home page with the specified tag as a search parameter.
@@ -78,6 +80,26 @@ const QuestionView = ({ question }: QuestionProps) => {
         <div>&nbsp;</div>
         <div className='question_meta'>asked {getMetaData(new Date(question.askDateTime))}</div>
       </div>
+
+      {/* Save to Collection Button */}
+      <button
+        className='save-to-collection-btn'
+        onClick={e => {
+          e.stopPropagation();
+          setShowSaveModal(true);
+        }}>
+        Save to Collection
+      </button>
+
+      {/* Save to Collection Popup */}
+      {showSaveModal && (
+        <div onClick={e => e.stopPropagation()}>
+          <SaveToCollection
+            questionId={String(question._id)}
+            onClose={() => setShowSaveModal(false)}
+          />
+        </div>
+      )}
     </div>
   );
 };
