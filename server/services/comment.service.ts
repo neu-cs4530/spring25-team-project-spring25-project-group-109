@@ -78,7 +78,7 @@ export const addComment = async (
       // send a notification to the question asker when this comment is added
       await saveNotification({
         username: result.askedBy,
-        text: `${comment.commentBy} commented on your question: ${result.title}`,
+        text: `${comment.commentBy} commented on your question: "${result.title}"`,
         seen: false,
         type: 'comment',
       });
