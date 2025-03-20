@@ -1,6 +1,7 @@
 import { GameMove, NimGameState, NimMove } from '../../types/types';
 import { MAX_NIM_OBJECTS } from '../../types/constants';
 import Game from './game';
+import UserStatsModel from '../../models/userstats.model';
 
 /**
  * Represents a game of Nim, extending the generic Game class.
@@ -68,13 +69,18 @@ class NimGame extends Game<NimGameState, NimMove> {
    * Checks if the game has ended based on the remaining objects.
    * If the game has ended, updates the game state to reflect the winner.
    */
-  private _gameEndCheck(): void {
+  private async _gameEndCheck(): Promise<void> {
     if (this.state.remainingObjects === 0) {
       this.state = {
         ...this.state,
         status: 'OVER',
         winners: [this._players[this.state.moves.length % 2]],
       };
+      await UserStatsModel.findOneAndUpdate(
+        { username: this._players[this.state.moves.length % 2] },
+        { $inc: { nimWinCount: 1 } },
+        { new: true },
+      );
     }
   }
 
