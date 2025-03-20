@@ -1,5 +1,4 @@
 import React from 'react';
-import './index.css';
 import {
   Alert,
   Avatar,
@@ -101,7 +100,7 @@ const ProfileSettings: React.FC = () => {
                   direction: 'column',
                 }}>
                 <Avatar
-                  sx={{ width: 125, height: 125 }}
+                  sx={{ width: 120, height: 120 }}
                   src={profilePhoto || '/images/avatars/default-avatar.png'}
                 />
                 {canEditProfile && (
