@@ -1,5 +1,6 @@
 import React from 'react';
 import './index.css';
+import { useNavigate } from 'react-router-dom';
 import useAllGamesPage from '../../../../hooks/useAllGamesPage';
 import GameCard from './gameCard';
 
@@ -21,6 +22,7 @@ const AllGamesPage = () => {
     error,
     permissions,
   } = useAllGamesPage();
+  const navigate = useNavigate();
 
   const hasUnlockedGames = permissions.nim;
 
@@ -31,7 +33,9 @@ const AllGamesPage = () => {
           <div className='locked-modal'>
             <h2>You have not purchased any games.</h2>
             <p>Visit the store to unlock games like Nim and more!</p>
-            {/* <button onClick={handleGoToStore}>Go to Store</button> */}
+            <button className='btn-create-game' onClick={e => navigate('/store')}>
+              Go to Store
+            </button>
           </div>
         </div>
       )}
