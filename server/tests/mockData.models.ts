@@ -259,6 +259,8 @@ export const safeUserTwo: SafeDatabaseUser = {
   username: 'user2',
   dateJoined: new Date('2024-12-03'),
   badgesEarned: [],
+  following: [],
+  followers: [],
 };
 
 export const badge: Badge = {
