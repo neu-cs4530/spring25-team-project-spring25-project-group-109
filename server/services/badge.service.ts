@@ -3,6 +3,7 @@ import BadgeModel from '../models/badge.model';
 import UserModel from '../models/users.model';
 import UserStatsModel from '../models/userstats.model';
 import { awardBadgeToUser } from './user.service';
+import { saveNotification } from './notification.service';
 
 /**
  * Saves a new badge to the database.
@@ -69,6 +70,16 @@ export const checkAndAwardBadges = async (username: string): Promise<BadgesRespo
         user.username,
         newBadges.map(badge => badge._id),
       );
+
+      // send a notification for each badge earned
+      for (const badge of newBadges) {
+        saveNotification({
+          username: user.username,
+          text: `You have earned the badge ${badge.name}!`,
+          seen: false,
+          type: 'badge',
+        });
+      }
     }
     return newBadges;
   } catch (error) {

@@ -321,7 +321,7 @@ const populate = async () => {
     await featureCreate("Nim", strings.NIM_FEATURE_DESCRIPTION, 5);
     await featureCreate("Custom Profile Photo", strings.PROFILE_FEATURE_DESCRIPTION, 10);
     
-    const q1badge = await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
+    await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
     await badgeCreate(strings.BQ10_NAME, strings.BQ10_DESCRIPTION, 'question', 10, `/images/badges/question/10.png`);
     await badgeCreate(strings.BQ50_NAME, strings.BQ50_DESCRIPTION, 'question', 50, `/images/badges/question/50.png`);
 
@@ -369,7 +369,11 @@ const populate = async () => {
       [c3],
     );
 
-    await notificationCreate('sama', `You have earned the badge ${q1badge.name}!`, false, 'badge');
+    await notificationCreate('sama', `annabelle answered your question: "${q1.title}"`, false, 'answer');
+    await notificationCreate('sama', `kyle answered your question: "${q1.title}"`, false, 'answer');
+    await notificationCreate('sama', `nitsa commented on your question: "${q1.title}"`, false, 'comment');
+    await notificationCreate('annabelle', `sama commented on your answer!`, false, 'comment');
+    await notificationCreate('kyle', `nitsa commented on your answer!`, false, 'comment');
 
     await collectionCreate('favorites', 'nitsa', 'private', [q1._id]);
     await collectionCreate('typescript', 'annabelle', 'public', []);
