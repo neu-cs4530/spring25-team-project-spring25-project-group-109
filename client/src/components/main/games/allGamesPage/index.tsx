@@ -1,6 +1,7 @@
 import React from 'react';
 import './index.css';
 import { Alert, Box, Button, Modal, Stack, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import useAllGamesPage from '../../../../hooks/useAllGamesPage';
 import GameCard from './gameCard';
 import modalStyle from '../../../profileSettings/styles';
@@ -23,9 +24,13 @@ const AllGamesPage = () => {
     error,
     permissions,
   } = useAllGamesPage();
+  const navigate = useNavigate();
 
   const hasUnlockedGames = permissions.nim;
 
+  function handleGoToStore(): void {
+    navigate(`/store`);
+  }
   // todo fix flash of modal when user does have permissions
 
   return (
@@ -38,7 +43,9 @@ const AllGamesPage = () => {
           <Typography sx={{ textAlign: 'center' }} variant='body1'>
             Visit the store to unlock Nim and more!
           </Typography>
-          {/* <button onClick={handleGoToStore}>Go to Store</button> */}
+          <Button variant={'contained'} onClick={handleGoToStore}>
+            Go to Store
+          </Button>
         </Box>
       </Modal>
 
