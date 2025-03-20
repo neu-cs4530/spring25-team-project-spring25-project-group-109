@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react';
-import './index.css';
+import { Typography, CircularProgress, Alert, Box, Avatar, Stack, Chip } from '@mui/material';
 import useUserContext from '../../../hooks/useUserContext';
 import getUserStore from '../../../services/storeService';
 import { DatabaseFeature, DatabaseStore } from '../../../types/types';
 import { getFeatures } from '../../../services/featureService';
 import FeatureCard from '../featureCard';
 
-/**
- * StorePage component fetches and displays the user's coin balance.
- */
 const StorePage = () => {
   const { user } = useUserContext();
   const [store, setStore] = useState<DatabaseStore>();
@@ -19,7 +16,6 @@ const StorePage = () => {
   useEffect(() => {
     const fetchUserStore = async () => {
       if (!user?.username) return;
-
       try {
         const userStore = await getUserStore(user.username);
         setStore(userStore);
@@ -32,7 +28,6 @@ const StorePage = () => {
 
     const fetchFeatures = async () => {
       if (!user?.username) return;
-
       try {
         const featuresList = await getFeatures();
         setFeatures(featuresList);
@@ -47,64 +42,54 @@ const StorePage = () => {
     fetchFeatures();
   }, [user?.username]);
 
-  // Handle loading state
   if (loading) {
-    return (
-      <div className='store-page'>
-        <header className='store-header'>
-          <h1>Store</h1>
-        </header>
-        <div className='store-content'>
-          <p>Loading coins...</p>
-        </div>
-      </div>
-    );
+    return <CircularProgress></CircularProgress>;
   }
 
-  // Handle error state
   if (error) {
     return (
-      <div className='store-page'>
-        <header className='store-header'>
-          <h1>Store</h1>
-        </header>
-        <div className='store-content'>
-          <p className='error-message'>{error}</p>
-        </div>
-      </div>
+      <Stack p={4}>
+        <Typography variant='h4' gutterBottom>
+          Store
+        </Typography>
+        <Alert severity='error'>{error}</Alert>
+      </Stack>
     );
   }
 
-  // Render the store content when data is available
   return (
-    <div className='store-page'>
-      <header className='store-header'>
-        <h1>Store</h1>
-        <p className='store-description'>
-          Earn coins by asking and answering questions and messaging fellow users and use them to
-          unlock cool features to level up your experience!
-        </p>
-      </header>
+    <Box p={4}>
+      <Typography variant='h4' gutterBottom>
+        {' '}
+        Store{' '}
+      </Typography>
+      {error && <Alert severity='error'>{error}</Alert>}
+      <Typography variant='body1'>
+        Earn coins by asking and answering questions and messaging fellow users and use them to
+        unlock cool features to level up your experience!
+      </Typography>
 
-      <div className='store-content'>
-        <div className='coin-box'>
-          <img src='/images/icons/coin.png' alt='Coin icon' className='coin-icon' />
-          <span className='coin-count'>{store?.coinCount || 0}</span>
-        </div>
-      </div>
+      <Chip
+        avatar={<Avatar alt='Coin' src='/images/icons/coin.png' />}
+        label={`${store?.coinCount || 0} ${store?.coinCount === 1 ? 'Coin' : 'Coins'}`}
+        variant='outlined'
+        sx={{ fontSize: '1rem', padding: '10px', height: '40px', mt: 2 }}
+      />
 
-      {features.map(feature => (
-        <FeatureCard
-          key={feature._id}
-          feature={feature}
-          // todo remove eslint disable on next line
-          // eslint-disable-next-line no-console
-          onPurchase={() => console.log('purchased - not really')} // Todo: Handle purchase on button click
-          purchased={store?.unlockedFeatures.some(name => name === feature.name) || false}
-          outOfBudget={(store?.coinCount || 0) < feature.price}
-        />
-      ))}
-    </div>
+      <Stack mt={4} gap={2}>
+        {features.map(feature => (
+          <FeatureCard
+            key={feature._id}
+            feature={feature}
+            // todo remove next line comment
+            // eslint-disable-next-line no-console
+            onPurchase={() => console.log('purchased - not really')}
+            purchased={store?.unlockedFeatures.some(name => name === feature.name) || false}
+            outOfBudget={(store?.coinCount || 0) < feature.price}
+          />
+        ))}
+      </Stack>
+    </Box>
   );
 };
 

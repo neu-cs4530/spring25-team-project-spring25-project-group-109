@@ -1,5 +1,4 @@
 import React from 'react';
-import './index.css';
 import { Box, Stack, Typography } from '@mui/material';
 import TagView from './tag';
 import useTagPage from '../../../hooks/useTagPage';
