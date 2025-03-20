@@ -20,6 +20,7 @@ import {
   User,
   UserStats,
   BadgeType,
+  EarnedBadge,
   Store,
   Feature,
   DatabaseFeature,
@@ -32,6 +33,7 @@ import * as strings from './data/posts_strings';
 import CommentModel from './models/comments.model';
 import UserModel from './models/users.model';
 import BadgeModel from './models/badge.model';
+import { checkAndAwardBadges } from './services/badge.service';
 import StoreModel from './models/store.model';
 import FeatureModel from './models/feature.model';
 import NotificationModel from './models/notification.model';
@@ -84,7 +86,16 @@ async function commentCreate(
     commentBy: commentBy,
     commentDateTime: commentDateTime,
   };
-  return await CommentModel.create(commentDetail);
+  const comment = await CommentModel.create(commentDetail);
+  const stats  = await UserStatsModel.findOneAndUpdate(
+    { username: commentBy },
+    { $inc: { commentsCount: 1 } },
+    { new: true }
+  );
+  if (stats) {
+    await checkAndAwardBadges(commentBy);
+  }
+  return comment;
 }
 
 /**
@@ -111,7 +122,16 @@ async function answerCreate(
     ansDateTime: ansDateTime,
     comments: comments,
   };
-  return await AnswerModel.create(answerDetail);
+  const answer = await AnswerModel.create(answerDetail);
+  const stats  = await UserStatsModel.findOneAndUpdate(
+    { username: ansBy },
+    { $inc: { answersCount: 1 } },
+    { new: true }
+  );
+  if (stats) {
+    await checkAndAwardBadges(ansBy);
+  }
+  return answer;
 }
 
 /**
@@ -147,7 +167,7 @@ async function questionCreate(
     comments == null
   )
     throw new Error('Invalid Question Format');
-  return await QuestionModel.create({
+  const question = await QuestionModel.create({
     title: title,
     text: text,
     tags: tags,
@@ -159,6 +179,15 @@ async function questionCreate(
     downVotes: [],
     comments: comments,
   });
+  const stats  = await UserStatsModel.findOneAndUpdate(
+    { username: question.askedBy },
+    { $inc: { questionsCount: 1 } },
+    { new: true }
+  );
+  if (stats) {
+    await checkAndAwardBadges(question.askedBy);
+  }
+  return question;
 }
 
 /**

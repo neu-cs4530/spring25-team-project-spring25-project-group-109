@@ -24,6 +24,7 @@ import {
   sortQuestionsByNewest,
   sortQuestionsByUnanswered,
 } from '../utils/sort.util';
+import UserStatsModel from '../models/userstats.model';
 
 /**
  * Checks if keywords exist in a question's title or text.
@@ -160,11 +161,20 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
   try {
     const result: DatabaseQuestion = await QuestionModel.create(question);
 
+    const userStats = await UserStatsModel.findOneAndUpdate(
+      { username: question.askedBy },
+      { $inc: { questionsCount: 1 } },
+      { new: true },
+    );
+    if (!userStats) {
+      throw new Error('Error updating user stats');
+    }
+
     await updateCoins(question.askedBy, 1);
 
     return result;
   } catch (error) {
-    return { error: 'Error when saving a question' };
+    return { error: 'Error when saving question' };
   }
 };
 

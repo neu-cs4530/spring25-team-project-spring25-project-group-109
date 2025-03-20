@@ -34,3 +34,13 @@ export type BadgesResponse = DatabaseBadge[] | { error: string };
 export interface BadgeRequest extends Request {
   body: Badge;
 }
+
+/**
+ * Represents a request containing a username in the parameter.
+ * Extends the Express Request object to include a query param of type string.
+ */
+export interface UpdateBadgeByUsernameRequest extends Request {
+  params: {
+    username: string;
+  };
+}

@@ -20,3 +20,10 @@ export interface UserStats {
 export interface DatabaseUserStats extends UserStats {
   _id: mongoose.Types.ObjectId;
 }
+
+/**
+ * Represents the response for user-stats-related operations.
+ * - `DatabaseUserStats`: A user stats object if the operation is successful.
+ * - `error`: An error message if the operation fails.
+ */
+export type UserStatsResponse = DatabaseUserStats | { error: string };

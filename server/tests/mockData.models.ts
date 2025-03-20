@@ -210,6 +210,27 @@ export const safeUser: SafeDatabaseUser = {
   following: [],
 };
 
+export const mockUserStatsFull: UserStats = {
+  username: 'user1',
+  questionsCount: 10,
+  commentsCount: 0,
+  answersCount: 0,
+  nimWinCount: 0,
+};
+
+export const mockUserStats: UserStats = {
+  username: 'user1',
+  questionsCount: 0,
+  commentsCount: 0,
+  answersCount: 0,
+  nimWinCount: 0,
+};
+
+export const mockDBUserStats: DatabaseUserStats = {
+  ...mockUserStats,
+  _id: new ObjectId(),
+};
+
 export const badge: Badge = {
   name: 'Inquisitive',
   description: 'Asked 5 Questions',
