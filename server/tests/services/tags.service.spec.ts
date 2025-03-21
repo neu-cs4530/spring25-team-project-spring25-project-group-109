@@ -246,6 +246,7 @@ describe('Tag model', () => {
       originalFetch = global.fetch;
       mockingoose.resetAll();
       jest.clearAllMocks();
+      jest.restoreAllMocks();
     });
 
     afterEach(() => {
