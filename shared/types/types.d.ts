@@ -13,3 +13,4 @@ export * from './collection';
 export * from './userstats';
 export * from './notification';
 export * from './badge';
+export * from './youtube.video';
