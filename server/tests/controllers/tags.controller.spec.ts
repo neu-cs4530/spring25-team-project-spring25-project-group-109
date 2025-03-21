@@ -95,7 +95,6 @@ describe('Test tagController', () => {
       const response = await supertest(app).get('/tag/getMostRecentQuestionTags/user123');
 
       expect(response.status).toBe(200);
-      // expect(response.body).toEqual({ ...mockTags, _id: mockDatabaseTag._id.toString() });
       expect(response.body).toEqual(
         mockTags.map(tag => ({
           ...tag,
