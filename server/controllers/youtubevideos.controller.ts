@@ -1,5 +1,5 @@
 import express, { Request, Response, Router } from 'express';
-import { fetchYoutubeVideos } from '../services/youtubevideos.service';
+import fetchYoutubeVideos from '../services/youtubevideos.service';
 
 const youtubeController = () => {
   const router: Router = express.Router();
