@@ -1,7 +1,7 @@
 import { DatabaseQuestion, DatabaseTag, Question, Tag, YouTubeVideo } from '../types/types';
 import QuestionModel from '../models/questions.model';
 import TagModel from '../models/tags.model';
-import { YOUTUBE_API_KEY, YOUTUBE_SEARCH_URL } from '../types/youtubeConstants'; // Assuming you have a config file for your API key
+import { YOUTUBE_API_KEY, YOUTUBE_SEARCH_URL } from '../types/constants';
 
 /**
  * Checks if given question contains any tags from the given list.
