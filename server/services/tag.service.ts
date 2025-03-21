@@ -126,7 +126,7 @@ export const getTagCountMap = async (): Promise<Map<string, number> | null | { e
 
 /**
  * Retreives the list of tags from the last question asked by the given user.
- *  
+ *
  * @param askedBy the user which asked the question
  * @returns {DatabaseTag[] | { error: string }}
  */

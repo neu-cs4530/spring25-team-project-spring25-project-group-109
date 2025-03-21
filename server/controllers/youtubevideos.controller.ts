@@ -28,7 +28,7 @@ const youtubeController = () => {
     }
   };
 
-  router.get('/getYoutubeVideos/:askedBy', getYoutubeVideosRoute); 
+  router.get('/getYoutubeVideos/:askedBy', getYoutubeVideosRoute);
   return router;
 };
 

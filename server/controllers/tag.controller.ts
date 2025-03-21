@@ -1,8 +1,5 @@
 import express, { Request, Response, Router } from 'express';
-import {
-  getTagCountMap,
-  getMostRecentQuestionTags,
-} from '../services/tag.service';
+import { getTagCountMap, getMostRecentQuestionTags } from '../services/tag.service';
 import TagModel from '../models/tags.model';
 import { DatabaseTag } from '../types/types';
 
@@ -85,8 +82,6 @@ const tagController = () => {
       res.status(500).send(`Error fetching tags: ${(err as Error).message}`);
     }
   };
-
-
 
   // Add appropriate HTTP verbs and their endpoints to the router.
   router.get('/getTagsWithQuestionNumber', getTagsWithQuestionNumber);

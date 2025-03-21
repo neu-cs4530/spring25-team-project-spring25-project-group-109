@@ -118,5 +118,4 @@ describe('Test tagController', () => {
       expect(response.text).toContain('Error fetching tags: Error fetching tags');
     });
   });
-
 });
