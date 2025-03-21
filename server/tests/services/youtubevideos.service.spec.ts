@@ -1,6 +1,6 @@
 import TagModel from '../../models/tags.model';
 import QuestionModel from '../../models/questions.model';
-import { fetchYoutubeVideos } from '../../services/youtubevideos.service';
+import fetchYoutubeVideos from '../../services/youtubevideos.service';
 import { POPULATED_QUESTIONS, tag1, tag2, tag3 } from '../mockData.models';
 import { DatabaseTag } from '../../types/types';
 

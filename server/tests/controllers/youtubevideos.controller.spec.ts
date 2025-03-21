@@ -3,7 +3,7 @@ import { app } from '../../app';
 
 import * as util from '../../services/youtubevideos.service';
 
-const fetchYoutubeVideosSpy = jest.spyOn(util, 'fetchYoutubeVideos');
+const fetchYoutubeVideosSpy = jest.spyOn(util, 'default');
 
 describe('Test youtubeController', () => {
   describe('GET /getYoutubeVideos/:askedBy', () => {
