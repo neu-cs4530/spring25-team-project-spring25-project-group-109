@@ -1,6 +1,7 @@
 import React from 'react';
 import './index.css';
 import { useNavigate } from 'react-router-dom';
+import { Box, List, Typography } from '@mui/material';
 import UserCardView from './userCard';
 import UsersListHeader from './header';
 import useUsersListPage from '../../../hooks/useUsersListPage';
@@ -37,9 +38,9 @@ const UsersListPage = (props: UserListPageProps) => {
     }
   };
   return (
-    <div className='user-card-container'>
+    <Box sx={{ padding: 2 }}>
       <UsersListHeader userCount={userList.length} setUserFilter={setUserFilter} />
-      <div id='users_list' className='users_list'>
+      <List>
         {userList.map(user => (
           <UserCardView
             user={user}
@@ -47,11 +48,13 @@ const UsersListPage = (props: UserListPageProps) => {
             handleUserCardViewClickHandler={handleUserCardViewClickHandler}
           />
         ))}
-      </div>
+      </List>
       {(!userList.length || userList.length === 0) && (
-        <div className='bold_title right_padding'>No Users Found</div>
+        <Typography variant='h6' align='center' sx={{ marginTop: 3 }}>
+          No Users Found
+        </Typography>
       )}
-    </div>
+    </Box>
   );
 };
 

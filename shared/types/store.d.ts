@@ -2,7 +2,10 @@ import { Request } from 'express';
 import { FeatureType } from './feature';
 
 /**
- * Represents a user's store, which includes their coin balance and unlocked features.
+ * Represents a user store.
+ * - `username`: the username of the user.
+ * - `coinCount`: the number of coins the user has.
+ * - `unlockedFeatures`: the features the user has unlocked.
  */
 export interface Store {
   username: string;

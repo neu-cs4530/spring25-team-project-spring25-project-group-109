@@ -1,6 +1,6 @@
 import React from 'react';
-import './index.css';
 import { ObjectId } from 'mongodb';
+import { Paper, Typography, useTheme } from '@mui/material';
 import { PopulatedDatabaseChat } from '../../../../types/types';
 
 /**
@@ -15,12 +15,22 @@ const ChatsListCard = ({
 }: {
   chat: PopulatedDatabaseChat;
   handleChatSelect: (chatID: ObjectId | undefined) => void;
-}) => (
-  <div onClick={() => handleChatSelect(chat._id)} className='chats-list-card'>
-    <p>
-      <strong>Chat with:</strong> {chat.participants.join(', ')}
-    </p>
-  </div>
-);
+}) => {
+  const theme = useTheme();
+
+  return (
+    <Paper
+      variant='outlined'
+      onClick={() => handleChatSelect(chat._id)}
+      style={{
+        padding: theme.spacing(2),
+        backgroundColor: theme.palette.background.default,
+      }}>
+      <Typography variant='body1'>
+        <strong>Chat with:</strong> {chat.participants.join(', ')}
+      </Typography>
+    </Paper>
+  );
+};
 
 export default ChatsListCard;

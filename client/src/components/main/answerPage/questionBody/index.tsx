@@ -1,5 +1,6 @@
 import React from 'react';
 import './index.css';
+import { Box, Divider, Typography } from '@mui/material';
 import { handleHyperlink } from '../../../../tool';
 
 /**
@@ -28,14 +29,19 @@ interface QuestionBodyProps {
  * @param meta Additional metadata related to the question.
  */
 const QuestionBody = ({ views, text, askby, meta }: QuestionBodyProps) => (
-  <div id='questionBody' className='questionBody right_padding'>
-    <div className='bold_title answer_question_view'>{views} views</div>
-    <div className='answer_question_text'>{handleHyperlink(text)}</div>
-    <div className='answer_question_right'>
-      <div className='question_author'>{askby}</div>
-      <div className='answer_question_meta'>asked {meta}</div>
-    </div>
-  </div>
+  <Box>
+    <Typography variant='body1' sx={{ mb: 2 }}>
+      {handleHyperlink(text)}
+    </Typography>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Typography variant='body2' fontWeight='bold'>
+        {askby}, {views} views
+      </Typography>
+      <Typography variant='caption' color='textSecondary'>
+        asked {meta}
+      </Typography>
+    </Box>
+    <Divider sx={{ mt: 2 }} />
+  </Box>
 );
-
 export default QuestionBody;

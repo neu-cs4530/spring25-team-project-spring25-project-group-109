@@ -1,5 +1,6 @@
 import React from 'react';
 import './index.css';
+import { Alert, Box, Button, Paper, Stack, Typography, TextField } from '@mui/material';
 import useDirectMessage from '../../../hooks/useDirectMessage';
 import ChatsListCard from './chatsListCard';
 import UsersListPage from '../usersListPage';
@@ -27,56 +28,88 @@ const DirectMessage = () => {
 
   return (
     <>
-      <div className='create-panel'>
-        <button
-          className='custom-button'
-          onClick={() => setShowCreatePanel(prevState => !prevState)}>
-          {showCreatePanel ? 'Hide Create Chat Panel' : 'Start a Chat'}
-        </button>
-        {error && <div className='direct-message-error'>{error}</div>}
-        {showCreatePanel && (
-          <>
-            <p>Selected user: {chatToCreate}</p>
-            <button className='custom-button' onClick={handleCreateChat}>
-              Create New Chat
-            </button>
-            <UsersListPage handleUserSelect={handleUserSelect} />
-          </>
-        )}
-      </div>
-      <div className='direct-message-container'>
-        <div className='chats-list'>
-          {chats.map(chat => (
-            <ChatsListCard key={String(chat._id)} chat={chat} handleChatSelect={handleChatSelect} />
-          ))}
-        </div>
-        <div className='chat-container'>
+      <Box>
+        <Stack spacing={2}>
+          <Box paddingLeft={4} paddingTop={4}>
+            <Button variant='contained' onClick={() => setShowCreatePanel(prevState => !prevState)}>
+              {showCreatePanel ? 'Hide Create Chat Panel' : 'Start a Chat'}
+            </Button>
+            {error && <Alert severity='error'>{error}</Alert>}
+          </Box>
+          {showCreatePanel && (
+            <Box>
+              <Stack paddingLeft={4} spacing={1}>
+                <Typography variant='body1'>
+                  <strong>Selected user:</strong> {chatToCreate}
+                </Typography>
+                <Box>
+                  <Button variant='contained' disabled={!chatToCreate} onClick={handleCreateChat}>
+                    Chat With User
+                  </Button>
+                </Box>
+              </Stack>
+              <UsersListPage handleUserSelect={handleUserSelect} />
+            </Box>
+          )}
+        </Stack>
+      </Box>
+
+      <Box p={4} display='flex' flexDirection='row' gap={2}>
+        <Paper sx={{ p: 2, width: '20%' }}>
+          <Stack spacing={2}>
+            {chats.map(chat => (
+              <ChatsListCard
+                key={String(chat._id)}
+                chat={chat}
+                handleChatSelect={handleChatSelect}
+              />
+            ))}
+          </Stack>
+        </Paper>
+
+        <Box
+          className='chat-container'
+          sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
           {selectedChat ? (
             <>
-              <h2>Chat Participants: {selectedChat.participants.join(', ')}</h2>
-              <div className='chat-messages'>
+              <Typography variant='h4'>Chat with {selectedChat.participants.join(', ')}</Typography>
+              <Box
+                className='chat-messages'
+                sx={{
+                  flex: 1,
+                  overflowY: 'auto',
+                  maxHeight: '50vh',
+                  padding: 2,
+                  backgroundColor: '#f7f7f7',
+                  borderRadius: 2,
+                }}>
                 {selectedChat.messages.map(message => (
                   <MessageCard key={String(message._id)} message={message} />
                 ))}
-              </div>
-              <div className='message-input'>
-                <input
-                  className='custom-input'
-                  type='text'
+              </Box>
+
+              <Box className='message-input' sx={{ display: 'flex', gap: 1 }}>
+                <TextField
+                  fullWidth
+                  variant='outlined'
                   value={newMessage}
                   onChange={e => setNewMessage(e.target.value)}
                   placeholder='Type a message...'
+                  size='small'
                 />
-                <button className='custom-button' onClick={handleSendMessage}>
+                <Button
+                  variant='contained'
+                  onClick={handleSendMessage}
+                  disabled={!newMessage.trim()}>
                   Send
-                </button>
-              </div>
+                </Button>
+              </Box>
             </>
           ) : (
-            <h2>Select a user to start chatting</h2>
+            <Typography variant='h6'>Select a user to start chatting</Typography>
           )}
-        </div>
-      </div>
+        </Box>
+      </Box>
     </>
   );
 };
