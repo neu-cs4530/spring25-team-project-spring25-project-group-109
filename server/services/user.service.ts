@@ -222,12 +222,14 @@ export const getRankedUsersList = async (): Promise<RankedUsersResponse> => {
         $sort: { count: -1 },
       },
     ]);
-    console.log(users);
     if (!users) {
       throw Error('Ranked users list could not be retrieved');
     }
 
-    const usersList = users.map(user => ({ count: user.count, ...user.user_info }));
+    const usersList = users.map(user => {
+      delete user.user_info.password;
+      return { count: user.count, ...user.user_info };
+    });
     return usersList;
   } catch (error) {
     return { error: `Error occurred when finding ranked users: ${error}` };
