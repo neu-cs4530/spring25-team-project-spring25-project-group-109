@@ -1,3 +1,4 @@
+import { Box, Button } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,13 +18,16 @@ const AskQuestionButton = () => {
   };
 
   return (
-    <button
-      className='bluebtn'
-      onClick={() => {
-        handleNewQuestion();
-      }}>
-      Ask a Question
-    </button>
+    <Box>
+      <Button
+        sx={{ fontSize: '1.1rem', padding: '12px 18px' }}
+        variant='contained'
+        onClick={() => {
+          handleNewQuestion();
+        }}>
+        Ask a Question
+      </Button>
+    </Box>
   );
 };
 

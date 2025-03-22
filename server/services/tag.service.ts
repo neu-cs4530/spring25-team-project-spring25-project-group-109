@@ -1,10 +1,7 @@
 import { DatabaseQuestion, DatabaseTag, Question, Tag, YouTubeVideo } from '../types/types';
 import QuestionModel from '../models/questions.model';
 import TagModel from '../models/tags.model';
-
-// Global constants for youtube videos - to be used below
-const YOUTUBE_API_KEY = 'AIzaSyC_6UhgEsCf-dYTplfBqUGUseLI7l3ooc0';
-const YOUTUBE_SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search';
+import { YOUTUBE_API_KEY, YOUTUBE_SEARCH_URL } from '../types/constants';
 
 /**
  * Checks if given question contains any tags from the given list.
@@ -134,10 +131,9 @@ export const getTagCountMap = async (): Promise<Map<string, number> | null | { e
  * @param askedBy the user which asked the question
  * @returns Promise<string[] | null>, where the string array is the array of tag names
  */
-
 export async function getMostRecentQuestionTags(
   askedBy: string,
-): Promise<string[] | { error: string }> {
+): Promise<DatabaseTag[] | { error: string }> {
   try {
     // Query the database for all questions asked by the user
     const questions = await QuestionModel.find({ askedBy }).sort({ askDateTime: -1 }); // Sort by askDateTime descending (most recent first)
@@ -146,16 +142,14 @@ export async function getMostRecentQuestionTags(
 
     // Take the most recent question
     const mostRecentQuestion = questions[0];
-
     const mostRecentQTags = mostRecentQuestion.tags;
-    if (!mostRecentQTags) {
-      throw Error("Most recent question doesn't have tags");
+    if (!mostRecentQTags || mostRecentQTags.length === 0) {
+      throw new Error('No tags found for the most recent question.');
     }
 
     // Return the tag of the most recent question
     const tags = await TagModel.find({ _id: { $in: mostRecentQTags } });
-    const tagNames = tags.map(tag => tag.name);
-    return tagNames;
+    return tags;
   } catch (error) {
     return { error: 'Error when fetching tags' };
   }
@@ -170,10 +164,12 @@ export async function fetchYoutubeVideos(
   askedBy: string,
 ): Promise<YouTubeVideo[] | { error: string }> {
   try {
-    const tagNames = await getMostRecentQuestionTags(askedBy);
-    if (!tagNames || 'error' in tagNames || tagNames.length === 0) {
+    const tags = await getMostRecentQuestionTags(askedBy);
+    if (!tags || 'error' in tags || tags.length === 0) {
       return []; // Return an empty array if no tags are found
     }
+
+    const tagNames = tags.map(tag => tag.name);
 
     const videoSet = new Map<string, YouTubeVideo>(); // To store unique videos
 
@@ -182,7 +178,11 @@ export async function fetchYoutubeVideos(
         const query = `intitle:${encodeURIComponent(tag)}`;
         const response = await fetch(
           `${YOUTUBE_SEARCH_URL}?part=snippet&q=${query}&key=${YOUTUBE_API_KEY}&maxResults=5`,
-        );
+        ).catch(e => ({ error: 'Error fetching YouTube videos' }));
+        if ('error' in response) {
+          throw new Error(response.error);
+        }
+
         const data = await response.json();
 
         (data.items || []).forEach(

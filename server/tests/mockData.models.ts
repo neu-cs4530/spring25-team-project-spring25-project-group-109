@@ -5,6 +5,7 @@ import {
   DatabaseAnswer,
   DatabaseBadge,
   DatabaseComment,
+  DatabaseFeature,
   DatabaseNotification,
   DatabaseQuestion,
   DatabaseStore,
@@ -259,6 +260,8 @@ export const safeUserTwo: SafeDatabaseUser = {
   username: 'user2',
   dateJoined: new Date('2024-12-03'),
   badgesEarned: [],
+  followers: [],
+  following: [],
 };
 
 export const badge: Badge = {
@@ -307,4 +310,16 @@ export const mockStoreJSONResponse = {
   username: 'user1',
   coinCount: 0,
   unlockedFeatures: [],
+};
+
+export const mockFeature: DatabaseFeature = {
+  _id: new mongoose.Types.ObjectId(),
+  name: 'Nim',
+  description: 'description',
+  price: 0,
+};
+
+export const mockFeatureJSONResponse: DatabaseFeature = {
+  ...mockFeature,
+  _id: mockFeature._id.toString(),
 };

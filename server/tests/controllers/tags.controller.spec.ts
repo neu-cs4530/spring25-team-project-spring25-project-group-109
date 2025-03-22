@@ -1,14 +1,19 @@
 import supertest from 'supertest';
 import mongoose from 'mongoose';
 
+import { ObjectId } from 'mongodb';
 import { app } from '../../app';
 import TagModel from '../../models/tags.model';
 import { DatabaseTag, Tag } from '../../types/types';
 
 import * as tagUtil from '../../services/tag.service';
 
+const tag1 = { name: 'tag1', description: 'desc1', _id: new ObjectId() };
+const tag2 = { name: 'tag2', description: 'desc2', _id: new ObjectId() };
+
 const getTagCountMapSpy: jest.SpyInstance = jest.spyOn(tagUtil, 'getTagCountMap');
-// Spy on the TagModel.findOne method
+const getMostRecentQuestionTagsSpy = jest.spyOn(tagUtil, 'getMostRecentQuestionTags');
+const fetchYoutubeVideosSpy = jest.spyOn(tagUtil, 'fetchYoutubeVideos');
 const findOneSpy = jest.spyOn(TagModel, 'findOne');
 
 describe('Test tagController', () => {
@@ -81,27 +86,29 @@ describe('Test tagController', () => {
   });
 });
 
-const getMostRecentQuestionTagsSpy = jest.spyOn(tagUtil, 'getMostRecentQuestionTags');
-const fetchYoutubeVideosSpy = jest.spyOn(tagUtil, 'fetchYoutubeVideos');
-
 describe('Test tagController', () => {
   describe('GET /getMostRecentQuestionTags/:askedBy', () => {
     it('should return tags when found', async () => {
-      const mockTags = ['tag1', 'tag2'];
+      const mockTags: DatabaseTag[] = [tag1, tag2];
       getMostRecentQuestionTagsSpy.mockResolvedValueOnce(mockTags);
 
       const response = await supertest(app).get('/tag/getMostRecentQuestionTags/user123');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(mockTags);
+      expect(response.body).toEqual(
+        mockTags.map(tag => ({
+          ...tag,
+          _id: tag._id.toString(),
+        })),
+      );
     });
 
-    it('should return 404 if no tags are found', async () => {
-      getMostRecentQuestionTagsSpy.mockResolvedValueOnce(null);
+    it('should return 500 if no tags are found', async () => {
+      getMostRecentQuestionTagsSpy.mockResolvedValueOnce({ error: 'No tags found for this user.' });
 
       const response = await supertest(app).get('/tag/getMostRecentQuestionTags/user123');
 
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(500);
       expect(response.text).toBe('No tags found for this user.');
     });
 
@@ -139,12 +146,12 @@ describe('Test tagController', () => {
       expect(response.body).toEqual(mockVideos);
     });
 
-    it('should return 404 if no videos are found', async () => {
-      fetchYoutubeVideosSpy.mockResolvedValueOnce([]);
-
+    it('should return 500 if no videos are found', async () => {
+      fetchYoutubeVideosSpy.mockResolvedValueOnce({
+        error: 'No YouTube videos found for these tags.',
+      });
       const response = await supertest(app).get('/tag/getYoutubeVideos/user123');
-
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(500);
       expect(response.text).toBe('No YouTube videos found for these tags.');
     });
 

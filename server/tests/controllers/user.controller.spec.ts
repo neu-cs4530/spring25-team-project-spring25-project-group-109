@@ -2,7 +2,8 @@ import supertest from 'supertest';
 import mongoose from 'mongoose';
 import { app } from '../../app';
 import * as util from '../../services/user.service';
-import { DatabaseUserStats, SafeDatabaseUser, User } from '../../types/types';
+import * as notifUtil from '../../services/notification.service';
+import { DatabaseUserStats, SafeDatabaseUser, User, NotificationType } from '../../types/types';
 import { mockDatabaseStore, mockStoreJSONResponse } from '../mockData.models';
 
 const mockUser: User = {
@@ -85,6 +86,7 @@ const updatedUserSpy = jest.spyOn(util, 'updateUser');
 const getUserByUsernameSpy = jest.spyOn(util, 'getUserByUsername');
 const getUsersListSpy = jest.spyOn(util, 'getUsersList');
 const deleteUserByUsernameSpy = jest.spyOn(util, 'deleteUserByUsername');
+const saveNotificationSpy = jest.spyOn(notifUtil, 'saveNotification');
 
 describe('Test userController', () => {
   describe('POST /signup', () => {
@@ -572,11 +574,23 @@ describe('Test userController', () => {
         followee: mockSafeUser2.username,
       };
 
+      const mockNotif = {
+        _id: new mongoose.Types.ObjectId(),
+        username: mockSafeUser2.username,
+        text: `${mockSafeUser.username} followed you!`,
+        seen: false,
+        type: 'follow' as NotificationType,
+        createdAt: new Date('2025-01-01'),
+        updatedAt: new Date('2025-01-01'),
+      };
+
       getUserByUsernameSpy.mockResolvedValueOnce(mockSafeUser);
       getUserByUsernameSpy.mockResolvedValueOnce(mockSafeUser2);
 
       updatedUserSpy.mockResolvedValueOnce(mockSafeUser);
       updatedUserSpy.mockResolvedValueOnce(mockSafeUser2);
+
+      saveNotificationSpy.mockResolvedValueOnce(mockNotif);
 
       const response = await supertest(app).patch('/user/follow').send(mockReqBody);
 

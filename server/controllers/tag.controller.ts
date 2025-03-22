@@ -63,21 +63,6 @@ const tagController = () => {
     }
   };
 
-  // async function getMostRecentQuestionTag(req: Request, res: Response) {
-  //   try {
-  //     const { askedBy } = req.query;
-  //     if (!askedBy) {
-  //       return res.status(400).json({ error: 'Missing required parameter: askedBy' });
-  //     }
-
-  //     const videos = await fetchYoutubeVideos(askedBy as string);
-  //     return res.json(videos);
-  //   } catch (error) {
-  //     console.error('Error fetching questions or YouTube videos:', error);
-  //     return res.status(500).json({ error: 'Internal Server Error' });
-  //   }
-  // }
-
   /**
    * Retrieves a list of tags for the most recent question asked by a given user.
    *
@@ -88,11 +73,11 @@ const tagController = () => {
    */
   const getMostRecentQuestionTagsRoute = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { askedBy } = req.params; // Get the user ID from the request parameters
-      const tags = await getMostRecentQuestionTags(askedBy as string);
+      const { askedBy } = req.params;
+      const tags = await getMostRecentQuestionTags(askedBy);
 
-      if (!tags) {
-        res.status(404).send('No tags found for this user.');
+      if ('error' in tags) {
+        res.status(500).send('No tags found for this user.');
         return;
       }
 
@@ -115,8 +100,8 @@ const tagController = () => {
       const { askedBy } = req.params; // Get the user ID from the request parameters
       const videos = await fetchYoutubeVideos(askedBy);
 
-      if (videos.length === 0) {
-        res.status(404).send('No YouTube videos found for these tags.');
+      if ('error' in videos) {
+        res.status(500).send('No YouTube videos found for these tags.');
         return;
       }
 

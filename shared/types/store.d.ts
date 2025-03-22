@@ -1,7 +1,12 @@
 import { Request } from 'express';
 import { FeatureType } from './feature';
 
-// todo
+/**
+ * Represents a user store.
+ * - `username`: the username of the user.
+ * - `coinCount`: the number of coins the user has.
+ * - `unlockedFeatures`: the features the user has unlocked.
+ */
 export interface Store {
   username: string;
   coinCount: number;
@@ -20,7 +25,6 @@ export interface DatabaseStore extends Store {
  * Interface extending the request body for creating a store object.
  * - `body`: the store object being created.
  */
-// todo create when we create a user
 export interface CreateStoreRequest extends Request {
   body: Store;
 }

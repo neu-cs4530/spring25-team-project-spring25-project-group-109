@@ -20,6 +20,7 @@ import {
   saveUserStore,
   updateUser,
 } from '../services/user.service';
+import { saveNotification } from '../services/notification.service';
 
 const userController = (socket: FakeSOSocket) => {
   const router: Router = express.Router();
@@ -334,20 +335,17 @@ const userController = (socket: FakeSOSocket) => {
         res.status(400).send('Invalid body');
         return;
       }
-
       if (follower === followee) {
         res.status(400).send('Cannot follow yourself');
         return;
       }
 
       const followerUser = await getUserByUsername(follower);
+      const followeeUser = await getUserByUsername(followee);
 
       if ('error' in followerUser) {
         throw new Error(followerUser.error);
       }
-
-      const followeeUser = await getUserByUsername(followee);
-
       if ('error' in followeeUser) {
         throw new Error(followeeUser.error);
       }
@@ -355,18 +353,24 @@ const userController = (socket: FakeSOSocket) => {
       const result1 = await updateUser(follower, {
         following: [...(followerUser.following || []), followee],
       });
-
-      if ('error' in result1) {
-        throw new Error(result1.error);
-      }
-
       const result2 = await updateUser(followee, {
         followers: [...followeeUser.followers, follower],
       });
 
+      if ('error' in result1) {
+        throw new Error(result1.error);
+      }
       if ('error' in result2) {
         throw new Error(result2.error);
       }
+
+      // send a notification to the followee
+      await saveNotification({
+        username: followee,
+        text: `${follower} followed you!`,
+        seen: false,
+        type: 'follow',
+      });
 
       res.status(200).json([result1, result2]);
     } catch (error) {
