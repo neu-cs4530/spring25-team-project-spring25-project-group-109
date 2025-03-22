@@ -204,11 +204,9 @@ const ProfileSettings: React.FC = () => {
               <Modal open={showFollowing} onClose={() => setShowFollowing(false)}>
                 <Box sx={modalStyle}>
                   <Typography variant='h4'>Following</Typography>
-                  {userData.following.length > 0 ? (
+                  {(userData?.following?.length ?? 0) > 0 ? (
                     <ul>
-                      {userData.following.map(following => (
-                        <li key={following}>{following}</li>
-                      ))}
+                      {userData?.following?.map(following => <li key={following}>{following}</li>)}
                     </ul>
                   ) : (
                     <p>Not following anyone yet.</p>
