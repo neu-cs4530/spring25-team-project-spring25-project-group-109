@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AppBar, Button, TextField, Toolbar, Typography } from '@mui/material';
 import useHeader from '../../hooks/useHeader';
 import './index.css';
 import useUserContext from '../../hooks/useUserContext';
@@ -14,26 +15,31 @@ const Header = () => {
   const { user: currentUser } = useUserContext();
   const navigate = useNavigate();
   return (
-    <div id='header' className='header'>
-      <div></div>
-      <div className='title'>Fake Stack Overflow</div>
-      <input
-        id='searchBar'
-        placeholder='Search ...'
-        type='text'
-        value={val}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
-      />
-      <button onClick={handleSignOut} className='logout-button'>
-        Log out
-      </button>
-      <button
-        className='view-profile-button'
-        onClick={() => navigate(`/user/${currentUser.username}`)}>
-        View Profile
-      </button>
-    </div>
+    <AppBar position='static' color='primary'>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+        <Typography variant='h3' sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+          Stack Overflow
+        </Typography>
+
+        <TextField
+          id='searchBar'
+          placeholder='Search'
+          type='text'
+          value={val}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          size='small'
+          sx={{ width: 200, bgcolor: 'white', borderRadius: 1 }}
+        />
+
+        <Button variant='outlined' onClick={handleSignOut}>
+          Log out
+        </Button>
+        <Button variant='outlined' onClick={() => navigate(`/user/${currentUser.username}`)}>
+          View Profile
+        </Button>
+      </Toolbar>
+    </AppBar>
   );
 };
 

@@ -1,6 +1,8 @@
 import { Request } from 'express';
 import { ObjectId } from 'mongodb';
 
+export type NotificationType = 'badge' | 'answer' | 'follow' | 'comment';
+
 /**
  * Represents a nofication.
  * - `username`: The username of the user who received the notification.
@@ -15,8 +17,6 @@ export interface Notification {
   type: NotificationType;
 }
 
-export type NotificationType = 'badge' | 'answer' | 'follow' | 'comment';
-
 /**
  * Represents an notification stored in the database.
  * - `_id`: The unique identifier of the notifcation.
@@ -29,17 +29,17 @@ export interface DatabaseNotification extends Notification {
 }
 
 /**
- * Interface extending the request body for adding a notification to a question.
- * - `qid`: The unique identifier of the question being answered.
- * - `ans`: The answer being added.
+ * Interface extending the request body for creating a new notification.
+ * - `body`: The notification being created.
  */
-export interface AddNotificationRequest extends Request {
-  body: {
-    qid: string;
-    Notification: Notifcation;
-  };
+export interface CreateNotificationRequest extends Request {
+  body: Notification;
 }
 
+/**
+ * Express request for fetching notifications based on the user's username.
+ * - `params`: contains the `username` of the user to look up the notifications.
+ */
 export interface GetNotificationsForUserRequest extends Request {
   params: {
     username: string;

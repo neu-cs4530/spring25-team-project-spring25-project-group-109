@@ -1,106 +1,106 @@
 import { useState } from 'react';
 import { ObjectId } from 'mongodb';
 import { useNavigate } from 'react-router-dom';
-import './index.css';
+import { Box, Card, CardContent, Chip, Stack, Typography, Button, Modal } from '@mui/material';
 import { getMetaData } from '../../../../tool';
 import { PopulatedDatabaseQuestion } from '../../../../types/types';
 import SaveToCollection from '../../saveToCollection';
 
-/**
- * Interface representing the props for the Question component.
- *
- * q - The question object containing details about the question.
- */
 interface QuestionProps {
   question: PopulatedDatabaseQuestion;
 }
 
-/**
- * Question component renders the details of a question including its title, tags, author, answers, and views.
- * Clicking on the component triggers the handleAnswer function,
- * and clicking on a tag triggers the clickTag function.
- *
- * @param q - The question object containing question details.
- */
 const QuestionView = ({ question }: QuestionProps) => {
   const navigate = useNavigate();
   const [showSaveModal, setShowSaveModal] = useState(false);
 
-  /**
-   * Function to navigate to the home page with the specified tag as a search parameter.
-   *
-   * @param tagName - The name of the tag to be added to the search parameters.
-   */
   const clickTag = (tagName: string) => {
     const searchParams = new URLSearchParams();
     searchParams.set('tag', tagName);
-
     navigate(`/home?${searchParams.toString()}`);
   };
 
-  /**
-   * Function to navigate to the specified question page based on the question ID.
-   *
-   * @param questionID - The ID of the question to navigate to.
-   */
   const handleAnswer = (questionID: ObjectId) => {
-    navigate(`/question/${questionID}`);
+    if (!showSaveModal) {
+      navigate(`/question/${questionID}`);
+    }
   };
 
   return (
-    <div
-      className='question right_padding'
+    <Card
+      sx={{
+        'padding': 2,
+        'marginBottom': 2,
+        'borderRadius': 2,
+        'cursor': 'pointer',
+        'transition': '0.3s',
+        '&:hover': { boxShadow: 4 },
+      }}
       onClick={() => {
-        if (question._id) {
-          handleAnswer(question._id);
-        }
+        if (question._id) handleAnswer(question._id);
       }}>
-      <div className='postStats'>
-        <div>{question.answers.length || 0} answers</div>
-        <div>{question.views.length} views</div>
-      </div>
-      <div className='question_mid'>
-        <div className='postTitle'>{question.title}</div>
-        <div className='question_tags'>
+      <CardContent>
+        <Box display='flex' gap={2} mb={1} color='text.secondary'>
+          <Typography variant='body2'>
+            <strong>{question.answers.length || 0}</strong> answers
+          </Typography>
+          <Typography variant='body2'>
+            <strong>{question.views.length}</strong> views
+          </Typography>
+        </Box>
+
+        <Typography variant='h6' color='primary' sx={{ fontWeight: 'bold', mb: 1 }}>
+          {question.title}
+        </Typography>
+
+        <Stack direction='row' spacing={1} mb={2} flexWrap='wrap'>
           {question.tags.map(tag => (
-            <button
+            <Chip
               key={String(tag._id)}
-              className='question_tag_button'
+              label={tag.name}
               onClick={e => {
                 e.stopPropagation();
                 clickTag(tag.name);
-              }}>
-              {tag.name}
-            </button>
+              }}
+              color='primary'
+              variant='outlined'
+              sx={{ cursor: 'pointer' }}
+            />
           ))}
-        </div>
-      </div>
-      <div className='lastActivity'>
-        <div className='question_author'>{question.askedBy}</div>
-        <div>&nbsp;</div>
-        <div className='question_meta'>asked {getMetaData(new Date(question.askDateTime))}</div>
-      </div>
+        </Stack>
 
-      {/* Save to Collection Button */}
-      <button
-        className='save-to-collection-btn'
-        onClick={e => {
-          e.stopPropagation();
-          setShowSaveModal(true);
-        }}>
-        Save to Collection
-      </button>
+        <Box display='flex' justifyContent='space-between' alignItems='center'>
+          <Typography variant='body2' color='text.secondary'>
+            Asked by <strong>{question.askedBy}</strong>
+          </Typography>
+          <Typography variant='body2' color='text.secondary'>
+            {getMetaData(new Date(question.askDateTime))}
+          </Typography>
+        </Box>
 
-      {/* Save to Collection Popup */}
-      {showSaveModal && (
-        <div onClick={e => e.stopPropagation()}>
+        <Button
+          variant='contained'
+          color='secondary'
+          sx={{ mt: 2 }}
+          onClick={e => {
+            e.stopPropagation();
+            setShowSaveModal(true);
+          }}>
+          Save to Collection
+        </Button>
+      </CardContent>
+
+      <Modal open={showSaveModal} onClose={() => setShowSaveModal(false)}>
+        <Box
+          sx={{ p: 2, backgroundColor: 'white', borderRadius: 2, width: 400, mx: 'auto', mt: 10 }}
+          onClick={e => e.stopPropagation()}>
           <SaveToCollection
             questionId={String(question._id)}
             onClose={() => setShowSaveModal(false)}
           />
-        </div>
-      )}
-    </div>
+        </Box>
+      </Modal>
+    </Card>
   );
 };
 

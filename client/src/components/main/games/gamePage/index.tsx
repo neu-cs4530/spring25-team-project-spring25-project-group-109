@@ -1,5 +1,6 @@
 import React from 'react';
 import './index.css';
+import { Alert, Box, Button, Typography } from '@mui/material';
 import NimGamePage from '../nimGamePage';
 import useGamePage from '../../../../hooks/useGamePage';
 import { GameInstance, NimGameState } from '../../../../types/types';
@@ -28,29 +29,28 @@ const GamePage = () => {
       case 'Nim':
         return <NimGamePage gameInstance={gameInstance as GameInstance<NimGameState>} />;
       default:
-        return <div>Unknown game type</div>;
+        return <Alert severity='error'>Unknown game type</Alert>;
     }
   };
 
   return (
-    <div className='game-page'>
-      <header className='game-header'>
-        <h1>Nim Game</h1>
-        <p className='game-status'>
-          Status: {gameInstance ? gameInstance.state.status : 'Not started'}
-        </p>
-      </header>
-
-      <div className='game-controls'>
-        <button className='btn-leave-game' onClick={handleLeaveGame}>
-          Leave Game
-        </button>
-      </div>
+    <Box p={4}>
+      <Typography variant='h4'>Nim Game</Typography>
+      <Typography variant='body1'>
+        Status: {gameInstance ? gameInstance.state.status : 'Not started'}
+      </Typography>
+      <Button sx={{ mt: 2, mb: 2 }} variant={'contained'} onClick={handleLeaveGame}>
+        Leave Game
+      </Button>
 
       {gameInstance && renderGameComponent(gameInstance.gameType)}
 
-      {error && <div className='game-error'>{error}</div>}
-    </div>
+      {error && (
+        <Alert sx={{ mt: 2 }} severity={'error'}>
+          {error}
+        </Alert>
+      )}
+    </Box>
   );
 };
 

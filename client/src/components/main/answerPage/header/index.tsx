@@ -1,6 +1,9 @@
 import React from 'react';
 import './index.css';
+import { Stack, Typography } from '@mui/material';
+import { PopulatedDatabaseQuestion } from '@fake-stack-overflow/shared';
 import AskQuestionButton from '../../askQuestionButton';
+import VoteComponent from '../../voteComponent';
 
 /**
  * Interface representing the props for the AnswerHeader component.
@@ -9,8 +12,7 @@ import AskQuestionButton from '../../askQuestionButton';
  * - title - The title of the question or discussion thread.
  */
 interface AnswerHeaderProps {
-  ansCount: number;
-  title: string;
+  question: PopulatedDatabaseQuestion;
 }
 
 /**
@@ -20,12 +22,17 @@ interface AnswerHeaderProps {
  * @param ansCount The number of answers to display.
  * @param title The title of the question or discussion thread.
  */
-const AnswerHeader = ({ ansCount, title }: AnswerHeaderProps) => (
-  <div id='answersHeader' className='space_between right_padding'>
-    <div className='bold_title'>{ansCount} answers</div>
-    <div className='bold_title answer_question_title'>{title}</div>
+const AnswerHeader = ({ question }: AnswerHeaderProps) => (
+  <Stack direction='row' justifyContent='space-between' alignItems='center' spacing={2}>
+    <VoteComponent question={question} />
+    <Typography
+      variant='h5'
+      fontWeight='bold'
+      sx={{ color: 'black', flexGrow: 1, textAlign: 'center' }}>
+      {question.title}
+    </Typography>
     <AskQuestionButton />
-  </div>
+  </Stack>
 );
 
 export default AnswerHeader;

@@ -1,5 +1,6 @@
-import React from 'react';
 import './index.css';
+import { Box, InputAdornment, TextField, Typography } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import useUserSearch from '../../../../hooks/useUserSearch';
 
 /**
@@ -25,21 +26,42 @@ const UsersListHeader = ({ userCount, setUserFilter }: UserHeaderProps) => {
   const { val, handleInputChange } = useUserSearch(setUserFilter);
 
   return (
-    <div>
-      <div className='space_between right_padding'>
-        <div className='bold_title'>Users List</div>
-        <input
+    <Box sx={{ padding: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 2,
+        }}>
+        <Typography variant='h4' sx={{ fontWeight: 'bold' }}>
+          All Users
+        </Typography>
+
+        <TextField
           id='user_search_bar'
           placeholder='Search Usernames ...'
           type='text'
           value={val}
           onChange={handleInputChange}
+          size='small'
+          sx={{ width: 200, bgcolor: 'white', borderRadius: 1 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position='start'>
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
         />
-      </div>
-      <div className='space_between right_padding'>
-        <div id='user_count'>{userCount} users</div>
-      </div>
-    </div>
+      </Box>
+
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant='body2' color='textSecondary'>
+          {userCount} users
+        </Typography>
+      </Box>
+    </Box>
   );
 };
 

@@ -115,10 +115,17 @@ A class diagram for the schema definition is shown below:
 | /createCollection               | POST   | Create a new collection                                              |
 | /getCollectionsByUser/:username | GET    | Retrieve all collections for a specific user based on their username |
 
+### `/features`
+
+| Endpoint     | Method | Description           |
+| ------------ | ------ | --------------------- |
+| /getFeatures | GET    | Gets all features     |
+
 ### `/notification `
 
 | Endpoint                    | Method | Description                     |
 | --------------------------- | ------ | ------------------------------- |
+| /createNotification         | POST   | Create a new notification       |
 | /getNotifications/:username | GET    | Gets all notifications for user |
 
 ## Running Stryker Mutation Testing

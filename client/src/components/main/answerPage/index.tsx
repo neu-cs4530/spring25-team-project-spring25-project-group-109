@@ -1,11 +1,11 @@
 import React from 'react';
+import { Box, Button, Stack } from '@mui/material';
 import { getMetaData } from '../../../tool';
 import AnswerView from './answer';
 import AnswerHeader from './header';
 import { Comment } from '../../../types/types';
 import './index.css';
 import QuestionBody from './questionBody';
-import VoteComponent from '../voteComponent';
 import CommentSection from '../commentSection';
 import useAnswerPage from '../../../hooks/useAnswerPage';
 
@@ -21,39 +21,44 @@ const AnswerPage = () => {
   }
 
   return (
-    <>
-      <VoteComponent question={question} />
-      <AnswerHeader ansCount={question.answers.length} title={question.title} />
-      <QuestionBody
-        views={question.views.length}
-        text={question.text}
-        askby={question.askedBy}
-        meta={getMetaData(new Date(question.askDateTime))}
-      />
-      <CommentSection
-        comments={question.comments}
-        handleAddComment={(comment: Comment) => handleNewComment(comment, 'question', questionID)}
-      />
-      {question.answers.map(a => (
-        <AnswerView
-          key={String(a._id)}
-          text={a.text}
-          ansBy={a.ansBy}
-          meta={getMetaData(new Date(a.ansDateTime))}
-          comments={a.comments}
-          handleAddComment={(comment: Comment) =>
-            handleNewComment(comment, 'answer', String(a._id))
-          }
+    <Box sx={{ p: 4 }}>
+      <AnswerHeader question={question} />
+      <Box mt={3}>
+        <QuestionBody
+          views={question.views.length}
+          text={question.text}
+          askby={question.askedBy}
+          meta={getMetaData(new Date(question.askDateTime))}
         />
-      ))}
-      <button
-        className='bluebtn ansButton'
-        onClick={() => {
-          handleNewAnswer();
-        }}>
+      </Box>
+      <Box mt={3}>
+        <CommentSection
+          comments={question.comments}
+          handleAddComment={(comment: Comment) => handleNewComment(comment, 'question', questionID)}
+        />
+      </Box>
+      <Stack spacing={3} mt={3}>
+        {question.answers.map(a => (
+          <AnswerView
+            key={String(a._id)}
+            text={a.text}
+            ansBy={a.ansBy}
+            meta={getMetaData(new Date(a.ansDateTime))}
+            comments={a.comments}
+            handleAddComment={(comment: Comment) =>
+              handleNewComment(comment, 'answer', String(a._id))
+            }
+          />
+        ))}
+      </Stack>
+      <Button
+        sx={{ mt: 4, width: '100%' }}
+        variant='contained'
+        color='primary'
+        onClick={handleNewAnswer}>
         Answer Question
-      </button>
-    </>
+      </Button>
+    </Box>
   );
 };
 

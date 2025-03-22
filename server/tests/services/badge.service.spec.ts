@@ -4,6 +4,9 @@ import { checkAndAwardBadges, getBadgesList, saveBadge } from '../../services/ba
 import { badge, dbBadge, mockUserStatsFull, user } from '../mockData.models';
 import UserModel from '../../models/users.model';
 import UserStatsModel from '../../models/userstats.model';
+import * as notifUtil from '../../services/notification.service';
+
+const saveNotificationSpy = jest.spyOn(notifUtil, 'saveNotification');
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
@@ -88,6 +91,13 @@ describe('User model', () => {
       mockingoose(UserStatsModel).toReturn(mockUserStatsFull, 'findOne');
       mockingoose(BadgeModel).toReturn([badge], 'find');
 
+      const mockNotif = {
+        username: user.username,
+        text: `You have earned the badge ${badge.name}!`,
+        seen: false,
+        type: 'badge',
+      };
+
       const badges = (await checkAndAwardBadges('user1')) as DatabaseBadge[];
       expect(badges.length).toEqual(1);
       expect(badges[0].description).toEqual(badge.description);
@@ -95,6 +105,7 @@ describe('User model', () => {
       expect(badges[0].name).toEqual(badge.name);
       expect(badges[0].threshold).toEqual(badge.threshold);
       expect(badges[0].type).toEqual(badge.type);
+      expect(saveNotificationSpy).toHaveBeenCalledWith(mockNotif);
     });
 
     it('should return error if user is null', async () => {
