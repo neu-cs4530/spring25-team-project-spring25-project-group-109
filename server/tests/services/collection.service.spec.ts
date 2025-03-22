@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 import CollectionModel from '../../models/collections.model';
 import UserModel from '../../models/users.model';
 import QuestionModel from '../../models/questions.model';
-import { populateDocument } from '../../utils/database.util';
 import {
   saveCollection,
   getCollectionsByUser,
@@ -17,10 +16,6 @@ import { user } from '../mockData.models';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
-
-jest.mock('../../utils/database.util', () => ({
-  populateDocument: jest.fn(),
-}));
 
 const collection: Collection = {
   name: 'favorites',
@@ -99,52 +94,6 @@ describe('Test Collection Service', () => {
 
       expect(collections).toHaveLength(1);
       expect(collections).toEqual([savedCollection]);
-    });
-
-    it('should return collections with fully populated questions', async () => {
-      const questionId = new mongoose.Types.ObjectId();
-      const populatedQuestion = {
-        _id: questionId,
-        title: 'What is TypeScript?',
-        content: 'How do I learn TypeScript effectively?',
-        postedBy: 'user123',
-        createdAt: new Date(),
-        views: 100,
-        answers: 5,
-      };
-
-      (populateDocument as jest.Mock).mockResolvedValue(populatedQuestion);
-
-      const collectionWithQuestion: DatabaseCollection = {
-        _id: new mongoose.Types.ObjectId(),
-        name: 'favorites',
-        username: user.username,
-        questions: [questionId],
-        visibility: 'public',
-      };
-
-      mockingoose(UserModel).toReturn(user, 'findOne');
-      mockingoose(CollectionModel).toReturn([collectionWithQuestion], 'find');
-
-      const collections = await getCollectionsByUser(user.username);
-
-      expect(collections).toHaveLength(1);
-
-      if (!Array.isArray(collections) || collections.length === 0) {
-        throw new Error('No collections found');
-      }
-
-      const returnedCollection = collections[0];
-      expect(returnedCollection.questions).toHaveLength(1);
-
-      const returnedQuestion = returnedCollection.questions[0];
-      expect(returnedQuestion).toHaveProperty('title', populatedQuestion.title);
-      expect(returnedQuestion).toHaveProperty('content', populatedQuestion.content);
-      expect(returnedQuestion).toHaveProperty('postedBy', populatedQuestion.postedBy);
-      expect(returnedQuestion).toHaveProperty('views', populatedQuestion.views);
-      expect(returnedQuestion).toHaveProperty('answers', populatedQuestion.answers);
-      expect(populateDocument).toHaveBeenCalledWith(questionId, 'question');
-      expect(populateDocument).toHaveBeenCalledTimes(1);
     });
 
     it('should return an empty array if the user is not found', async () => {
@@ -266,6 +215,7 @@ describe('Test Collection Service', () => {
       };
 
       mockingoose(QuestionModel).toReturn({ _id: questionId }, 'findOne');
+      mockingoose(CollectionModel).toReturn(existingCollection, 'findOne');
       mockingoose(CollectionModel).toReturn(updatedCollection, 'findOneAndUpdate');
 
       const result = await addQuestionToCollection(collectionId, questionId.toString());
@@ -307,6 +257,29 @@ describe('Test Collection Service', () => {
         expect(result.error).toContain(
           'Error adding question to collection: Error: Collection not found',
         );
+      }
+    });
+
+    it('should return an error if the question is already in the collection', async () => {
+      const collectionId = new mongoose.Types.ObjectId().toString();
+      const questionId = new mongoose.Types.ObjectId();
+
+      const existingCollection: DatabaseCollection = {
+        _id: new ObjectId(collectionId),
+        name: 'favorites',
+        username: user.username,
+        questions: [questionId],
+        visibility: 'public',
+      };
+
+      mockingoose(QuestionModel).toReturn({ _id: questionId }, 'findOne');
+      mockingoose(CollectionModel).toReturn(existingCollection, 'findOne');
+
+      const result = await addQuestionToCollection(collectionId, questionId.toString());
+
+      expect('error' in result).toBe(true);
+      if ('error' in result) {
+        expect(result.error).toContain('Question is already in the collection.');
       }
     });
   });

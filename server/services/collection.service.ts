@@ -1,7 +1,6 @@
 import CollectionModel from '../models/collections.model';
 import UserModel from '../models/users.model';
 import QuestionModel from '../models/questions.model';
-import { populateDocument } from '../utils/database.util';
 import {
   DatabaseCollection,
   Collection,
@@ -62,18 +61,7 @@ export const getCollectionsByUser = async (username: string): Promise<Collection
       throw new Error('Collections not found for the provided user');
     }
 
-    const populatedCollections = await Promise.all(
-      collections.map(async collection => ({
-        ...collection,
-        questions: await Promise.all(
-          collection.questions.map((questionId: string) =>
-            populateDocument(questionId, 'question'),
-          ),
-        ),
-      })),
-    );
-
-    return populatedCollections;
+    return collections;
   } catch {
     return [];
   }
@@ -146,17 +134,19 @@ export const addQuestionToCollection = async (
       throw new Error('Question not found');
     }
 
-    const updatedCollection: DatabaseCollection | null = await CollectionModel.findByIdAndUpdate(
-      collectionId,
-      { $addToSet: { questions: questionId } },
-      { new: true },
-    );
-
-    if (!updatedCollection) {
+    const collection = await CollectionModel.findById(collectionId);
+    if (!collection) {
       throw new Error('Collection not found');
     }
 
-    return updatedCollection;
+    if (collection.questions.includes(questionId)) {
+      throw new Error('Question is already in the collection.');
+    }
+
+    collection.questions.push(questionId);
+    await collection.save();
+
+    return collection;
   } catch (error) {
     return { error: `Error adding question to collection: ${error}` };
   }

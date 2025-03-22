@@ -16,6 +16,7 @@ import {
   addQuestionToCollection,
   removeQuestionFromCollection,
 } from '../services/collection.service';
+import { populateDocument } from '../utils/database.util';
 
 const collectionController = (socket: FakeSOSocket) => {
   const router = express.Router();
@@ -118,7 +119,18 @@ const collectionController = (socket: FakeSOSocket) => {
         throw new Error(collections.error);
       }
 
-      res.status(200).json(collections);
+      const populatedCollections = await Promise.all(
+        collections.map(async collection => ({
+          ...collection,
+          questions: await Promise.all(
+            collection.questions.map((questionId: string) =>
+              populateDocument(questionId, 'question'),
+            ),
+          ),
+        })),
+      );
+
+      res.status(200).json(populatedCollections);
     } catch (err: unknown) {
       res.status(500).send(`Error retrieving collections: ${(err as Error).message}`);
     }

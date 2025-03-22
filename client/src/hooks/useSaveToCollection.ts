@@ -119,7 +119,7 @@ const useSaveToCollection = () => {
       await addQuestionToCollection(collectionId, questionId);
       showMessage(`Added to "${collectionName}"`);
     } catch {
-      setError('Failed to add question to collection');
+      showErrorMessage('Question already exists in this collection.');
     }
   };
 

@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { app } from '../../app';
 import * as util from '../../services/collection.service';
 import { DatabaseCollection, Collection } from '../../types/types';
+import { populateDocument } from '../../utils/database.util';
 
 const mockCollection: Collection = {
   name: 'favorites',
@@ -26,6 +27,10 @@ const mockCollectionJSONResponse = {
   questions: [],
   visibility: 'public',
 };
+
+jest.mock('../../utils/database.util', () => ({
+  populateDocument: jest.fn(),
+}));
 
 const saveCollectionSpy = jest.spyOn(util, 'saveCollection');
 const getCollectionsByUserSpy = jest.spyOn(util, 'getCollectionsByUser');
@@ -94,6 +99,47 @@ describe('Test Collection Controller', () => {
       expect(response.status).toBe(200);
       expect(response.body).toEqual([mockCollectionJSONResponse]);
       expect(getCollectionsByUserSpy).toHaveBeenCalledWith(mockCollection.username);
+    });
+
+    it('should return collections with populated questions', async () => {
+      const questionId = new mongoose.Types.ObjectId();
+      const populatedQuestion = {
+        _id: questionId,
+        title: 'What is TypeScript?',
+        content: 'How do I learn TypeScript effectively?',
+        postedBy: 'user123',
+        createdAt: new Date(),
+        views: 100,
+        answers: 5,
+      };
+
+      const collectionWithQuestion: DatabaseCollection = {
+        _id: new mongoose.Types.ObjectId(),
+        name: 'favorites',
+        username: 'user1',
+        questions: [questionId],
+        visibility: 'public',
+      };
+
+      getCollectionsByUserSpy.mockResolvedValueOnce([collectionWithQuestion]);
+      (populateDocument as jest.Mock).mockResolvedValue(populatedQuestion);
+
+      const response = await supertest(app).get(`/collection/getCollectionsByUser/user1`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveLength(1);
+
+      const returnedCollection = response.body[0];
+      expect(returnedCollection.questions).toHaveLength(1);
+      expect(returnedCollection.questions[0]).toMatchObject({
+        title: populatedQuestion.title,
+        content: populatedQuestion.content,
+        postedBy: populatedQuestion.postedBy,
+        views: populatedQuestion.views,
+        answers: populatedQuestion.answers,
+      });
+
+      expect(populateDocument).toHaveBeenCalledWith(questionId, 'question');
     });
 
     it('should return 404 for a missing username', async () => {
