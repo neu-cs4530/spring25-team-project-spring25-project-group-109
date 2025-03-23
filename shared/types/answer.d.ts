@@ -28,10 +28,11 @@ export interface DatabaseAnswer extends Omit<Answer, 'comments'> {
 
 /**
  * Represents a fully populated answer from the database.
- * - `comments`: A list of populated `DatabaseComment` objects.
+ * - `comments`: A list of `PopulatedDatabaseComment` objects.
  */
 export interface PopulatedDatabaseAnswer extends Omit<DatabaseAnswer, 'comments'> {
-  comments: DatabaseComment[];
+  comments: PopulatedDatabaseComment[];
+  ansBy: DatabaseUser;
 }
 
 /**

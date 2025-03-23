@@ -163,7 +163,7 @@ const ProfileSettings: React.FC = () => {
                     onClick={() => setShowFollowing(true)}
                     sx={{ textAlign: 'center' }}>
                     <Typography variant='subtitle1'>
-                      <span style={{ fontWeight: 'bold' }}>{userData.following.length}</span>{' '}
+                      <span style={{ fontWeight: 'bold' }}>{userData?.following?.length}</span>{' '}
                       Following
                     </Typography>
                   </Button>

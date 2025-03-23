@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent, Paper, Stack, Typography } from '@mui/material';
+import { Card, CardContent, Paper, Stack, Typography, Avatar } from '@mui/material';
 import CommentSection from '../../commentSection';
 import './index.css';
-import { Comment, DatabaseComment } from '../../../../types/types';
+import { Comment, DatabaseUser, PopulatedDatabaseComment } from '../../../../types/types';
 
 /**
  * Interface representing the props for the AnswerView component.
@@ -15,9 +15,9 @@ import { Comment, DatabaseComment } from '../../../../types/types';
  */
 interface AnswerProps {
   text: string;
-  ansBy: string;
+  ansBy: DatabaseUser;
   meta: string;
-  comments: DatabaseComment[];
+  comments: PopulatedDatabaseComment[];
   handleAddComment: (comment: Comment) => void;
 }
 
@@ -31,27 +31,35 @@ interface AnswerProps {
  * @param comments An array of comments associated with the answer.
  * @param handleAddComment Function to handle adding a new comment.
  */
-const AnswerView = ({ text, ansBy, meta, comments, handleAddComment }: AnswerProps) => (
-  <Paper elevation={1} sx={{ p: 1, borderRadius: 2 }}>
-    <Card sx={{ boxShadow: 'none' }}>
-      <CardContent>
-        <Stack spacing={2}>
-          <Typography variant='body1' sx={{ mb: 2 }}>
-            {text}
-          </Typography>
-          <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mt: 1 }}>
-            <Typography variant='subtitle2' color='primary'>
-              {ansBy}
+const AnswerView = ({ text, ansBy, meta, comments, handleAddComment }: AnswerProps) => {
+  console.log(ansBy);
+  return (
+    <Paper elevation={1} sx={{ p: 1, borderRadius: 2 }}>
+      <Card sx={{ boxShadow: 'none' }}>
+        <CardContent>
+          <Stack spacing={2}>
+            <Typography variant='body1' sx={{ mb: 2 }}>
+              {text}
             </Typography>
-            <Typography variant='caption' color='text.secondary'>
-              {meta}
-            </Typography>
+            <Stack
+              direction='row'
+              justifyContent='space-between'
+              alignItems='center'
+              sx={{ mt: 1 }}>
+              <Avatar alt='No Photo' src={ansBy.profilePhoto} />
+              <Typography variant='subtitle2' color='primary'>
+                {ansBy.username}
+              </Typography>
+              <Typography variant='caption' color='text.secondary'>
+                {meta}
+              </Typography>
+            </Stack>
+            <CommentSection comments={comments} handleAddComment={handleAddComment} />
           </Stack>
-          <CommentSection comments={comments} handleAddComment={handleAddComment} />
-        </Stack>
-      </CardContent>
-    </Card>
-  </Paper>
-);
+        </CardContent>
+      </Card>
+    </Paper>
+  );
+};
 
 export default AnswerView;

@@ -2,7 +2,7 @@ import React from 'react';
 import { ObjectId } from 'mongodb';
 import { useNavigate } from 'react-router-dom';
 import './index.css';
-import { Box, Card, CardContent, Chip, Stack, Typography } from '@mui/material';
+import { Box, Card, CardContent, Chip, Stack, Typography, Avatar } from '@mui/material';
 import { getMetaData } from '../../../../tool';
 import { PopulatedDatabaseQuestion } from '../../../../types/types';
 
@@ -90,8 +90,9 @@ const QuestionView = ({ question }: QuestionProps) => {
         </Stack>
 
         <Box display='flex' justifyContent='space-between' alignItems='center'>
+          <Avatar alt='No Photo' src={question.askedBy.profilePhoto} />
           <Typography variant='body2' color='text.secondary'>
-            Asked by <strong>{question.askedBy}</strong>
+            Asked by <strong>{question.askedBy.username}</strong>
           </Typography>
           <Typography variant='body2' color='text.secondary'>
             {getMetaData(new Date(question.askDateTime))}
