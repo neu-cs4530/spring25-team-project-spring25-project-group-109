@@ -47,6 +47,16 @@ export interface GetNotificationsForUserRequest extends Request {
 }
 
 /**
+ * Express request for toggling the seen status of a notification.
+ * - `params`: contains the id of the notification
+ */
+export interface ToggleNotificationSeenRequest extends Request {
+  params: {
+    id: string;
+  };
+}
+
+/**
  * Type representing possible responses for an Notification-related operation.
  * - Either a `DatabaseNotification` object or an error message.
  */

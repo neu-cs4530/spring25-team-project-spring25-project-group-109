@@ -1,6 +1,14 @@
 import express, { Response, Router } from 'express';
-import { getNotificationsByUsername, saveNotification } from '../services/notification.service';
-import { CreateNotificationRequest, GetNotificationsForUserRequest } from '../types/types';
+import {
+  getNotificationsByUsername,
+  saveNotification,
+  updateNotificationSeen,
+} from '../services/notification.service';
+import {
+  CreateNotificationRequest,
+  GetNotificationsForUserRequest,
+  ToggleNotificationSeenRequest,
+} from '../types/types';
 
 const notificationController = () => {
   const router: Router = express.Router();
@@ -71,8 +79,30 @@ const notificationController = () => {
     }
   };
 
+  /**
+   * Toggles the notification's seen status.
+   *
+   * @param req the request object containing the notification id as a parameter.
+   * @param res the response object to send the result, either updated notification or an error message.
+   * @returns {Promise<void>} a promise that resolves when the notification is successfully toggled.
+   */
+  const toggleNotificationSeen = async (
+    req: ToggleNotificationSeenRequest,
+    res: Response,
+  ): Promise<void> => {
+    const { id } = req.params;
+
+    try {
+      const notification = await updateNotificationSeen(id);
+      res.status(200).json(notification);
+    } catch (err) {
+      res.status(500).send(`Error toggling notification seen status: ${(err as Error).message}`);
+    }
+  };
+
   router.post('/createNotification', createNotification);
   router.get('/getNotifications/:username', getNotificationsForUser);
+  router.patch('/toggleSeen/:id', toggleNotificationSeen);
 
   return router;
 };
