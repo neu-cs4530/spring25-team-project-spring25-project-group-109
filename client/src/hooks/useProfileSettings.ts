@@ -56,6 +56,8 @@ const useProfileSettings = () => {
   const canEditProfile =
     currentUser.username && userData?.username ? currentUser.username === userData.username : false;
 
+  const followsCurrentUser = userData?.following.includes(currentUser.username);
+
   useEffect(() => {
     if (!username) return;
 
@@ -279,6 +281,7 @@ const useProfileSettings = () => {
     pendingAction,
     setPendingAction,
     canEditProfile,
+    followsCurrentUser,
     showPassword,
     togglePasswordVisibility,
     handleResetPassword,
