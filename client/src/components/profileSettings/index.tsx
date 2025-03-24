@@ -19,7 +19,9 @@ import {
   Typography,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
+import { Link } from 'react-router-dom';
 import useProfileSettings from '../../hooks/useProfileSettings';
 import modalStyle from './styles';
 
@@ -39,6 +41,7 @@ const ProfileSettings: React.FC = () => {
     showConfirmation,
     pendingAction,
     canEditProfile,
+    followsCurrentUser,
     showPassword,
     togglePasswordVisibility,
     allBadges,
@@ -64,6 +67,8 @@ const ProfileSettings: React.FC = () => {
   } = useProfileSettings();
 
   const numEarnedBadges = userData?.badgesEarned ? userData.badgesEarned.length : 0;
+
+  const theme = useTheme();
 
   const handleButtonClick = () => {
     setEditProfilePhotoMode(!editProfilePhotoMode);
@@ -144,53 +149,74 @@ const ProfileSettings: React.FC = () => {
               )}
 
               {/* ---- Follower/Following Section ---- */}
-
               <Box display={'flex'} flexDirection={'column'} mt={2} alignItems='center'>
-                <Box display='flex' justifyContent='center'>
-                  <Button
-                    className='follow-count'
-                    variant='text'
-                    onClick={() => setShowFollowers(true)}
-                    sx={{ textAlign: 'center' }}>
-                    <Typography variant='subtitle1'>
-                      <span style={{ fontWeight: 'bold' }}>{userData.followers.length}</span>{' '}
-                      Followers
-                    </Typography>
-                  </Button>
-                  <Button
-                    className='follow-count'
-                    variant='text'
-                    onClick={() => setShowFollowing(true)}
-                    sx={{ textAlign: 'center' }}>
-                    <Typography variant='subtitle1'>
-                      <span style={{ fontWeight: 'bold' }}>{userData.following.length}</span>{' '}
-                      Following
-                    </Typography>
-                  </Button>
+                <Box display='flex' justifyContent='center' alignItems='center' gap={2}>
+                  <Typography
+                    variant='subtitle1'
+                    onClick={() => (followsCurrentUser || canEditProfile) && setShowFollowers(true)}
+                    sx={{ cursor: followsCurrentUser ? 'pointer' : 'default' }}>
+                    <strong>{userData.followers.length}</strong> Following
+                  </Typography>
+
+                  <Typography
+                    variant='subtitle1'
+                    onClick={() => (followsCurrentUser || canEditProfile) && setShowFollowing(true)}
+                    sx={{ cursor: followsCurrentUser ? 'pointer' : 'default' }}>
+                    <strong>{userData.following.length}</strong> Following
+                  </Typography>
                 </Box>
 
-                {!canEditProfile && (
-                  <Button
-                    variant='contained'
-                    color={isFollowing ? 'error' : 'primary'}
-                    onClick={isFollowing ? handleUnfollowUser : handleFollowUser}
-                    sx={{ maxWidth: 200, mt: 1 }}>
-                    {isFollowing ? 'Unfollow' : 'Follow'}
-                  </Button>
+                {/* Show privacy notice if user cannot see the lists */}
+                {!followsCurrentUser && !canEditProfile && (
+                  <Typography variant='caption' color='text.secondary' sx={{ m: 1 }}>
+                    User&apos;s followers and following lists are private unless they follow you.
+                  </Typography>
                 )}
+
+                {/* Follow/Unfollow Button */}
+                {!canEditProfile &&
+                  (isFollowing ? (
+                    <Button variant='outlined' onClick={handleUnfollowUser} sx={{ mt: 1 }}>
+                      Unfollow
+                    </Button>
+                  ) : (
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={handleFollowUser}
+                      sx={{ mt: 1 }}>
+                      Follow
+                    </Button>
+                  ))}
               </Box>
 
               <Modal open={showFollowers} onClose={() => setShowFollowers(false)}>
                 <Box sx={modalStyle}>
                   <Typography variant='h4'>Followers</Typography>
                   {userData.followers.length > 0 ? (
-                    <ul>
+                    <ul
+                      style={{
+                        listStyleType: 'none',
+                        padding: 0,
+                        textAlign: 'center',
+                        margin: '0 auto',
+                      }}>
                       {userData.followers.map(follower => (
-                        <li key={follower}>{follower}</li>
+                        <li key={follower}>
+                          <Link
+                            to={`/user/${follower}`}
+                            onClick={() => setShowFollowers(false)}
+                            style={{
+                              textDecoration: 'none',
+                              color: theme.palette.success.main,
+                            }}>
+                            {follower}
+                          </Link>
+                        </li>
                       ))}
                     </ul>
                   ) : (
-                    <p>No followers yet.</p>
+                    <p style={{ textAlign: 'center' }}>No followers yet.</p>
                   )}
                   <Button
                     variant='contained'
@@ -201,17 +227,35 @@ const ProfileSettings: React.FC = () => {
                 </Box>
               </Modal>
 
-              <Modal open={showFollowing} onClose={() => setShowFollowing(false)}>
+              <Modal
+                open={showFollowing && (canEditProfile || isFollowing)}
+                onClose={() => setShowFollowing(false)}>
                 <Box sx={modalStyle}>
                   <Typography variant='h4'>Following</Typography>
                   {userData.following.length > 0 ? (
-                    <ul>
+                    <ul
+                      style={{
+                        listStyleType: 'none',
+                        padding: 0,
+                        textAlign: 'center',
+                        margin: '0 auto',
+                      }}>
                       {userData.following.map(following => (
-                        <li key={following}>{following}</li>
+                        <li key={following}>
+                          <Link
+                            to={`/user/${following}`}
+                            onClick={() => setShowFollowing(false)}
+                            style={{
+                              textDecoration: 'none',
+                              color: theme.palette.success.main,
+                            }}>
+                            {following}
+                          </Link>
+                        </li>
                       ))}
                     </ul>
                   ) : (
-                    <p>Not following anyone yet.</p>
+                    <p style={{ textAlign: 'center' }}>Not following anyone yet.</p>
                   )}
                   <Button
                     variant='contained'
