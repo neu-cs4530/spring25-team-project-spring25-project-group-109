@@ -11,15 +11,27 @@ import {
   saveUserStats,
   saveUserStore,
   updateUser,
+  getRankedUsersList,
 } from '../../services/user.service';
+import AnswerModel from '../../models/answers.model';
 import {
   DatabaseStore,
   DatabaseUserStats,
   SafeDatabaseUser,
   User,
   UserCredentials,
+  RankedUser,
 } from '../../types/types';
-import { user, safeUser, mockUserStats, mockDatabaseStore } from '../mockData.models';
+import {
+  user,
+  safeUser,
+  mockUserStats,
+  mockDatabaseStore,
+  safeUserTwo,
+  ans5,
+  ans6,
+  ans7,
+} from '../mockData.models';
 import UserStatsModel from '../../models/userstats.model';
 import StoreModel from '../../models/store.model';
 
@@ -371,5 +383,42 @@ describe('awardBadgeToUser', () => {
 
     const result = await awardBadgeToUser(user.username, [new ObjectId()]);
     expect('error' in result).toBe(true);
+  });
+});
+
+describe('getRankedUsersList', () => {
+  beforeEach(() => {
+    mockingoose.resetAll();
+  });
+
+  it('should return the users', async () => {
+    const usersArray = [safeUser, safeUserTwo];
+    const answerArray = [
+      { _id: safeUserTwo.username, count: 2, user_info: { ...safeUserTwo } },
+      { _id: safeUser.username, count: 1, user_info: { ...safeUser } },
+    ];
+
+    mockingoose(UserModel).toReturn(usersArray, 'find');
+    mockingoose(AnswerModel).toReturn(answerArray, 'aggregate');
+
+    const retrievedUsers = (await getRankedUsersList()) as RankedUser[];
+    expect(retrievedUsers[0].username).toEqual(safeUserTwo.username);
+    expect(retrievedUsers[0].count).toEqual(2);
+  });
+
+  it('should throw an error if the users cannot be found', async () => {
+    mockingoose(AnswerModel).toReturn(null, 'aggregate');
+
+    const getUsersError = await getRankedUsersList();
+
+    expect('error' in getUsersError).toBe(true);
+  });
+
+  it('should throw an error if there is an error while searching the database', async () => {
+    mockingoose(AnswerModel).toReturn(new Error('Error finding document'), 'aggregate');
+
+    const getUsersError = await getRankedUsersList();
+
+    expect('error' in getUsersError).toBe(true);
   });
 });

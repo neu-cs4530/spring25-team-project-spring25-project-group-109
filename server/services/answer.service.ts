@@ -3,7 +3,9 @@ import {
   AnswerResponse,
   DatabaseAnswer,
   DatabaseQuestion,
+  DatabaseUser,
   PopulatedDatabaseAnswer,
+  PopulatedDatabaseComment,
   PopulatedDatabaseQuestion,
   QuestionResponse,
 } from '../types/types';
@@ -12,6 +14,8 @@ import QuestionModel from '../models/questions.model';
 import UserStatsModel from '../models/userstats.model';
 import { updateCoins } from './store.service';
 import { saveNotification } from './notification.service';
+import UserModel from '../models/users.model';
+import CommentModel from '../models/comments.model';
 
 /**
  * Records the most recent answer time for a given question based on its answers.
@@ -93,5 +97,36 @@ export const addAnswerToQuestion = async (
     return result;
   } catch (error) {
     return { error: 'Error when adding answer to question' };
+  }
+};
+
+/**
+ * Gather all the answers of the users that the user is following.
+ */
+
+export const fetchAnswersByFollowing = async (following: string[]) => {
+  try {
+    const answers = await AnswerModel.find({ ansBy: { $in: following } })
+      .populate<{
+        comments: PopulatedDatabaseComment[];
+        ansBy: DatabaseUser;
+      }>([
+        {
+          path: 'comments',
+          model: CommentModel,
+          populate: {
+            path: 'commentBy',
+            model: UserModel,
+            localField: 'commentBy',
+            foreignField: 'username',
+          },
+        },
+        { path: 'ansBy', model: UserModel, localField: 'ansBy', foreignField: 'username' },
+      ])
+      .sort({ ansDateTime: -1 });
+
+    return answers;
+  } catch (error) {
+    return { error: 'Error when fetching answers by following!' };
   }
 };

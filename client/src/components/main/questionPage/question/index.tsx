@@ -1,7 +1,18 @@
 import { useState } from 'react';
 import { ObjectId } from 'mongodb';
 import { useNavigate } from 'react-router-dom';
-import { Box, Card, CardContent, Chip, Stack, Typography, Button, Modal } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Chip,
+  Stack,
+  Typography,
+  Button,
+  Modal,
+  Avatar,
+} from '@mui/material';
+import './index.css';
 import { getMetaData } from '../../../../tool';
 import { PopulatedDatabaseQuestion } from '../../../../types/types';
 import SaveToCollection from '../../saveToCollection';
@@ -70,8 +81,9 @@ const QuestionView = ({ question }: QuestionProps) => {
         </Stack>
 
         <Box display='flex' justifyContent='space-between' alignItems='center'>
+          <Avatar alt='No Photo' src={question.askedBy.profilePhoto} />
           <Typography variant='body2' color='text.secondary'>
-            Asked by <strong>{question.askedBy}</strong>
+            Asked by <strong>{question.askedBy.username}</strong>
           </Typography>
           <Typography variant='body2' color='text.secondary'>
             {getMetaData(new Date(question.askDateTime))}

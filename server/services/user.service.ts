@@ -3,15 +3,19 @@ import UserModel from '../models/users.model';
 import UserStatsModel from '../models/userstats.model';
 import {
   DatabaseStore,
+  AnswerResponse,
   DatabaseUser,
   DatabaseUserStats,
+  PopulatedDatabaseQuestion,
   SafeDatabaseUser,
   User,
   UserCredentials,
   UserResponse,
   UsersResponse,
+  RankedUsersResponse,
 } from '../types/types';
 import StoreModel from '../models/store.model';
+import AnswerModel from '../models/answers.model';
 
 /**
  * Saves a new user to the database.
@@ -199,6 +203,38 @@ export const updateUser = async (
   }
 };
 
+export const getRankedUsersList = async (): Promise<RankedUsersResponse> => {
+  try {
+    const users = await AnswerModel.aggregate([
+      { $group: { _id: '$ansBy', count: { $sum: 1 } } },
+      {
+        $lookup: {
+          from: UserModel.collection.name,
+          localField: '_id',
+          foreignField: 'username',
+          as: 'user_info',
+        },
+      },
+      {
+        $unwind: '$user_info',
+      },
+      {
+        $sort: { count: -1 },
+      },
+    ]);
+    if (!users) {
+      throw Error('Ranked users list could not be retrieved');
+    }
+
+    const usersList = users.map(user => {
+      delete user.user_info.password;
+      return { count: user.count, ...user.user_info };
+    });
+    return usersList;
+  } catch (error) {
+    return { error: `Error occurred when finding ranked users: ${error}` };
+  }
+};
 /**
  * Award one or more badges to a user.
  *
