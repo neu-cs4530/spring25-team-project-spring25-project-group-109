@@ -91,9 +91,7 @@ const QuestionView = ({ question }: QuestionProps) => {
       </CardContent>
 
       <Modal open={showSaveModal} onClose={() => setShowSaveModal(false)}>
-        <Box
-          sx={{ p: 2, backgroundColor: 'white', borderRadius: 2, width: 400, mx: 'auto', mt: 10 }}
-          onClick={e => e.stopPropagation()}>
+        <Box onClick={e => e.stopPropagation()}>
           <SaveToCollection
             questionId={String(question._id)}
             onClose={() => setShowSaveModal(false)}
