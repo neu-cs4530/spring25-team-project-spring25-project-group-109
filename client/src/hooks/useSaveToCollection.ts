@@ -19,7 +19,7 @@ const useSaveToCollection = () => {
      */
     const fetchCollections = async () => {
       try {
-        const data = await getCollectionsByUsername(user.username);
+        const data = await getCollectionsByUsername(user.username, user.username);
         setCollections(data);
       } catch {
         setError('Failed to load collections');

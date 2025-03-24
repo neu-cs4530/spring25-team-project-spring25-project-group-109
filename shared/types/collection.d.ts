@@ -44,6 +44,9 @@ export interface GetCollectionsByUserRequest extends Request {
   params: {
     username: string;
   };
+  query: {
+    requestingUser: string;
+  };
 }
 
 // redo these types, extend the params from above with the body like in chat.

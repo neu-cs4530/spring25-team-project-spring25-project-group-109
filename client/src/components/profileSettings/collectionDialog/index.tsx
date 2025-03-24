@@ -9,11 +9,12 @@ import {
   Paper,
   useTheme,
   Stack,
-  Chip,
   Input,
   IconButton,
   Alert,
-  DialogContentText,
+  FormControlLabel,
+  Switch,
+  Chip,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
@@ -24,6 +25,7 @@ interface CollectionDialogProps {
   open: boolean;
   handleClose: () => void;
   collection: PopulatedDatabaseCollection;
+  canEditProfile: boolean;
   clickQuestion: (questionID: string) => void;
   handleUpdateCollection: (
     collectionId: string,
@@ -34,56 +36,83 @@ interface CollectionDialogProps {
     collectionId: string,
     setErrorMessage: (message: string) => void,
   ) => void;
+  handleTogglePrivacy: (
+    collectionId: string,
+    isPrivate: boolean,
+    setErrorMessage: (message: string) => void,
+  ) => void;
 }
 
 const CollectionDialog = ({
   open,
   handleClose,
   collection,
+  canEditProfile,
   clickQuestion,
   handleUpdateCollection,
   handleDeleteCollection,
+  handleTogglePrivacy,
 }: CollectionDialogProps) => {
   const theme = useTheme();
   const [editNameMode, setEditNameMode] = useState(false);
   const [newName, setNewName] = useState(collection.name);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const isPrivate = collection.visibility === 'private';
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth='sm'>
       <Box sx={{ p: 1 }}>
         <DialogTitle>
-          {!editNameMode ? (
-            <Box display='flex' alignItems='center'>
-              <Typography variant='h5' fontWeight={'bold'}>
-                {collection.name}
-              </Typography>
-              <IconButton
-                color='primary'
-                onClick={() => {
-                  setEditNameMode(true);
-                  setNewName(collection.name || '');
-                }}>
-                <EditIcon sx={{ fontSize: 20 }} />
-              </IconButton>
-            </Box>
-          ) : (
-            <Box display='flex' alignItems='center' gap={2}>
-              <Input type='text' value={newName} onChange={e => setNewName(e.target.value)} />
-              <Button
-                variant='contained'
-                onClick={() => {
-                  handleUpdateCollection(String(collection._id), newName, setErrorMessage);
-                  setEditNameMode(false);
-                }}>
-                Save
-              </Button>
-              <Button variant='outlined' onClick={() => setEditNameMode(false)}>
-                Cancel
-              </Button>
-            </Box>
-          )}
+          <Box display='flex' alignItems='center' justifyContent='space-between'>
+            {!editNameMode ? (
+              <Box display='flex' alignItems='center' gap={1}>
+                <Typography variant='h5' fontWeight={'bold'}>
+                  {collection.name}
+                </Typography>
+                {canEditProfile && (
+                  <IconButton
+                    color='primary'
+                    onClick={() => {
+                      setEditNameMode(true);
+                      setNewName(collection.name || '');
+                    }}>
+                    <EditIcon sx={{ fontSize: 20 }} />
+                  </IconButton>
+                )}
+              </Box>
+            ) : (
+              <Box display='flex' alignItems='center' gap={2}>
+                <Input type='text' value={newName} onChange={e => setNewName(e.target.value)} />
+                <Button
+                  variant='contained'
+                  onClick={() => {
+                    handleUpdateCollection(String(collection._id), newName, setErrorMessage);
+                    setEditNameMode(false);
+                  }}>
+                  Save
+                </Button>
+                <Button variant='outlined' onClick={() => setEditNameMode(false)}>
+                  Cancel
+                </Button>
+              </Box>
+            )}
+            {canEditProfile && (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isPrivate}
+                    onChange={() =>
+                      handleTogglePrivacy(String(collection._id), !isPrivate, setErrorMessage)
+                    }
+                    color='primary'
+                  />
+                }
+                label={isPrivate ? 'Private' : 'Public'}
+                labelPlacement='start'
+              />
+            )}
+          </Box>
           {errorMessage && (
             <Alert sx={{ mt: 2 }} severity={'error'}>
               {errorMessage}
@@ -99,11 +128,9 @@ const CollectionDialog = ({
                   key={String(question._id)}
                   onClick={() => clickQuestion(String(question._id))}
                   sx={{ padding: 2, cursor: 'pointer' }}>
-                  <Box display='flex' flexDirection='row' justifyContent={'space-between'} gap={1}>
-                    <Typography variant='h6' fontWeight={'bold'}>
-                      {question.title}
-                    </Typography>
-                  </Box>
+                  <Typography variant='h6' fontWeight={'bold'}>
+                    {question.title}
+                  </Typography>
                   <Stack direction='row' spacing={1} mt={1} flexWrap='wrap'>
                     {question.tags.map(tag => (
                       <Chip
@@ -118,8 +145,9 @@ const CollectionDialog = ({
               ))
             ) : (
               <Typography variant='body1' sx={{ color: theme.palette.text.secondary }}>
-                This collection is empty, questions can be added from <Link to={'/home'}>here</Link>
-                .
+                This collection is empty,{' '}
+                {canEditProfile ? 'questions can be added from ' : 'all questions can be viewed '}{' '}
+                <Link to={'/home'}>here</Link>
               </Typography>
             )}
           </Box>
@@ -127,13 +155,15 @@ const CollectionDialog = ({
         <DialogActions sx={{ padding: 2 }}>
           {!confirmDelete ? (
             <Box display='flex' flexDirection='row' gap={2}>
-              <Button
-                onClick={() => setConfirmDelete(true)}
-                variant='outlined'
-                color='error'
-                sx={{ color: theme.palette.error.main }}>
-                Delete
-              </Button>
+              {canEditProfile && (
+                <Button
+                  onClick={() => setConfirmDelete(true)}
+                  variant='outlined'
+                  color='error'
+                  sx={{ color: theme.palette.error.main }}>
+                  Delete
+                </Button>
+              )}
               <Button onClick={handleClose} variant='outlined'>
                 Close
               </Button>
@@ -141,7 +171,6 @@ const CollectionDialog = ({
           ) : (
             <Stack display='flex' gap={2}>
               <Alert severity='warning'>
-                {' '}
                 Are you sure you want to delete this collection? This action cannot be undone.
               </Alert>
               <Box display='flex' gap={1} justifyContent='flex-end'>

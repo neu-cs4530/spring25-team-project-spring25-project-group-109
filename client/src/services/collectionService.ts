@@ -27,8 +27,13 @@ const createCollection = async (collection: Collection): Promise<DatabaseCollect
  * @throws Error if there is an issue while fetching the collections.
  */
 
-const getCollectionsByUsername = async (username: string): Promise<DatabaseCollection[]> => {
-  const res = await api.get(`${COLLECTION_API_URL}/getCollectionsByUser/${username}`);
+const getCollectionsByUsername = async (
+  username: string,
+  requestingUser: string,
+): Promise<DatabaseCollection[]> => {
+  const res = await api.get(
+    `${COLLECTION_API_URL}/getCollectionsByUser/${username}?requestingUser=${requestingUser}`,
+  );
 
   if (res.status !== 200) {
     throw new Error('Error while fetching collections');
@@ -81,10 +86,24 @@ const deleteCollection = async (collectionId: string): Promise<DatabaseCollectio
   return res.data;
 };
 
+const updateCollectionVisibility = async (
+  collectionId: string,
+  visibility: string,
+): Promise<DatabaseCollection> => {
+  const res = await api.patch(`${COLLECTION_API_URL}/updateCollectionVisibility/${collectionId}`, {
+    visibility,
+  });
+  if (res.status !== 200) {
+    throw new Error('Error while updating collection visibility');
+  }
+  return res.data;
+};
+
 export {
   createCollection,
   getCollectionsByUsername,
   addQuestionToCollection,
   renameCollection,
   deleteCollection,
+  updateCollectionVisibility,
 };

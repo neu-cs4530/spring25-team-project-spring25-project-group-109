@@ -71,6 +71,7 @@ const ProfileSettings: React.FC = () => {
     handleUnfollowUser,
     handleCollectionInputChange,
     handleDeleteCollection,
+    handleTogglePrivacy,
   } = useProfileSettings();
 
   const numEarnedBadges = userData?.badgesEarned ? userData.badgesEarned.length : 0;
@@ -331,9 +332,11 @@ const ProfileSettings: React.FC = () => {
               <Paper variant='outlined' sx={{ padding: 2, borderRadius: 4 }}>
                 <Box display='flex' justifyContent='space-between' alignItems='center'>
                   <Typography variant='h4'>Collections</Typography>
-                  <IconButton onClick={() => setShowAddCollection(true)}>
-                    <AddCircle color='primary' />
-                  </IconButton>
+                  {canEditProfile && (
+                    <IconButton onClick={() => setShowAddCollection(true)}>
+                      <AddCircle color='primary' />
+                    </IconButton>
+                  )}
                 </Box>
                 <Box
                   sx={{
@@ -347,9 +350,11 @@ const ProfileSettings: React.FC = () => {
                       <CollectionView
                         key={String(collection._id)}
                         collection={collection}
+                        canEditProfile={canEditProfile}
                         clickQuestion={clickQuestion}
                         handleUpdateCollection={handleUpdateCollection}
                         handleDeleteCollection={handleDeleteCollection}
+                        handleTogglePrivacy={handleTogglePrivacy}
                       />
                     ))
                   ) : (

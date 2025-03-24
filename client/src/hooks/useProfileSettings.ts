@@ -17,6 +17,7 @@ import {
   deleteCollection,
   getCollectionsByUsername,
   renameCollection,
+  updateCollectionVisibility,
 } from '../services/collectionService';
 import useQuestionPage from './useQuestionPage';
 
@@ -80,7 +81,28 @@ const useProfileSettings = () => {
     if (!userData) return;
     try {
       await renameCollection(collectionId, newName);
-      const collectionsData = await getCollectionsByUsername(userData.username);
+      const collectionsData = await getCollectionsByUsername(
+        userData.username,
+        currentUser.username,
+      );
+      setCollections(collectionsData);
+    } catch (error) {
+      setCollectionErrorMessage('Failed to update collection.');
+    }
+  };
+
+  const handleTogglePrivacy = async (
+    collectionId: string,
+    isPrivate: boolean, // new value
+    setCollectionErrorMessage: (message: string) => void,
+  ) => {
+    if (!userData) return;
+    try {
+      await updateCollectionVisibility(collectionId, isPrivate ? 'private' : 'public');
+      const collectionsData = await getCollectionsByUsername(
+        userData.username,
+        currentUser.username,
+      );
       setCollections(collectionsData);
     } catch (error) {
       setCollectionErrorMessage('Failed to update collection.');
@@ -94,7 +116,10 @@ const useProfileSettings = () => {
     if (!userData) return;
     try {
       await deleteCollection(collectionId);
-      const collectionsData = await getCollectionsByUsername(userData.username);
+      const collectionsData = await getCollectionsByUsername(
+        userData.username,
+        currentUser.username,
+      );
       setCollections(collectionsData);
     } catch (error) {
       setCollectionErrorMessage('Failed to delete collection');
@@ -147,20 +172,9 @@ const useProfileSettings = () => {
       }
     };
 
-    const fetchCollections = async () => {
-      try {
-        const collectionsData = await getCollectionsByUsername(username);
-        setCollections(collectionsData);
-      } catch (error) {
-        setErrorMessage('Error fetching collections');
-        setCollections([]);
-      }
-    };
-
     fetchUserData();
     fetchBadges();
-    fetchCollections();
-  }, [username]);
+  }, [currentUser.username, username]);
 
   useEffect(() => {
     if (userData) {
@@ -351,6 +365,7 @@ const useProfileSettings = () => {
     handleFollowUser,
     handleUnfollowUser,
     handleDeleteCollection,
+    handleTogglePrivacy,
   };
 };
 
