@@ -20,6 +20,8 @@ import {
   updateUser,
 } from '../services/user.service';
 import { saveNotification } from '../services/notification.service';
+import multer from 'multer';
+import path from 'path';
 
 const userController = (socket: FakeSOSocket) => {
   const router: Router = express.Router();
@@ -270,7 +272,7 @@ const userController = (socket: FakeSOSocket) => {
 
   /**
    * Updates a user's profile photo.
-   * @param req The request containing the username and profile photo URL in the body.
+   * @param req The request containing the username and profile photo path.
    * @param res The response, either confirming the update or returning an error.
    * @returns A promise resolving to void.
    */
@@ -303,6 +305,23 @@ const userController = (socket: FakeSOSocket) => {
       res.status(200).json(updatedUser);
     } catch (error) {
       res.status(500).send(`Error when updating user profile photo: ${error}`);
+    }
+  };
+
+  const uploadProfilePhoto = async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+
+      const filePath = `/uploads/${req.file.filename}`;
+      const username = req.body.username;
+
+      const updatedUser = await updateUser(username, { profilePhoto: filePath });
+
+      res.status(200).json({ imageUrl: filePath, user: updatedUser });
+    } catch (error) {
+      res.status(500).json({ error: 'Error uploading file' });
     }
   };
 
@@ -416,6 +435,15 @@ const userController = (socket: FakeSOSocket) => {
     }
   };
 
+  const storage = multer.diskStorage({
+    destination: '../client/public/uploads/',
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + path.extname(file.originalname));
+    },
+  });
+
+  const upload = multer({ storage });
+
   // Define routes for the user-related operations.
   router.post('/signup', createUser);
   router.post('/login', userLogin);
@@ -427,6 +455,8 @@ const userController = (socket: FakeSOSocket) => {
   router.patch('/updateProfilePhoto', updateProfilePhoto);
   router.patch('/follow', follow);
   router.patch('/unfollow', unfollow);
+  router.post('/uploadProfilePhoto', upload.single('file'), uploadProfilePhoto);
+
   return router;
 };
 

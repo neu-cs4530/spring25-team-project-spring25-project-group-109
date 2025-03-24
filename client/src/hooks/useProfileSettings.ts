@@ -8,10 +8,12 @@ import {
   updateProfilePhoto,
   follow,
   unfollow,
+  uploadProfilePhoto,
 } from '../services/userService';
 import { getBadges } from '../services/badgeService';
 import { DatabaseBadge, SafeDatabaseUser } from '../types/types';
 import useUserContext from './useUserContext';
+import getUserStore from '../services/storeService';
 
 const AVAILABLE_AVATARS = [
   '/images/avatars/default-avatar.png',
@@ -44,6 +46,7 @@ const useProfileSettings = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
+  const [permissions, setPermissions] = useState<{ customPhoto: boolean }>({ customPhoto: false });
 
   // For delete-user confirmation modal
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -61,7 +64,11 @@ const useProfileSettings = () => {
         setLoading(true);
         const data = await getUserByUsername(username);
         setUserData(data);
-        setProfilePhoto(data.profilePhoto || '/images/avatars/default-avatar.png');
+        setProfilePhoto(String(data.profilePhoto) || '/images/avatars/default-avatar.png');
+        const userStore = await getUserStore(currentUser.username);
+        setPermissions({
+          customPhoto: userStore.unlockedFeatures.includes('Custom Profile Photo'),
+        });
       } catch (error) {
         setErrorMessage('Error fetching user profile');
         setUserData(null);
@@ -171,6 +178,21 @@ const useProfileSettings = () => {
     }
   };
 
+  const handleUploadProfilePhoto = async (file: File) => {
+    if (!username || !file) return;
+    try {
+      const newPhotoUrl = await uploadProfilePhoto(username, file);
+      setUserData(prev => (prev ? { ...prev, profilePhoto: newPhotoUrl } : null));
+      setProfilePhoto(newPhotoUrl);
+      setEditProfilePhotoMode(false);
+      setSuccessMessage('Profile photo uploaded successfully!');
+      setErrorMessage(null);
+    } catch (error) {
+      setErrorMessage('Failed to upload profile photo.');
+      setSuccessMessage(null);
+    }
+  };
+
   const handleFollowUser = async () => {
     if (!username || !currentUser.username) return;
     try {
@@ -264,6 +286,8 @@ const useProfileSettings = () => {
     handleDeleteUser,
     handleFollowUser,
     handleUnfollowUser,
+    handleUploadProfilePhoto,
+    permissions,
   };
 };
 
