@@ -45,6 +45,50 @@ export interface GetCollectionsByUserRequest extends Request {
   };
 }
 
+// redo these types, extend the params from above with the body like in chat.
+/**
+ * Express request for querying a collection by its id.
+ * - `params`: contains the `id` of the collection to look up.
+ */
+export interface CollectionByIdRequest extends Request {
+  params: {
+    id: string;
+  };
+}
+
+/**
+ * Express request for updating a collection's visibility.
+ * - `id`: contains the `id` of the collection being updated.
+ * - `visibility`: contains the new visibility status of the collection.
+ */
+export interface UpdateCollectionVisibilityRequest extends CollectionByIdRequest {
+  body: {
+    visibility: 'public' | 'private';
+  };
+}
+
+/**
+ * Express request for updating the name of a collection.
+ * - `id`: contains the `id` of the collection being updated.
+ * - `name`: contains the new name of the collection.
+ */
+export interface UpdateCollectionNameRequest extends CollectionByIdRequest {
+  body: {
+    name: string;
+  };
+}
+
+/**
+ * Express request for adding or deleting a question from a collection.
+ * - `id`: contains the `id` of the collection being updated.
+ * - `questionId`: contains the `id` of the question to be added.
+ */
+export interface QuestionToCollectionRequest extends CollectionByIdRequest {
+  body: {
+    questionId: string;
+  };
+}
+
 /**
  * Represents the response for collection-related operations.
  * - `DatabaseCollection`: a collection object.

@@ -1,6 +1,7 @@
 import { PopulatedDatabaseAnswer } from './answer';
 import { PopulatedDatabaseChat } from './chat';
 import { DatabaseMessage } from './message';
+import { DatabaseCollection } from './collection';
 import { PopulatedDatabaseQuestion } from './question';
 import { SafeDatabaseUser } from './user';
 import { BaseMove, GameInstance, GameInstanceID, GameMove, GameState } from './game';
@@ -84,6 +85,17 @@ export interface UserUpdatePayload {
 }
 
 /**
+ * Payload for a collection update event.
+ * - `collection`: The updated collection object.
+ * - `type`: The type of modification (`'created'`, `'deleted'`, or `'updated'`).
+ */
+
+export interface CollectionUpdatePayload {
+  collection: DatabaseCollection;
+  type: 'created' | 'deleted' | 'updated';
+}
+
+/**
  * Interface representing the payload for a game move operation, which contains:
  * - `gameID`: The ID of the game being played.
  * - `move`: The move being made in the game, defined by `GameMove`.
@@ -121,6 +133,7 @@ export interface ClientToServerEvents {
  * - `gameUpdate`: Server sends updated game state.
  * - `gameError`: Server sends error message related to game operation.
  * - `chatUpdate`: Server sends updated chat.
+ * - `collectionUpdate`: Server sends an updated collection.
  */
 export interface ServerToClientEvents {
   questionUpdate: (question: PopulatedDatabaseQuestion) => void;
@@ -133,4 +146,5 @@ export interface ServerToClientEvents {
   gameUpdate: (game: GameUpdatePayload) => void;
   gameError: (error: GameErrorPayload) => void;
   chatUpdate: (chat: ChatUpdatePayload) => void;
+  collectionUpdate: (collection: CollectionUpdatePayload) => void;
 }
