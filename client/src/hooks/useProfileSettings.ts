@@ -13,7 +13,7 @@ import {
 import { getBadges } from '../services/badgeService';
 import { DatabaseBadge, SafeDatabaseUser } from '../types/types';
 import useUserContext from './useUserContext';
-import getUserStore from '../services/storeService';
+import { getUserStore } from '../services/storeService';
 
 const AVAILABLE_AVATARS = [
   '/images/avatars/default-avatar.png',
@@ -89,7 +89,7 @@ const useProfileSettings = () => {
 
     fetchUserData();
     fetchBadges();
-  }, [username]);
+  }, [username, currentUser.username]);
 
   useEffect(() => {
     if (userData) {

@@ -1,5 +1,7 @@
 import express, { Request, Response, Router } from 'express';
 import multer from 'multer';
+import fs from 'fs';
+import path from 'path';
 import {
   UserRequest,
   User,
@@ -21,9 +23,6 @@ import {
   updateUser,
 } from '../services/user.service';
 import { saveNotification } from '../services/notification.service';
-
-const fs = require('fs');
-const path = require('path');
 
 const userController = (socket: FakeSOSocket) => {
   const router: Router = express.Router();
@@ -290,6 +289,19 @@ const userController = (socket: FakeSOSocket) => {
 
       // Validate that request has username and profile photo
       const { username, profilePhoto } = req.body;
+
+      const user = await getUserByUsername(req.body.username);
+      if ('error' in user) {
+        throw new Error(user.error);
+      }
+
+      // delete previously uploaded profile photo to avoid storing unecessary images
+      if (
+        user.profilePhoto?.includes('uploads') &&
+        fs.existsSync(path.join(__dirname, '../../client/public', user.profilePhoto))
+      ) {
+        fs.unlinkSync(path.join(__dirname, '../../client/public', user.profilePhoto));
+      }
 
       // Call the same updateUser(...) service used by resetPassword
       const updatedUser = await updateUser(username, { profilePhoto });
