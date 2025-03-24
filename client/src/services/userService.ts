@@ -178,7 +178,7 @@ const follow = async (follower: string, followee: string) => {
   if (res.status !== 200) {
     throw new Error('Error when following');
   }
-  return res.data.imageUrl;
+  return res.data;
 };
 
 /**

@@ -1,4 +1,5 @@
 import express, { Request, Response, Router } from 'express';
+import multer from 'multer';
 import {
   UserRequest,
   User,
@@ -20,8 +21,9 @@ import {
   updateUser,
 } from '../services/user.service';
 import { saveNotification } from '../services/notification.service';
-import multer from 'multer';
-import path from 'path';
+
+const fs = require('fs');
+const path = require('path');
 
 const userController = (socket: FakeSOSocket) => {
   const router: Router = express.Router();
@@ -308,14 +310,28 @@ const userController = (socket: FakeSOSocket) => {
     }
   };
 
-  const uploadProfilePhoto = async (req: Request, res: Response) => {
+  const uploadProfilePhoto = async (req: UserByUsernameRequest, res: Response): Promise<void> => {
     try {
       if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded' });
+        res.status(400).send('No file uploaded');
+        return;
+      }
+
+      const user = await getUserByUsername(req.body.username);
+      if ('error' in user) {
+        throw new Error(user.error);
+      }
+
+      // delete previously uploaded profile photo to avoid storing unecessary images
+      if (
+        user.profilePhoto?.includes('uploads') &&
+        fs.existsSync(path.join(__dirname, '../../client/public', user.profilePhoto))
+      ) {
+        fs.unlinkSync(path.join(__dirname, '../../client/public', user.profilePhoto));
       }
 
       const filePath = `/uploads/${req.file.filename}`;
-      const username = req.body.username;
+      const { username } = req.body;
 
       const updatedUser = await updateUser(username, { profilePhoto: filePath });
 
