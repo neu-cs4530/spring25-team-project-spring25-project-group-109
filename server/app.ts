@@ -92,7 +92,7 @@ app.use('/chat', chatController(socket));
 app.use('/games', gameController(socket));
 app.use('/store', storeController());
 app.use('/badge', badgeController());
-app.use('/collection', collectionController());
+app.use('/collection', collectionController(socket));
 app.use('/features', featureController());
 app.use('/notification', notificationController())
 app.use('/videos', youtubeController())
