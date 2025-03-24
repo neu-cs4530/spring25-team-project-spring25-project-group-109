@@ -172,8 +172,19 @@ const useProfileSettings = () => {
       }
     };
 
+    const fetchCollections = async () => {
+      try {
+        const collectionsData = await getCollectionsByUsername(username, currentUser.username);
+        setCollections(collectionsData);
+      } catch (error) {
+        setErrorMessage('Error fetching collections');
+        setCollections([]);
+      }
+    };
+
     fetchUserData();
     fetchBadges();
+    fetchCollections();
   }, [currentUser.username, username]);
 
   useEffect(() => {
