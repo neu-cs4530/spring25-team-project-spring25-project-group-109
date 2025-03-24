@@ -324,8 +324,8 @@ const userController = (socket: FakeSOSocket) => {
 
   const uploadProfilePhoto = async (req: UserByUsernameRequest, res: Response): Promise<void> => {
     try {
-      if (!req.file) {
-        res.status(400).send('No file uploaded');
+      if (!req.file || !req.body.username) {
+        res.status(400).send('Invalid user body');
         return;
       }
 
@@ -344,8 +344,11 @@ const userController = (socket: FakeSOSocket) => {
 
       const filePath = `/uploads/${req.file.filename}`;
       const { username } = req.body;
-
       const updatedUser = await updateUser(username, { profilePhoto: filePath });
+
+      if ('error' in updatedUser) {
+        throw new Error(updatedUser.error);
+      }
 
       res.status(200).json({ imageUrl: filePath, user: updatedUser });
     } catch (error) {
