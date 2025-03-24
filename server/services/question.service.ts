@@ -28,6 +28,7 @@ import {
 } from '../utils/sort.util';
 import UserStatsModel from '../models/userstats.model';
 import UserModel from '../models/users.model';
+import questionController from '../controllers/question.controller';
 
 /**
  * Checks if keywords exist in a question's title or text.
@@ -328,5 +329,58 @@ export const addVoteToQuestion = async (
           ? 'Error when adding upvote to question'
           : 'Error when adding downvote to question',
     };
+  }
+};
+
+/**
+ * Gather all the questions of the users that the user is following.
+ */
+
+export const fetchQuestionsByFollowing = async (
+  following: string[],
+): Promise<PopulatedDatabaseQuestion[] | { error: string }> => {
+  try {
+    const questions = await QuestionModel.find({ askedBy: { $in: following } })
+      .populate<{
+        tags: DatabaseTag[];
+        answers: PopulatedDatabaseAnswer[];
+        comments: PopulatedDatabaseComment[];
+        askedBy: DatabaseUser;
+      }>([
+        { path: 'tags', model: TagModel },
+        {
+          path: 'answers',
+          model: AnswerModel,
+          populate: [
+            {
+              path: 'comments',
+              model: CommentModel,
+              populate: {
+                path: 'commentBy',
+                model: UserModel,
+                localField: 'commentBy',
+                foreignField: 'username',
+              },
+            },
+            { path: 'ansBy', model: UserModel, localField: 'ansBy', foreignField: 'username' },
+          ],
+        },
+        {
+          path: 'comments',
+          model: CommentModel,
+          populate: {
+            path: 'commentBy',
+            model: UserModel,
+            localField: 'commentBy',
+            foreignField: 'username',
+          },
+        },
+        { path: 'askedBy', model: UserModel, localField: 'askedBy', foreignField: 'username' },
+      ])
+      .sort({ askDateTime: -1 });
+
+    return questions;
+  } catch (error) {
+    return { error: 'Error when fetching questions by following!' };
   }
 };

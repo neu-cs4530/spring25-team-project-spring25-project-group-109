@@ -132,3 +132,11 @@ export interface VoteRequest extends Request {
     username: string;
   };
 }
+
+/**
+ * Interface for requesting a user's question feed (by username).
+ */
+
+export interface QuestionFeedRequest extends Request {
+  params: { username: string };
+}

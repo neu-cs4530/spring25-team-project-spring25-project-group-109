@@ -52,3 +52,11 @@ export interface AddAnswerRequest extends Request {
  * - Either a `DatabaseAnswer` object or an error message.
  */
 export type AnswerResponse = DatabaseAnswer | { error: string };
+
+/**
+ * Interface for requesting a user's answer feed (by username).
+ */
+
+export interface AnswerFeedRequest extends Request {
+  params: { username: string };
+}
