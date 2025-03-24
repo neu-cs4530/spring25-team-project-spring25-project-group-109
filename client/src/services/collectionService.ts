@@ -59,4 +59,32 @@ const addQuestionToCollection = async (
   return res.data;
 };
 
-export { createCollection, getCollectionsByUsername, addQuestionToCollection };
+const renameCollection = async (
+  collectionId: string,
+  name: string,
+): Promise<DatabaseCollection> => {
+  const res = await api.patch(`${COLLECTION_API_URL}/updateCollectionName/${collectionId}`, {
+    name,
+  });
+  if (res.status !== 200) {
+    throw new Error('Error while adding question to collection');
+  }
+
+  return res.data;
+};
+
+const deleteCollection = async (collectionId: string): Promise<DatabaseCollection> => {
+  const res = await api.delete(`${COLLECTION_API_URL}/deleteCollection/${collectionId}`);
+  if (res.status !== 200) {
+    throw new Error('Error while deleting collection');
+  }
+  return res.data;
+};
+
+export {
+  createCollection,
+  getCollectionsByUsername,
+  addQuestionToCollection,
+  renameCollection,
+  deleteCollection,
+};

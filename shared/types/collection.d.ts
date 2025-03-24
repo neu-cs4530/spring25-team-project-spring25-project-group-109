@@ -1,5 +1,6 @@
 import { Request } from 'express';
 import { ObjectId } from 'mongodb';
+import { PopulatedDatabaseQuestion } from './question';
 
 /**
  * Represents a collection document in the database.
@@ -102,3 +103,11 @@ export type CollectionResponse = DatabaseCollection | { error: string };
  * - `error`: an error message if the operation fails.
  */
 export type CollectionsResponse = DatabaseCollection[] | { error: string };
+
+/**
+ * Represents the response for collection-related operations with full questions.
+ * - `PopulatedDatabaseCollection`: collection object with populated questions.
+ */
+export interface PopulatedDatabaseCollection extends Omit<DatabaseCollection, 'questions'> {
+  questions: PopulatedDatabaseQuestion[];
+}

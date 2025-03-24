@@ -69,7 +69,12 @@ const badgeController = () => {
     }
   };
 
-  // todo
+  /**
+   * Updates the badges for a user.
+   * @param req The request, which should contain the username in the params.
+   * @param res The response, either returning the badges or an error.
+   * @returns A promise resolving to void.
+   */
   const updateBadges = async (req: UpdateBadgeByUsernameRequest, res: Response): Promise<void> => {
     try {
       const { username } = req.params;

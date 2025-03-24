@@ -10,8 +10,15 @@ import {
   unfollow,
 } from '../services/userService';
 import { getBadges } from '../services/badgeService';
-import { DatabaseBadge, SafeDatabaseUser } from '../types/types';
+import { DatabaseBadge, DatabaseCollection, SafeDatabaseUser } from '../types/types';
 import useUserContext from './useUserContext';
+import {
+  createCollection,
+  deleteCollection,
+  getCollectionsByUsername,
+  renameCollection,
+} from '../services/collectionService';
+import useQuestionPage from './useQuestionPage';
 
 const AVAILABLE_AVATARS = [
   '/images/avatars/default-avatar.png',
@@ -44,14 +51,74 @@ const useProfileSettings = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
+  const [showAddCollection, setShowAddCollection] = useState(false);
+  const [collections, setCollections] = useState<DatabaseCollection[]>([]);
+  const [collectionName, setCollectionName] = useState<string>('');
 
   // For delete-user confirmation modal
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
+  const { clickQuestion } = useQuestionPage();
+
   const canEditProfile =
     currentUser.username && userData?.username ? currentUser.username === userData.username : false;
+
+  const handleCollectionInputChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const fieldText = event.target.value;
+    setCollectionName(fieldText);
+  };
+
+  const handleUpdateCollection = async (
+    collectionId: string,
+    newName: string,
+    setCollectionErrorMessage: (message: string) => void,
+  ) => {
+    if (!userData) return;
+    try {
+      await renameCollection(collectionId, newName);
+      const collectionsData = await getCollectionsByUsername(userData.username);
+      setCollections(collectionsData);
+    } catch (error) {
+      setCollectionErrorMessage('Failed to update collection.');
+    }
+  };
+
+  const handleDeleteCollection = async (
+    collectionId: string,
+    setCollectionErrorMessage: (message: string) => void,
+  ) => {
+    if (!userData) return;
+    try {
+      await deleteCollection(collectionId);
+      const collectionsData = await getCollectionsByUsername(userData.username);
+      setCollections(collectionsData);
+    } catch (error) {
+      setCollectionErrorMessage('Failed to delete collection');
+    }
+  };
+
+  const handleAddCollection = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!collectionName || !userData) return;
+    try {
+      const newCollection = await createCollection({
+        name: collectionName,
+        username: userData.username,
+        questions: [],
+        visibility: 'public',
+      });
+      setCollections(prevCollections => [...prevCollections, newCollection]);
+      setShowAddCollection(false);
+      setCollectionName('');
+      setSuccessMessage('Collection added!');
+    } catch (error) {
+      setErrorMessage('Failed to add collection.');
+    }
+  };
 
   useEffect(() => {
     if (!username) return;
@@ -80,8 +147,19 @@ const useProfileSettings = () => {
       }
     };
 
+    const fetchCollections = async () => {
+      try {
+        const collectionsData = await getCollectionsByUsername(username);
+        setCollections(collectionsData);
+      } catch (error) {
+        setErrorMessage('Error fetching collections');
+        setCollections([]);
+      }
+    };
+
     fetchUserData();
     fetchBadges();
+    fetchCollections();
   }, [username]);
 
   useEffect(() => {
@@ -232,6 +310,8 @@ const useProfileSettings = () => {
     userData,
     profilePhoto,
     handleUpdateProfilePhoto,
+    collectionName,
+    clickQuestion,
     availableAvatars: AVAILABLE_AVATARS,
     editProfilePhotoMode,
     setEditProfilePhotoMode,
@@ -240,6 +320,7 @@ const useProfileSettings = () => {
     setShowFollowers,
     showFollowing,
     setShowFollowing,
+    handleCollectionInputChange,
     newPassword,
     confirmNewPassword,
     setNewPassword,
@@ -247,6 +328,8 @@ const useProfileSettings = () => {
     loading,
     editBioMode,
     allBadges,
+    showAddCollection,
+    setShowAddCollection,
     setEditBioMode,
     newBio,
     setNewBio,
@@ -258,12 +341,16 @@ const useProfileSettings = () => {
     setPendingAction,
     canEditProfile,
     showPassword,
+    collections,
+    handleAddCollection,
+    handleUpdateCollection,
     togglePasswordVisibility,
     handleResetPassword,
     handleUpdateBiography,
     handleDeleteUser,
     handleFollowUser,
     handleUnfollowUser,
+    handleDeleteCollection,
   };
 };
 
