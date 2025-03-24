@@ -144,6 +144,7 @@ const useProfileSettings = () => {
       setErrorMessage('Failed to add collection.');
     }
   };
+  const followsCurrentUser = userData?.following.includes(currentUser.username);
 
   useEffect(() => {
     if (!username) return;
@@ -365,6 +366,7 @@ const useProfileSettings = () => {
     pendingAction,
     setPendingAction,
     canEditProfile,
+    followsCurrentUser,
     showPassword,
     collections,
     handleAddCollection,

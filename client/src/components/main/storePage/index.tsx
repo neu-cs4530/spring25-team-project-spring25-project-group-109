@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Typography, CircularProgress, Alert, Box, Avatar, Stack, Chip } from '@mui/material';
 import useUserContext from '../../../hooks/useUserContext';
-import getUserStore from '../../../services/storeService';
+import { getUserStore, purchaseFeature } from '../../../services/storeService';
 import { DatabaseFeature, DatabaseStore } from '../../../types/types';
 import { getFeatures } from '../../../services/featureService';
 import FeatureCard from '../featureCard';
@@ -57,6 +57,15 @@ const StorePage = () => {
     );
   }
 
+  const onPurchase = async (username: string, featureName: string): Promise<void> => {
+    try {
+      const newStore = await purchaseFeature(username, featureName);
+      setStore(newStore);
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  };
+
   return (
     <Box p={4}>
       <Typography variant='h4' gutterBottom>
@@ -81,9 +90,7 @@ const StorePage = () => {
           <FeatureCard
             key={feature._id}
             feature={feature}
-            // todo remove next line comment
-            // eslint-disable-next-line no-console
-            onPurchase={() => console.log('purchased - not really')}
+            onPurchase={() => onPurchase(user.username, feature.name)}
             purchased={store?.unlockedFeatures.some(name => name === feature.name) || false}
             outOfBudget={(store?.coinCount || 0) < feature.price}
           />

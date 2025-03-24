@@ -19,4 +19,16 @@ const getUserStore = async (username: string): Promise<DatabaseStore> => {
   return response.data;
 };
 
-export default getUserStore;
+const purchaseFeature = async (username: string, featureName: string): Promise<DatabaseStore> => {
+  const response = await axios.patch(`${API_BASE_URL}/unlockFeature`, {
+    username,
+    featureName,
+  });
+
+  if (response.status !== 200) {
+    throw new Error(response.statusText);
+  }
+  return response.data;
+};
+
+export { purchaseFeature, getUserStore };
