@@ -20,7 +20,7 @@ const useNewQuestion = () => {
   const { user } = useUserContext();
   const [title, setTitle] = useState<string>('');
   const [text, setText] = useState<string>('');
-  const [tagNames, setTagNames] = useState<string[]>([]); // Updated to array to manage multiple tags
+  const [tagNames, setTagNames] = useState<string[]>([]);
 
   const [titleErr, setTitleErr] = useState<string>('');
   const [textErr, setTextErr] = useState<string>('');
@@ -97,7 +97,7 @@ const useNewQuestion = () => {
     textErr,
     tagErr,
     postQuestion,
-    existingTags, // Expose the list of existing tags
+    existingTags,
   };
 };
 
