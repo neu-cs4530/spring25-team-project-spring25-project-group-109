@@ -3,6 +3,8 @@ import { ObjectId } from 'mongodb';
 import { Answer, AddAnswerRequest, FakeSOSocket, PopulatedDatabaseAnswer } from '../types/types';
 import { addAnswerToQuestion, saveAnswer } from '../services/answer.service';
 import { populateDocument } from '../utils/database.util';
+import QuestionModel from '../models/questions.model';
+import { saveNotification } from '../services/notification.service';
 
 const answerController = (socket: FakeSOSocket) => {
   const router = express.Router();
@@ -70,6 +72,22 @@ const answerController = (socket: FakeSOSocket) => {
       if (populatedAns && 'error' in populatedAns) {
         throw new Error(populatedAns.error);
       }
+
+      // send a notification to the question asker when this answer is added
+      const question = await QuestionModel.findOne({ _id: qid });
+      if (!question) {
+        throw Error('Question not found');
+      }
+      const notification = await saveNotification({
+        username: question.askedBy,
+        text: `${ansFromDb.ansBy} answered your question: "${question.title}"`,
+        seen: false,
+        type: 'answer',
+      });
+      if ('error' in notification) {
+        throw new Error(notification.error);
+      }
+      socket.emit('notificationUpdate', { notification, type: 'created' });
 
       // Populates the fields of the answer that was added and emits the new object
       socket.emit('answerUpdate', {

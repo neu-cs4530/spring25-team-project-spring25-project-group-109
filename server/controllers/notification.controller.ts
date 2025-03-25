@@ -6,11 +6,12 @@ import {
 } from '../services/notification.service';
 import {
   CreateNotificationRequest,
+  FakeSOSocket,
   GetNotificationsForUserRequest,
   ToggleNotificationSeenRequest,
 } from '../types/types';
 
-const notificationController = () => {
+const notificationController = (socket: FakeSOSocket) => {
   const router: Router = express.Router();
 
   /**
@@ -44,11 +45,10 @@ const notificationController = () => {
 
     try {
       const savedNotification = await saveNotification({ username, text, seen, type });
-
       if ('error' in savedNotification) {
         throw new Error(savedNotification.error);
       }
-
+      socket.emit('notificationUpdate', { notification: savedNotification, type: 'created' });
       res.status(200).json(savedNotification);
     } catch (err: unknown) {
       res.status(500).send(`Error creating a notification: ${(err as Error).message}`);
@@ -94,6 +94,7 @@ const notificationController = () => {
 
     try {
       const notification = await updateNotificationSeen(id);
+      socket.emit('notificationUpdate', { notification, type: 'updated' });
       res.status(200).json(notification);
     } catch (err) {
       res.status(500).send(`Error toggling notification seen status: ${(err as Error).message}`);

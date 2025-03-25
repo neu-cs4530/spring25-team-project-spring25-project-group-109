@@ -82,14 +82,6 @@ export const addAnswerToQuestion = async (
       throw new Error('Error updating user stats');
     }
 
-    // send a notification to the question asker when this answer is added
-    await saveNotification({
-      username: result.askedBy,
-      text: `${ans.ansBy} answered your question: "${result.title}"`,
-      seen: false,
-      type: 'answer',
-    });
-
     return result;
   } catch (error) {
     return { error: 'Error when adding answer to question' };

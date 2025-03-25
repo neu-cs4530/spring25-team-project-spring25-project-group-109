@@ -41,7 +41,9 @@ export const getNotificationsByUsername = async (
     if (!user) {
       throw new Error(`User ${username} does not exist`);
     }
-    const notifications: DatabaseNotification[] = await NotificationModel.find({ username }).lean();
+    const notifications: DatabaseNotification[] = await NotificationModel.find({ username })
+      .lean()
+      .sort({ createdAt: -1 });
     return notifications || [];
   } catch (error) {
     return { error: `Error getting notifications (${(error as Error).message})` };

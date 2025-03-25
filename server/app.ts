@@ -91,10 +91,10 @@ app.use('/user', userController(socket));
 app.use('/chat', chatController(socket));
 app.use('/games', gameController(socket));
 app.use('/store', storeController());
-app.use('/badge', badgeController());
+app.use('/badge', badgeController(socket));
 app.use('/collection', collectionController(socket));
 app.use('/features', featureController());
-app.use('/notification', notificationController())
+app.use('/notification', notificationController(socket))
 app.use('/videos', youtubeController())
 
 // Export the app instance

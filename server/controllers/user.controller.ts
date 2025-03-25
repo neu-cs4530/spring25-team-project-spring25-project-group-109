@@ -350,12 +350,16 @@ const userController = (socket: FakeSOSocket) => {
       }
 
       // send a notification to the followee
-      await saveNotification({
+      const notification = await saveNotification({
         username: followee,
         text: `${follower} followed you!`,
         seen: false,
         type: 'follow',
       });
+      if ('error' in notification) {
+        throw new Error(notification.error);
+      }
+      socket.emit('notificationUpdate', { notification, type: 'created' });
 
       res.status(200).json([result1, result2]);
     } catch (error) {
