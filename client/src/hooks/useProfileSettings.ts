@@ -21,6 +21,7 @@ const AVAILABLE_AVATARS = [
   '/images/avatars/avatar2.png',
   '/images/avatars/avatar3.png',
   '/images/avatars/avatar4.png',
+  '/images/avatars/avatar5.png',
 ];
 
 /**
