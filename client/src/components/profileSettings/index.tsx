@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Alert,
   Avatar,
@@ -50,6 +50,7 @@ const ProfileSettings: React.FC = () => {
     setShowFollowers,
     showFollowing,
     setShowFollowing,
+    permissions,
 
     setEditBioMode,
     setEditProfilePhotoMode,
@@ -62,6 +63,7 @@ const ProfileSettings: React.FC = () => {
     handleUpdateBiography,
     handleDeleteUser,
     handleUpdateProfilePhoto,
+    handleUploadProfilePhoto,
     handleFollowUser,
     handleUnfollowUser,
   } = useProfileSettings();
@@ -69,10 +71,7 @@ const ProfileSettings: React.FC = () => {
   const numEarnedBadges = userData?.badgesEarned ? userData.badgesEarned.length : 0;
 
   const theme = useTheme();
-
-  const handleButtonClick = () => {
-    setEditProfilePhotoMode(!editProfilePhotoMode);
-  };
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (loading) {
     return (
@@ -110,18 +109,41 @@ const ProfileSettings: React.FC = () => {
                   alignItems: 'center',
                   direction: 'column',
                 }}>
-                <Avatar
-                  sx={{ width: 120, height: 120 }}
-                  src={profilePhoto || '/images/avatars/default-avatar.png'}
-                />
+                <Avatar sx={{ width: 120, height: 120 }} src={profilePhoto} />
                 {canEditProfile && (
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={handleButtonClick}
-                    sx={{ mt: 2 }}>
-                    {editProfilePhotoMode ? 'Cancel' : 'Change Photo'}
-                  </Button>
+                  <>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={() => setEditProfilePhotoMode(!editProfilePhotoMode)}
+                      sx={{ mt: 2 }}>
+                      {editProfilePhotoMode ? 'Cancel' : 'Change Photo'}
+                    </Button>
+
+                    {editProfilePhotoMode && permissions.customPhoto && (
+                      <>
+                        <input
+                          type='file'
+                          accept='image/*'
+                          ref={fileInputRef}
+                          style={{ display: 'none' }}
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            const file = event.target.files?.[0];
+                            if (file) {
+                              handleUploadProfilePhoto(file);
+                            }
+                          }}
+                        />
+                        <Button
+                          variant='outlined'
+                          color='secondary'
+                          onClick={() => fileInputRef.current?.click()}
+                          sx={{ mt: 1 }}>
+                          Upload Profile Photo
+                        </Button>
+                      </>
+                    )}
+                  </>
                 )}
               </Stack>
 

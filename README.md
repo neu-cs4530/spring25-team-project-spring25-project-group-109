@@ -71,6 +71,7 @@ A class diagram for the schema definition is shown below:
 | /deleteUser/        | DELETE | Delete a user by username             |
 | /updateBiography    | PATCH  | Update user biography                 |
 | /updateProfilePhoto | PATCH  | Update user profile photo             |
+| /uploadProfilePhoto | POST   | Upload a custom profile photo         |
 | /follow             | PATCH  | Update user's following (add item)    |
 | /unfollow           | PATCH  | Update user's following (remove item) |
 

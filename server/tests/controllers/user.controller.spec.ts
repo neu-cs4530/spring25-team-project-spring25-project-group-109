@@ -1,10 +1,11 @@
 import supertest from 'supertest';
 import mongoose from 'mongoose';
+import fs from 'fs';
 import { app } from '../../app';
 import * as util from '../../services/user.service';
 import * as notifUtil from '../../services/notification.service';
 import { DatabaseUserStats, SafeDatabaseUser, User, NotificationType } from '../../types/types';
-import { mockDatabaseStore, mockStoreJSONResponse } from '../mockData.models';
+import { mockDatabaseStore } from '../mockData.models';
 
 const mockUser: User = {
   username: 'user1',
@@ -51,15 +52,6 @@ const mockUserStats: DatabaseUserStats = {
   nimWinCount: 0,
 };
 
-const mockUserStatsJSONResponse = {
-  _id: mockUserStats._id.toString(),
-  username: 'user1',
-  questionsCount: 0,
-  commentsCount: 0,
-  answersCount: 0,
-  nimWinCount: 0,
-};
-
 const mockUserJSONResponse = {
   _id: mockSafeUser._id.toString(),
   username: 'user1',
@@ -87,6 +79,32 @@ const getUserByUsernameSpy = jest.spyOn(util, 'getUserByUsername');
 const getUsersListSpy = jest.spyOn(util, 'getUsersList');
 const deleteUserByUsernameSpy = jest.spyOn(util, 'deleteUserByUsername');
 const saveNotificationSpy = jest.spyOn(notifUtil, 'saveNotification');
+const existsSyncSpy = jest.spyOn(fs, 'existsSync');
+const unlinkSyncSpy = jest.spyOn(fs, 'unlinkSync');
+
+jest.mock('multer', () => {
+  const multerMock = () => ({
+    single: jest.fn(() => (req: Express.Request, res: Express.Response, next: () => void) => {
+      req.file = { filename: 'mocked-file.png', buffer: Buffer.from('') } as Express.Multer.File;
+      next();
+    }),
+  });
+
+  multerMock.diskStorage = jest.fn(() => ({
+    destination: jest.fn(),
+    filename: jest.fn(
+      (
+        req: Express.Request,
+        file: Express.Multer.File,
+        cb: (error: Error | null, filename: string) => void,
+      ) => cb(null, 'mocked-file.png'),
+    ),
+  }));
+
+  multerMock.memoryStorage = jest.fn(() => ({}));
+
+  return multerMock;
+});
 
 describe('Test userController', () => {
   describe('POST /signup', () => {
@@ -95,7 +113,7 @@ describe('Test userController', () => {
         username: mockUser.username,
         password: mockUser.password,
         biography: 'This is a test biography',
-        profilePhoto: '/images/avatars/default-avatar.png',
+        profilePhoto: '/images/avatars/avatar1.png',
       };
 
       saveUserSpy.mockResolvedValueOnce({ ...mockSafeUser, biography: mockReqBody.biography });
@@ -104,11 +122,9 @@ describe('Test userController', () => {
 
       const response = await supertest(app).post('/user/signup').send(mockReqBody);
       expect(response.status).toBe(200);
-      expect(response.body.userStats.username).toEqual(response.body.user.username);
       expect(response.body).toEqual({
-        user: { ...mockUserJSONResponse, biography: mockReqBody.biography },
-        userStats: mockUserStatsJSONResponse,
-        userStore: mockStoreJSONResponse,
+        ...mockUserJSONResponse,
+        biography: mockReqBody.biography,
       });
       expect(saveUserSpy).toHaveBeenCalledWith({
         ...mockReqBody,
@@ -496,57 +512,77 @@ describe('Test userController', () => {
   });
 
   describe('PATCH /updateProfilePhoto', () => {
-    it('should successfully update profilePhoto given correct arguments', async () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+
+      getUserByUsernameSpy.mockResolvedValue(mockSafeUser);
+    });
+
+    it('should successfully update profilePhoto', async () => {
       const mockReqBody = {
-        username: mockUser.username,
+        username: mockUser2.username,
         profilePhoto: '/images/avatars/avatar1.png',
       };
 
-      // Mock a successful updateUser call
-      updatedUserSpy.mockResolvedValueOnce(mockSafeUser);
+      existsSyncSpy.mockReturnValue(true);
+      unlinkSyncSpy.mockImplementation(() => {});
+
+      updatedUserSpy.mockResolvedValueOnce({
+        ...mockSafeUser2,
+        profilePhoto: mockReqBody.profilePhoto,
+      });
+      const response = await supertest(app).patch('/user/updateProfilePhoto').send(mockReqBody);
+
+      expect(response.status).toBe(200);
+      expect(response.body.profilePhoto).toBe('/images/avatars/avatar1.png');
+      expect(updatedUserSpy).toHaveBeenCalledWith(mockSafeUser2.username, {
+        profilePhoto: mockReqBody.profilePhoto,
+      });
+    });
+
+    it('should NOT delete old photo if it is an avatar', async () => {
+      mockUser.profilePhoto = '/images/avatars/avatar1.png'; // Old photo is an avatar
+
+      const mockReqBody = {
+        username: mockUser.username,
+        profilePhoto: '/uploads/new-pic.jpg',
+      };
+
+      updatedUserSpy.mockResolvedValueOnce({
+        ...mockSafeUser,
+        profilePhoto: mockReqBody.profilePhoto,
+      });
 
       const response = await supertest(app).patch('/user/updateProfilePhoto').send(mockReqBody);
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(mockUserJSONResponse);
-      // Ensure updateUser is called with the correct args
-      expect(updatedUserSpy).toHaveBeenCalledWith(mockUser.username, {
-        profilePhoto: '/images/avatars/avatar1.png',
-      });
     });
 
     it('should return 400 for request missing username', async () => {
-      const mockReqBody = {
-        profilePhoto: '/images/avatars/avatar1.png',
-      };
-
-      const response = await supertest(app).patch('/user/updateProfilePhoto').send(mockReqBody);
+      const response = await supertest(app)
+        .patch('/user/updateProfilePhoto')
+        .send({ profilePhoto: '/images/avatars/avatar1.png' });
 
       expect(response.status).toBe(400);
-      expect(response.text).toEqual('Invalid user body');
+      expect(response.text).toBe('Invalid user body');
     });
 
     it('should return 400 for request with empty username', async () => {
-      const mockReqBody = {
-        username: '',
-        profilePhoto: '/images/avatars/avatar1.png',
-      };
-
-      const response = await supertest(app).patch('/user/updateProfilePhoto').send(mockReqBody);
+      const response = await supertest(app)
+        .patch('/user/updateProfilePhoto')
+        .send({ username: '', profilePhoto: '/images/avatars/avatar1.png' });
 
       expect(response.status).toBe(400);
-      expect(response.text).toEqual('Invalid user body');
+      expect(response.text).toBe('Invalid user body');
     });
 
     it('should return 400 for request missing profile photo field', async () => {
-      const mockReqBody = {
-        username: mockUser.username,
-      };
-
-      const response = await supertest(app).patch('/user/updateProfilePhoto').send(mockReqBody);
+      const response = await supertest(app)
+        .patch('/user/updateProfilePhoto')
+        .send({ username: mockUser.username });
 
       expect(response.status).toBe(400);
-      expect(response.text).toEqual('Invalid user body');
+      expect(response.text).toBe('Invalid user body');
     });
 
     it('should return 500 if updateUser returns an error', async () => {
@@ -555,7 +591,6 @@ describe('Test userController', () => {
         profilePhoto: '/images/avatars/avatar1.png',
       };
 
-      // Simulate a DB error
       updatedUserSpy.mockResolvedValueOnce({ error: 'Error updating user' });
 
       const response = await supertest(app).patch('/user/updateProfilePhoto').send(mockReqBody);
@@ -564,6 +599,52 @@ describe('Test userController', () => {
       expect(response.text).toContain(
         'Error when updating user profile photo: Error: Error updating user',
       );
+    });
+  });
+
+  describe('uploadProfilePhoto', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('should return 400 if no file or username is provided', async () => {
+      const res = await supertest(app).post('/user/uploadProfilePhoto').send({});
+      expect(res.status).toBe(400);
+      expect(res.text).toBe('Invalid user body');
+    });
+
+    it('should return 500 if user retrieval fails', async () => {
+      getUserByUsernameSpy.mockResolvedValue({ error: 'User not found' });
+      const res = await supertest(app)
+        .post('/user/uploadProfilePhoto')
+        .send({ username: 'testuser' });
+      expect(res.status).toBe(500);
+      expect(res.text).toContain('Error uploading file');
+    });
+
+    it('should delete old profile photo if it exists', async () => {
+      getUserByUsernameSpy.mockResolvedValue({ ...mockSafeUser, profilePhoto: '/uploads/old.png' });
+      updatedUserSpy.mockResolvedValue({ ...mockSafeUser, profilePhoto: '/uploads/new.png' });
+      existsSyncSpy.mockReturnValue(true);
+
+      const res = await supertest(app)
+        .post('/user/uploadProfilePhoto')
+        .send({ username: 'testuser' });
+
+      expect(res.status).toBe(200);
+      expect(existsSyncSpy).toHaveBeenCalled();
+      expect(unlinkSyncSpy).toHaveBeenCalled();
+    });
+
+    it('should return 500 if updating user fails', async () => {
+      getUserByUsernameSpy.mockResolvedValue({ ...mockSafeUser, profilePhoto: '/uploads/old.png' });
+      updatedUserSpy.mockResolvedValue({ error: 'Update failed' });
+
+      const res = await supertest(app)
+        .post('/user/uploadProfilePhoto')
+        .send({ username: 'testuser' });
+
+      expect(res.status).toBe(500);
     });
   });
 

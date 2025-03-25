@@ -45,7 +45,11 @@ const Header = () => {
           </Badge>
         </IconButton>
 
-        <Button variant='outlined' onClick={() => navigate(`/user/${currentUser.username}`)}>
+        <Button
+          variant='outlined'
+          onClick={() => {
+            navigate(`/user/${currentUser.username}`);
+          }}>
           View Profile
         </Button>
         <Button variant='outlined' onClick={handleSignOut}>
