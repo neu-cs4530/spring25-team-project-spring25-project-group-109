@@ -155,7 +155,7 @@ const ProfileSettings: React.FC = () => {
                     variant='subtitle1'
                     onClick={() => (followsCurrentUser || canEditProfile) && setShowFollowers(true)}
                     sx={{ cursor: followsCurrentUser ? 'pointer' : 'default' }}>
-                    <strong>{userData.followers.length}</strong> Following
+                    <strong>{userData.followers.length}</strong> Followers
                   </Typography>
 
                   <Typography
@@ -190,7 +190,9 @@ const ProfileSettings: React.FC = () => {
                   ))}
               </Box>
 
-              <Modal open={showFollowers} onClose={() => setShowFollowers(false)}>
+              <Modal
+                open={showFollowers && (canEditProfile || followsCurrentUser)}
+                onClose={() => setShowFollowers(false)}>
                 <Box sx={modalStyle}>
                   <Typography variant='h4'>Followers</Typography>
                   {userData.followers.length > 0 ? (
@@ -228,7 +230,7 @@ const ProfileSettings: React.FC = () => {
               </Modal>
 
               <Modal
-                open={showFollowing && (canEditProfile || isFollowing)}
+                open={showFollowing && (canEditProfile || followsCurrentUser)}
                 onClose={() => setShowFollowing(false)}>
                 <Box sx={modalStyle}>
                   <Typography variant='h4'>Following</Typography>
