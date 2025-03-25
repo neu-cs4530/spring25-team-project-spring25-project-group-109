@@ -16,9 +16,8 @@ import useNotifications from '../../../hooks/useNotificationPage';
 
 const NotificationsPage = () => {
   const { user } = useUserContext();
-  const { notifications, loading, error, toggleSeen, filterByType } = useNotifications(
-    user.username,
-  );
+  const { notifications, loading, error, toggleSeen, filterByType, markAllAsSeen } =
+    useNotifications(user.username);
   const [selectedType, setSelectedType] = useState<NotificationType | 'all'>('all');
   const handleTabChange = (_: React.SyntheticEvent, newValue: NotificationType | 'all') => {
     setSelectedType(newValue);
@@ -36,13 +35,19 @@ const NotificationsPage = () => {
         Notifications
       </Typography>
 
-      <Tabs value={selectedType} onChange={handleTabChange} sx={{ marginBottom: 2 }}>
-        <Tab label='All' value='all' />
-        <Tab label='Follows' value='follow' />
-        <Tab label='Answers' value='answer' />
-        <Tab label='Comments' value='comment' />
-        <Tab label='Badges' value='badge' />
-      </Tabs>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+        <Tabs value={selectedType} onChange={handleTabChange}>
+          <Tab label='All' value='all' />
+          <Tab label='Follows' value='follow' />
+          <Tab label='Answers' value='answer' />
+          <Tab label='Comments' value='comment' />
+          <Tab label='Badges' value='badge' />
+        </Tabs>
+
+        <Button variant='contained' color='primary' onClick={markAllAsSeen}>
+          Mark All as Seen
+        </Button>
+      </Box>
 
       <List>
         {displayedNotifications.length > 0 ? (

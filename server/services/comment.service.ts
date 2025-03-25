@@ -11,7 +11,6 @@ import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
 import CommentModel from '../models/comments.model';
 import UserStatsModel from '../models/userstats.model';
-import { saveNotification } from './notification.service';
 
 /**
  * Saves a new comment to the database.
@@ -72,7 +71,7 @@ export const addComment = async (
     if (!userStats) {
       throw new Error('Error updating user stats');
     }
-    
+
     return result;
   } catch (error) {
     return { error: `Error when adding comment: ${(error as Error).message}` };

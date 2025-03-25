@@ -48,7 +48,7 @@ const useNotifications = (username: string) => {
     return () => {
       socket.off('notificationUpdate', handleNotificationUpdate);
     };
-  }, [username]);
+  }, [username, socket, user.username]);
 
   const toggleSeen = async (notificationId: string) => {
     try {
@@ -64,6 +64,14 @@ const useNotifications = (username: string) => {
     }
   };
 
+  const markAllAsSeen = () => {
+    notifications.forEach(notification => {
+      if (!notification.seen) {
+        toggleSeen(notification._id.toString());
+      }
+    });
+  };
+
   const filterByType = (type: NotificationType) => notifications.filter(n => n.type === type);
 
   return {
@@ -73,6 +81,7 @@ const useNotifications = (username: string) => {
     error,
     toggleSeen,
     filterByType,
+    markAllAsSeen,
   };
 };
 

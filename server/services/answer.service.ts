@@ -11,7 +11,6 @@ import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
 import UserStatsModel from '../models/userstats.model';
 import { updateCoins } from './store.service';
-import { saveNotification } from './notification.service';
 
 /**
  * Records the most recent answer time for a given question based on its answers.
