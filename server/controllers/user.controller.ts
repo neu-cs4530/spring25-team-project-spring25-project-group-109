@@ -108,7 +108,7 @@ const userController = (socket: FakeSOSocket) => {
         user: result,
         type: 'created',
       });
-      res.status(200).json({ user: result, userStats: statsResult, userStore: storeResult });
+      res.status(200).json(result);
     } catch (error) {
       res.status(500).send(`Error when saving user: ${error}`);
     }

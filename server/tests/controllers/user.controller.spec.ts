@@ -5,7 +5,7 @@ import { app } from '../../app';
 import * as util from '../../services/user.service';
 import * as notifUtil from '../../services/notification.service';
 import { DatabaseUserStats, SafeDatabaseUser, User, NotificationType } from '../../types/types';
-import { mockDatabaseStore, mockStoreJSONResponse } from '../mockData.models';
+import { mockDatabaseStore } from '../mockData.models';
 
 const mockUser: User = {
   username: 'user1',
@@ -45,15 +45,6 @@ const mockSafeUser2: SafeDatabaseUser = {
 
 const mockUserStats: DatabaseUserStats = {
   _id: new mongoose.Types.ObjectId(),
-  username: 'user1',
-  questionsCount: 0,
-  commentsCount: 0,
-  answersCount: 0,
-  nimWinCount: 0,
-};
-
-const mockUserStatsJSONResponse = {
-  _id: mockUserStats._id.toString(),
   username: 'user1',
   questionsCount: 0,
   commentsCount: 0,
@@ -131,11 +122,9 @@ describe('Test userController', () => {
 
       const response = await supertest(app).post('/user/signup').send(mockReqBody);
       expect(response.status).toBe(200);
-      expect(response.body.userStats.username).toEqual(response.body.user.username);
       expect(response.body).toEqual({
-        user: { ...mockUserJSONResponse, biography: mockReqBody.biography },
-        userStats: mockUserStatsJSONResponse,
-        userStore: mockStoreJSONResponse,
+        ...mockUserJSONResponse,
+        biography: mockReqBody.biography,
       });
       expect(saveUserSpy).toHaveBeenCalledWith({
         ...mockReqBody,

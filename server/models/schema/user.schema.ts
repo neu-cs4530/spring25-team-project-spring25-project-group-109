@@ -33,10 +33,7 @@ const userSchema: Schema = new Schema(
     },
     profilePhoto: {
       type: String,
-      default() {
-        const avatarNumber = Math.floor(Math.random() * 5) + 1;
-        return `/images/avatars/avatar${avatarNumber}.png`;
-      },
+      default: '',
     },
     badgesEarned: [
       {
