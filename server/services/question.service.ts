@@ -379,6 +379,10 @@ export const fetchQuestionsByFollowing = async (
       ])
       .sort({ askDateTime: -1 });
 
+    if (!questions) {
+      return [];
+    }
+
     return questions;
   } catch (error) {
     return { error: 'Error when fetching questions by following!' };

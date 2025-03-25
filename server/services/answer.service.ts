@@ -104,7 +104,9 @@ export const addAnswerToQuestion = async (
  * Gather all the answers of the users that the user is following.
  */
 
-export const fetchAnswersByFollowing = async (following: string[]) => {
+export const fetchAnswersByFollowing = async (
+  following: string[],
+): Promise<PopulatedDatabaseAnswer[] | { error: string }> => {
   try {
     const answers = await AnswerModel.find({ ansBy: { $in: following } })
       .populate<{
@@ -124,6 +126,10 @@ export const fetchAnswersByFollowing = async (following: string[]) => {
         { path: 'ansBy', model: UserModel, localField: 'ansBy', foreignField: 'username' },
       ])
       .sort({ ansDateTime: -1 });
+
+    if (!answers) {
+      return [];
+    }
 
     return answers;
   } catch (error) {

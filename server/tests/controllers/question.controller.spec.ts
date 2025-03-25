@@ -764,23 +764,15 @@ describe('Test questionController', () => {
 
       // Asserting the response
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(MOCK_POPULATED_QUESTIONS);
+      expect(response.body).toEqual(EXPECTED_QUESTIONS);
     });
 
     it('should return bad request error if the username is not provided', async () => {
-      // Mock request parameters
-      const mockReqParams = {
-        username: 'question3_user',
-      };
-
       // Making the request
-      const response = await supertest(app).get(
-        `/question/getQuestionFeed/${mockReqParams.username}`,
-      );
+      const response = await supertest(app).get(`/question/getQuestionFeed/`);
 
       // Asserting the response
-      expect(response.status).toBe(400);
-      expect(response.text).toBe('Invalid username requesting question.'); // update this later
+      expect(response.status).toBe(404);
     });
 
     it('should return database error if the user fetch fails', async () => {

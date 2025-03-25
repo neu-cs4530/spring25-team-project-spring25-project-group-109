@@ -7,6 +7,7 @@ import {
   fetchAndIncrementQuestionViewsById,
   saveQuestion,
   addVoteToQuestion,
+  fetchQuestionsByFollowing,
 } from '../../services/question.service';
 import { DatabaseQuestion, PopulatedDatabaseQuestion } from '../../types/types';
 import {
@@ -514,6 +515,48 @@ describe('Question model', () => {
       const result = await addVoteToQuestion('someQuestionId', 'testUser', 'downvote');
 
       expect(result).toEqual({ error: 'Error when adding downvote to question' });
+    });
+  });
+
+  describe('fetchQuestionsByFollowing', () => {
+    test('get questions by following, sorted by most recent', async () => {
+      mockingoose(QuestionModel).toReturn(POPULATED_QUESTIONS.slice(0, 3), 'find');
+      QuestionModel.schema.path('answers', Object);
+      QuestionModel.schema.path('tags', Object);
+      QuestionModel.schema.path('comments', Object);
+
+      const result = (await fetchQuestionsByFollowing([
+        'user1',
+        'user2',
+        'user3',
+      ])) as PopulatedDatabaseQuestion[];
+
+      expect(result.length).toEqual(3);
+      expect(result[0]._id.toString()).toEqual('65e9b58910afe6e94fc6e6dc');
+      expect(result[1]._id.toString()).toEqual('65e9b5a995b6c7045a30d823');
+      expect(result[2]._id.toString()).toEqual('65e9b9b44c052f0a08ecade0');
+    });
+
+    test('fetchQuestionsByFollowing should return empty list if find throws an error', async () => {
+      mockingoose(QuestionModel).toReturn(new Error('error'), 'find');
+
+      const result = (await fetchQuestionsByFollowing(['user1', 'user2', 'user3'])) as {
+        error: string;
+      };
+
+      expect(result.error).toEqual('Error when fetching questions by following!');
+    });
+
+    test('fetchQuestionsByFollowing should return empty list if find returns null', async () => {
+      mockingoose(QuestionModel).toReturn(null, 'find');
+
+      const result = (await fetchQuestionsByFollowing([
+        'user1',
+        'user2',
+        'user3',
+      ])) as PopulatedDatabaseQuestion[];
+
+      expect(result.length).toEqual(0);
     });
   });
 });
