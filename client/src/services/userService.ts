@@ -142,6 +142,28 @@ const updateProfilePhoto = async (username: string, newPhoto: string) => {
 };
 
 /**
+ * Updates the user's profile picture.
+ * @param username - The username of the user whose profile picture is being updated
+ * @param newPhoto - The new profile photo URL
+ * @returns A promise resolving to the updated user
+ * @throws Error if the request fails
+ */
+const uploadProfilePhoto = async (username: string, file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('username', username);
+
+  const res = await api.post(`${USER_API_URL}/uploadProfilePhoto`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+
+  if (res.status !== 200) {
+    throw new Error('Error when updating profile photo');
+  }
+  return res.data.imageUrl;
+};
+
+/**
  * Follows the user.
  * @param follower - The username of the user who is following.
  * @param followee - The username of the user who is being followed..
@@ -186,6 +208,7 @@ export {
   resetPassword,
   updateBiography,
   updateProfilePhoto,
+  uploadProfilePhoto,
   follow,
   unfollow,
 };

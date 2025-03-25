@@ -35,7 +35,11 @@ const Header = () => {
         <Button variant='outlined' onClick={handleSignOut}>
           Log out
         </Button>
-        <Button variant='outlined' onClick={() => navigate(`/user/${currentUser.username}`)}>
+        <Button
+          variant='outlined'
+          onClick={() => {
+            navigate(`/user/${currentUser.username}`);
+          }}>
           View Profile
         </Button>
       </Toolbar>
