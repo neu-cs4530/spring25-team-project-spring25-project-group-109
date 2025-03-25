@@ -11,6 +11,7 @@ import {
   Button,
 } from '@mui/material';
 import { NotificationType } from '@fake-stack-overflow/shared';
+import { Link } from 'react-router-dom';
 import useUserContext from '../../../hooks/useUserContext';
 import useNotifications from '../../../hooks/useNotificationPage';
 
@@ -59,10 +60,41 @@ const NotificationsPage = () => {
                 borderRadius: 1,
                 mb: 1,
               }}>
-              <ListItemText
-                primary={notification.text}
-                secondary={new Date(notification.createdAt).toLocaleDateString()}
-              />
+              {notification.link ? (
+                <ListItemText
+                  primary={
+                    <Link
+                      to={notification.link}
+                      onClick={e => {
+                        if (!notification.seen) {
+                          toggleSeen(notification._id.toString());
+                        }
+                      }}
+                      style={{
+                        textDecoration: 'none',
+                        color: 'inherit',
+                        transition: 'all 0.2s',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.textDecoration = 'underline';
+                        e.currentTarget.style.color = 'primary';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.textDecoration = 'none';
+                        e.currentTarget.style.color = 'inherit';
+                      }}>
+                      {notification.text}
+                    </Link>
+                  }
+                  secondary={new Date(notification.createdAt).toLocaleDateString()}
+                />
+              ) : (
+                <ListItemText
+                  primary={notification.text}
+                  secondary={new Date(notification.createdAt).toLocaleDateString()}
+                />
+              )}
+
               <Button
                 variant='outlined'
                 size='small'

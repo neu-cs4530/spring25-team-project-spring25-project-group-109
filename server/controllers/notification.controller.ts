@@ -41,10 +41,10 @@ const notificationController = (socket: FakeSOSocket) => {
       return;
     }
 
-    const { username, text, seen, type } = req.body;
+    const { username, text, seen, type, link } = req.body;
 
     try {
-      const savedNotification = await saveNotification({ username, text, seen, type });
+      const savedNotification = await saveNotification({ username, text, seen, type, link });
       if ('error' in savedNotification) {
         throw new Error(savedNotification.error);
       }

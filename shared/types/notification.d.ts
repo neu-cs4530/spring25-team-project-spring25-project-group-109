@@ -9,12 +9,14 @@ export type NotificationType = 'badge' | 'answer' | 'follow' | 'comment';
  * - `text`: The notification text.
  * - `seen`: Indicator if the notification has been seen or not.
  * - `type`: The notification type.
+ * - `link`: The link to the notification activity.
  */
 export interface Notification {
   username: string;
   text: string;
   seen: boolean;
   type: NotificationType;
+  link: string;
 }
 
 /**

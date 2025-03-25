@@ -110,6 +110,7 @@ const commentController = (socket: FakeSOSocket) => {
           text: `${comment.commentBy} commented on your question: "${question.title}"`,
           seen: false,
           type: 'comment',
+          link: `/question/${id}`,
         });
         if ('error' in notification) {
           throw new Error(notification.error);
@@ -121,12 +122,17 @@ const commentController = (socket: FakeSOSocket) => {
         if (!answer) {
           throw Error('Answer not found');
         }
+        const question = await QuestionModel.findOne({ answers: id });
+        if (!question) {
+          throw new Error('Question not found');
+        }
 
         const notification = await saveNotification({
           username: answer.ansBy,
-          text: `${comment.commentBy} commented on your answer!`,
+          text: `${comment.commentBy} commented on your answer on "${question.title}"`,
           seen: false,
           type: 'comment',
+          link: `/question/${id}`,
         });
         if ('error' in notification) {
           throw new Error(notification.error);

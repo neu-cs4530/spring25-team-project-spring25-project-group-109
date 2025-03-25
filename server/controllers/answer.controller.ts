@@ -83,6 +83,7 @@ const answerController = (socket: FakeSOSocket) => {
         text: `${ansFromDb.ansBy} answered your question: "${question.title}"`,
         seen: false,
         type: 'answer',
+        link: `/question/${qid}`,
       });
       if ('error' in notification) {
         throw new Error(notification.error);

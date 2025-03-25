@@ -290,14 +290,16 @@ async function notificationCreate(
   text: string,
   seen: boolean,
   type: NotificationType,
+  link: string,
 ): Promise<DatabaseNotification> {
-  if (username === '' || text === '' || seen === null || type === null)
+  if (username === '' || text === '' || seen === null || type === null || link === null)
     throw new Error('Invalid Notification Format');
   const notification: Notification = {
     username,
     text,
     seen,
     type,
+    link,
   };
   return await NotificationModel.create(notification);
 }
@@ -392,11 +394,11 @@ const populate = async () => {
       [],
     );
 
-    await notificationCreate('sama', `annabelle answered your question: "${q1.title}"`, false, 'answer');
-    await notificationCreate('sama', `kyle answered your question: "${q1.title}"`, false, 'answer');
-    await notificationCreate('sama', `nitsa commented on your question: "${q1.title}"`, false, 'comment');
-    await notificationCreate('annabelle', `sama commented on your answer!`, false, 'comment');
-    await notificationCreate('kyle', `nitsa commented on your answer!`, false, 'comment');
+    await notificationCreate('sama', `annabelle answered your question: "${q1.title}"`, false, 'answer', `/question/${q1._id}`);
+    await notificationCreate('sama', `kyle answered your question: "${q1.title}"`, false, 'answer', `/question/${q1._id}`);
+    await notificationCreate('sama', `nitsa commented on your question: "${q1.title}"`, false, 'comment', `/question/${q1._id}`);
+    await notificationCreate('annabelle', `sama commented on your answer on "${q1.title}"`, false, 'comment', `/question/${q1._id}`);
+    await notificationCreate('kyle', `nitsa commented on your answer on "${q1.title}"`, false, 'comment', `/question/${q1._id}`);
 
     await collectionCreate('favorites', 'nitsa', 'private', [q1._id]);
     await collectionCreate('typescript', 'annabelle', 'public', []);

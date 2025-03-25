@@ -86,6 +86,7 @@ const badgeController = (socket: FakeSOSocket) => {
           text: `You have earned the badge ${badge.name}!`,
           seen: false,
           type: 'badge',
+          link: `/user/${username}`,
         });
         if ('error' in notification) {
           throw new Error(notification.error);

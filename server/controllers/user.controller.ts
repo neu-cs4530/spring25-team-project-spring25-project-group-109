@@ -355,6 +355,7 @@ const userController = (socket: FakeSOSocket) => {
         text: `${follower} followed you!`,
         seen: false,
         type: 'follow',
+        link: `/user/${follower}`,
       });
       if ('error' in notification) {
         throw new Error(notification.error);
