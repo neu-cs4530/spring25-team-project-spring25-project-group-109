@@ -122,7 +122,7 @@ describe('Test userController', () => {
         username: mockUser.username,
         password: mockUser.password,
         biography: 'This is a test biography',
-        profilePhoto: '/images/avatars/default-avatar.png',
+        profilePhoto: '/images/avatars/avatar1.png',
       };
 
       saveUserSpy.mockResolvedValueOnce({ ...mockSafeUser, biography: mockReqBody.biography });
@@ -552,7 +552,7 @@ describe('Test userController', () => {
     });
 
     it('should NOT delete old photo if it is an avatar', async () => {
-      mockUser.profilePhoto = '/images/avatars/default-avatar.png'; // Old photo is an avatar
+      mockUser.profilePhoto = '/images/avatars/avatar1.png'; // Old photo is an avatar
 
       const mockReqBody = {
         username: mockUser.username,

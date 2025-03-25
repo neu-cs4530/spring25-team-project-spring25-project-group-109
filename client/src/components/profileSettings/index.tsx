@@ -109,10 +109,7 @@ const ProfileSettings: React.FC = () => {
                   alignItems: 'center',
                   direction: 'column',
                 }}>
-                <Avatar
-                  sx={{ width: 120, height: 120 }}
-                  src={profilePhoto || '/images/avatars/default-avatar.png'}
-                />
+                <Avatar sx={{ width: 120, height: 120 }} src={profilePhoto} />
                 {canEditProfile && (
                   <>
                     <Button

@@ -9,7 +9,7 @@ import { Schema } from 'mongoose';
  * - `password`: The encrypted password securing the user's account.
  * - `dateJoined`: The date the user joined the platform.
  * - `biography`: The biography of the user.
- * - `profilePhoto`: A path to the URL of the profile photo of the user.
+ * - `profilePhoto`: A path to the profile photo of the user.
  * - `badgesEarned`: A list of ids referencing the badges the user has earned and their dates.
  * - `following`: A list of usernames representing the users this user is following.
  * - `followers`: A list of usernames representing the users that follow this user.
@@ -33,7 +33,10 @@ const userSchema: Schema = new Schema(
     },
     profilePhoto: {
       type: String,
-      default: '/images/avatars/default-avatar.png',
+      default() {
+        const avatarNumber = Math.floor(Math.random() * 5) + 1;
+        return `/images/avatars/avatar${avatarNumber}.png`;
+      },
     },
     badgesEarned: [
       {

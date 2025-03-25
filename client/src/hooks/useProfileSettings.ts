@@ -16,7 +16,6 @@ import useUserContext from './useUserContext';
 import { getUserStore } from '../services/storeService';
 
 const AVAILABLE_AVATARS = [
-  '/images/avatars/default-avatar.png',
   '/images/avatars/avatar1.png',
   '/images/avatars/avatar2.png',
   '/images/avatars/avatar3.png',
@@ -42,7 +41,7 @@ const useProfileSettings = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [editProfilePhotoMode, setEditProfilePhotoMode] = useState(false);
-  const [profilePhoto, setProfilePhoto] = useState<string>('/images/avatars/default-avatar.png');
+  const [profilePhoto, setProfilePhoto] = useState<string>('');
   const [allBadges, setAllBadges] = useState<DatabaseBadge[] | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
@@ -67,7 +66,7 @@ const useProfileSettings = () => {
         setLoading(true);
         const data = await getUserByUsername(username);
         setUserData(data);
-        setProfilePhoto(String(data.profilePhoto) || '/images/avatars/default-avatar.png');
+        setProfilePhoto(String(data.profilePhoto));
         const userStore = await getUserStore(currentUser.username);
         setPermissions({
           customPhoto: userStore.unlockedFeatures.includes('Custom Profile Photo'),
