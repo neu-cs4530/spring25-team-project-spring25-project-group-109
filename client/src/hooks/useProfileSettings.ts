@@ -163,7 +163,7 @@ const useProfileSettings = () => {
   };
 
   const handleUpdateProfilePhoto = async (avatar: string) => {
-    if (!username || !avatar) return;
+    if (!username) return;
     try {
       const updatedUser = await updateProfilePhoto(username, avatar);
       await new Promise(resolve => {

@@ -19,6 +19,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
 import { Link } from 'react-router-dom';
@@ -159,14 +160,26 @@ const ProfileSettings: React.FC = () => {
                   }}>
                   {availableAvatars.map(avatar => (
                     <Avatar
+                      sx={{ cursor: 'pointer' }}
                       key={avatar}
                       src={avatar}
-                      className={`avatar-option ${profilePhoto === avatar ? 'selected' : ''}`}
                       onClick={() => {
                         handleUpdateProfilePhoto(avatar);
                       }}
                     />
                   ))}
+                  <IconButton
+                    onClick={() => handleUpdateProfilePhoto('')}
+                    sx={{
+                      'width': 40,
+                      'height': 40,
+                      'display': 'flex',
+                      'border': '1px solid gray',
+                      'backgroundColor': 'white',
+                      '&:hover': { backgroundColor: '#f0f0f0' },
+                    }}>
+                    <CloseIcon />
+                  </IconButton>
                 </Container>
               )}
 
