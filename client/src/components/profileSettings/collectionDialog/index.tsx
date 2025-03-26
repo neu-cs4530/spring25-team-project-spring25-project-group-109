@@ -70,7 +70,16 @@ const CollectionDialog = ({
   const isPrivate = collection.visibility === 'private';
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth='sm'>
+    <Dialog
+      open={open}
+      onClose={() => {
+        handleClose();
+        setErrorMessage(null);
+        setConfirmDelete(false);
+        setConfirmDeleteQuestionId(null);
+      }}
+      fullWidth
+      maxWidth='sm'>
       <Box sx={{ p: 1 }}>
         <DialogTitle>
           <Box display='flex' alignItems='center' justifyContent='space-between'>
@@ -146,6 +155,7 @@ const CollectionDialog = ({
                       sx={{
                         cursor: 'pointer',
                         display: 'flex',
+                        flexDirection: 'row',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                       }}
@@ -167,8 +177,7 @@ const CollectionDialog = ({
                       </Box>
                       {canEditProfile && (
                         <Box>
-                          {!confirmDeleteQuestionId ||
-                          confirmDeleteQuestionId !== String(question._id) ? (
+                          {confirmDeleteQuestionId !== String(question._id) ? (
                             <IconButton
                               color='error'
                               onClick={event => {
@@ -178,7 +187,7 @@ const CollectionDialog = ({
                               <DeleteOutlineIcon />
                             </IconButton>
                           ) : (
-                            <>
+                            <Box display='flex' gap={1} flexDirection={'row'}>
                               <IconButton
                                 color='default'
                                 onClick={event => {
@@ -200,7 +209,7 @@ const CollectionDialog = ({
                                 }}>
                                 <DeleteOutlineIcon />
                               </IconButton>
-                            </>
+                            </Box>
                           )}
                         </Box>
                       )}
