@@ -20,6 +20,12 @@ type TogglePrivacyHandler = (
   setErrorMessage: (message: string) => void,
 ) => void;
 
+type RemoveQuestionHandler = (
+  collectionId: string,
+  questionId: string,
+  setErrorMessage: (message: string) => void,
+) => void;
+
 interface CollectionViewProps {
   collection: PopulatedDatabaseCollection;
   canEditProfile: boolean;
@@ -27,6 +33,7 @@ interface CollectionViewProps {
   handleUpdateCollection: UpdateCollectionHandler;
   handleDeleteCollection: DeleteCollectionHandler;
   handleTogglePrivacy: TogglePrivacyHandler;
+  handleRemoveQuestion: RemoveQuestionHandler;
 }
 
 const CollectionView = ({
@@ -36,6 +43,7 @@ const CollectionView = ({
   handleUpdateCollection,
   handleDeleteCollection,
   handleTogglePrivacy,
+  handleRemoveQuestion,
 }: CollectionViewProps) => {
   const { name, questions } = collection;
   const [open, setOpen] = useState(false);
@@ -58,6 +66,7 @@ const CollectionView = ({
         clickQuestion={clickQuestion}
         handleUpdateCollection={handleUpdateCollection}
         handleDeleteCollection={handleDeleteCollection}
+        handleRemoveQuestion={handleRemoveQuestion}
         handleTogglePrivacy={handleTogglePrivacy}
       />
     </>

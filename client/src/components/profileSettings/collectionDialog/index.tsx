@@ -19,6 +19,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
 import { PopulatedDatabaseCollection } from '../../../types/types';
 
 interface CollectionDialogProps {
@@ -41,6 +42,11 @@ interface CollectionDialogProps {
     isPrivate: boolean,
     setErrorMessage: (message: string) => void,
   ) => void;
+  handleRemoveQuestion: (
+    collectionId: string,
+    questionId: string,
+    setErrorMessage: (message: string) => void,
+  ) => void;
 }
 
 const CollectionDialog = ({
@@ -52,12 +58,14 @@ const CollectionDialog = ({
   handleUpdateCollection,
   handleDeleteCollection,
   handleTogglePrivacy,
+  handleRemoveQuestion,
 }: CollectionDialogProps) => {
   const theme = useTheme();
   const [editNameMode, setEditNameMode] = useState(false);
   const [newName, setNewName] = useState(collection.name);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmDeleteQuestion, setConfirmDeleteQuestion] = useState(false);
   const isPrivate = collection.visibility === 'private';
 
   return (
@@ -126,21 +134,69 @@ const CollectionDialog = ({
                 <Paper
                   variant='outlined'
                   key={String(question._id)}
-                  onClick={() => clickQuestion(String(question._id))}
-                  sx={{ padding: 2, cursor: 'pointer' }}>
-                  <Typography variant='h6' fontWeight={'bold'}>
-                    {question.title}
-                  </Typography>
-                  <Stack direction='row' spacing={1} mt={1} flexWrap='wrap'>
-                    {question.tags.map(tag => (
-                      <Chip
-                        key={String(tag._id)}
-                        label={tag.name}
-                        color='primary'
-                        variant='outlined'
-                      />
-                    ))}
-                  </Stack>
+                  sx={{
+                    padding: 2,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                  <Box
+                    sx={{ cursor: 'pointer' }}
+                    onClick={() => clickQuestion(String(question._id))}>
+                    <Typography variant='h6' fontWeight={'bold'}>
+                      {question.title}
+                    </Typography>
+                    <Stack direction='row' spacing={1} mt={1} flexWrap='wrap'>
+                      {question.tags.map(tag => (
+                        <Chip
+                          key={String(tag._id)}
+                          label={tag.name}
+                          color='primary'
+                          variant='outlined'
+                        />
+                      ))}
+                    </Stack>
+                  </Box>
+                  {canEditProfile && (
+                    <Box>
+                      <IconButton color='error' onClick={() => setConfirmDeleteQuestion(true)}>
+                        <CloseIcon />
+                      </IconButton>
+                      <Dialog
+                        open={confirmDeleteQuestion}
+                        maxWidth='xs'
+                        sx={{ padding: 2 }}
+                        onClose={() => setConfirmDeleteQuestion(false)}>
+                        <DialogTitle>Confirm Deletion</DialogTitle>
+                        <DialogContent>
+                          <Typography variant='body2'>
+                            Are you sure you want to remove this question from the collection? This
+                            action cannot be undone.
+                          </Typography>
+                        </DialogContent>
+                        <DialogActions>
+                          <Button
+                            onClick={() => setConfirmDeleteQuestion(false)}
+                            variant='outlined'
+                            color='primary'>
+                            Cancel
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              handleRemoveQuestion(
+                                String(collection._id),
+                                String(question._id),
+                                setErrorMessage,
+                              )
+                            }
+                            variant='contained'
+                            color='error'>
+                            Confirm
+                          </Button>
+                        </DialogActions>
+                      </Dialog>
+                    </Box>
+                  )}
                 </Paper>
               ))
             ) : (

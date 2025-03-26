@@ -17,6 +17,7 @@ import {
   createCollection,
   deleteCollection,
   getCollectionsByUsername,
+  removeQuestionFromCollection,
   renameCollection,
   updateCollectionVisibility,
 } from '../services/collectionService';
@@ -74,6 +75,24 @@ const useProfileSettings = () => {
   ) => {
     const fieldText = event.target.value;
     setCollectionName(fieldText);
+  };
+
+  const handleRemoveQuestion = async (
+    collectionId: string,
+    questionId: string,
+    setCollectionErrorMessage: (message: string) => void,
+  ) => {
+    if (!userData) return;
+    try {
+      await removeQuestionFromCollection(collectionId, questionId);
+      const collectionsData = await getCollectionsByUsername(
+        userData.username,
+        currentUser.username,
+      );
+      setCollections(collectionsData);
+    } catch (error) {
+      setCollectionErrorMessage('Failed to remove question.');
+    }
   };
 
   const handleUpdateCollection = async (
@@ -402,6 +421,7 @@ const useProfileSettings = () => {
     handleDeleteCollection,
     handleTogglePrivacy,
     handleUploadProfilePhoto,
+    handleRemoveQuestion,
     permissions,
   };
 };

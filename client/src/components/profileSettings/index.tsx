@@ -78,6 +78,7 @@ const ProfileSettings: React.FC = () => {
     handleCollectionInputChange,
     handleDeleteCollection,
     handleTogglePrivacy,
+    handleRemoveQuestion,
   } = useProfileSettings();
 
   const numEarnedBadges = userData?.badgesEarned ? userData.badgesEarned.length : 0;
@@ -437,6 +438,7 @@ const ProfileSettings: React.FC = () => {
                         handleUpdateCollection={handleUpdateCollection}
                         handleDeleteCollection={handleDeleteCollection}
                         handleTogglePrivacy={handleTogglePrivacy}
+                        handleRemoveQuestion={handleRemoveQuestion}
                       />
                     ))
                   ) : (

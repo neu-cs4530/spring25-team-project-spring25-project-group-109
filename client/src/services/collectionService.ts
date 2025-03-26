@@ -64,6 +64,21 @@ const addQuestionToCollection = async (
   return res.data;
 };
 
+const removeQuestionFromCollection = async (
+  collectionId: string,
+  questionId: string,
+): Promise<DatabaseCollection> => {
+  const res = await api.patch(`${COLLECTION_API_URL}/removeQuestion/${collectionId}`, {
+    questionId,
+  });
+
+  if (res.status !== 200) {
+    throw new Error('Error while removing question to collection');
+  }
+
+  return res.data;
+};
+
 const renameCollection = async (
   collectionId: string,
   name: string,
@@ -106,4 +121,5 @@ export {
   renameCollection,
   deleteCollection,
   updateCollectionVisibility,
+  removeQuestionFromCollection,
 };
