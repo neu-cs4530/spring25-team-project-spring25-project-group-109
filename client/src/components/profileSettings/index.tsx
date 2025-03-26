@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Alert,
   Avatar,
@@ -19,6 +19,8 @@ import {
   Typography,
 } from '@mui/material';
 import { AddCircle, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
 import { Link } from 'react-router-dom';
@@ -57,6 +59,7 @@ const ProfileSettings: React.FC = () => {
     setShowFollowing,
     clickQuestion,
     handleAddCollection,
+    permissions,
 
     setEditBioMode,
     setEditProfilePhotoMode,
@@ -70,6 +73,7 @@ const ProfileSettings: React.FC = () => {
     handleUpdateBiography,
     handleDeleteUser,
     handleUpdateProfilePhoto,
+    handleUploadProfilePhoto,
     handleFollowUser,
     handleUnfollowUser,
     handleCollectionInputChange,
@@ -80,10 +84,7 @@ const ProfileSettings: React.FC = () => {
   const numEarnedBadges = userData?.badgesEarned ? userData.badgesEarned.length : 0;
 
   const theme = useTheme();
-
-  const handleButtonClick = () => {
-    setEditProfilePhotoMode(!editProfilePhotoMode);
-  };
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (loading) {
     return (
@@ -121,18 +122,41 @@ const ProfileSettings: React.FC = () => {
                   alignItems: 'center',
                   direction: 'column',
                 }}>
-                <Avatar
-                  sx={{ width: 120, height: 120 }}
-                  src={profilePhoto || '/images/avatars/default-avatar.png'}
-                />
+                <Avatar sx={{ width: 120, height: 120 }} src={profilePhoto} />
                 {canEditProfile && (
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={handleButtonClick}
-                    sx={{ mt: 2 }}>
-                    {editProfilePhotoMode ? 'Cancel' : 'Change Photo'}
-                  </Button>
+                  <>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={() => setEditProfilePhotoMode(!editProfilePhotoMode)}
+                      sx={{ mt: 2 }}>
+                      {editProfilePhotoMode ? 'Cancel' : 'Change Photo'}
+                    </Button>
+
+                    {editProfilePhotoMode && permissions.customPhoto && (
+                      <>
+                        <input
+                          type='file'
+                          accept='image/*'
+                          ref={fileInputRef}
+                          style={{ display: 'none' }}
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            const file = event.target.files?.[0];
+                            if (file) {
+                              handleUploadProfilePhoto(file);
+                            }
+                          }}
+                        />
+                        <Button
+                          variant='outlined'
+                          color='secondary'
+                          onClick={() => fileInputRef.current?.click()}
+                          sx={{ mt: 1 }}>
+                          Upload Profile Photo
+                        </Button>
+                      </>
+                    )}
+                  </>
                 )}
               </Stack>
 
@@ -148,14 +172,26 @@ const ProfileSettings: React.FC = () => {
                   }}>
                   {availableAvatars.map(avatar => (
                     <Avatar
+                      sx={{ cursor: 'pointer' }}
                       key={avatar}
                       src={avatar}
-                      className={`avatar-option ${profilePhoto === avatar ? 'selected' : ''}`}
                       onClick={() => {
                         handleUpdateProfilePhoto(avatar);
                       }}
                     />
                   ))}
+                  <IconButton
+                    onClick={() => handleUpdateProfilePhoto('')}
+                    sx={{
+                      'width': 40,
+                      'height': 40,
+                      'display': 'flex',
+                      'border': '1px solid gray',
+                      'backgroundColor': 'white',
+                      '&:hover': { backgroundColor: '#f0f0f0' },
+                    }}>
+                    <CloseIcon />
+                  </IconButton>
                 </Container>
               )}
 
@@ -166,7 +202,7 @@ const ProfileSettings: React.FC = () => {
                     variant='subtitle1'
                     onClick={() => (followsCurrentUser || canEditProfile) && setShowFollowers(true)}
                     sx={{ cursor: followsCurrentUser ? 'pointer' : 'default' }}>
-                    <strong>{userData.followers.length}</strong> Following
+                    <strong>{userData.followers.length}</strong> Followers
                   </Typography>
 
                   <Typography
@@ -201,7 +237,9 @@ const ProfileSettings: React.FC = () => {
                   ))}
               </Box>
 
-              <Modal open={showFollowers} onClose={() => setShowFollowers(false)}>
+              <Modal
+                open={showFollowers && (canEditProfile || followsCurrentUser)}
+                onClose={() => setShowFollowers(false)}>
                 <Box sx={modalStyle}>
                   <Typography variant='h4'>Followers</Typography>
                   {userData.followers.length > 0 ? (
@@ -239,7 +277,7 @@ const ProfileSettings: React.FC = () => {
               </Modal>
 
               <Modal
-                open={showFollowing && (canEditProfile || isFollowing)}
+                open={showFollowing && (canEditProfile || followsCurrentUser)}
                 onClose={() => setShowFollowing(false)}>
                 <Box sx={modalStyle}>
                   <Typography variant='h4'>Following</Typography>
