@@ -56,7 +56,7 @@ const useProfileSettings = () => {
   const canEditProfile =
     currentUser.username && userData?.username ? currentUser.username === userData.username : false;
 
-  const followsCurrentUser = userData?.following.includes(currentUser.username);
+  const followsCurrentUser = userData?.following.includes(currentUser.username) || false;
 
   useEffect(() => {
     if (!username) return;
