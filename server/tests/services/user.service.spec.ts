@@ -22,16 +22,7 @@ import {
   UserCredentials,
   RankedUser,
 } from '../../types/types';
-import {
-  user,
-  safeUser,
-  mockUserStats,
-  mockDatabaseStore,
-  safeUserTwo,
-  ans5,
-  ans6,
-  ans7,
-} from '../mockData.models';
+import { user, safeUser, mockUserStats, mockDatabaseStore, safeUserTwo } from '../mockData.models';
 import UserStatsModel from '../../models/userstats.model';
 import StoreModel from '../../models/store.model';
 

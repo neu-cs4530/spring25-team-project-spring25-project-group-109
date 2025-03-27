@@ -1,7 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { QueryOptions } from 'mongoose';
 import {
-  DatabaseComment,
   DatabaseQuestion,
   DatabaseTag,
   DatabaseUser,
@@ -28,7 +27,6 @@ import {
 } from '../utils/sort.util';
 import UserStatsModel from '../models/userstats.model';
 import UserModel from '../models/users.model';
-import questionController from '../controllers/question.controller';
 
 /**
  * Checks if keywords exist in a question's title or text.

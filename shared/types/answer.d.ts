@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { ObjectId } from 'mongodb';
-import { Comment, DatabaseComment } from './comment';
+import { Comment } from './comment';
 
 /**
  * Represents an answer to a question.
