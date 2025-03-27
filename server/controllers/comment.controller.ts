@@ -132,7 +132,7 @@ const commentController = (socket: FakeSOSocket) => {
           text: `${comment.commentBy} commented on your answer on "${question.title}"`,
           seen: false,
           type: 'comment',
-          link: `/question/${id}`,
+          link: `/question/${question._id}`,
         });
         if ('error' in notification) {
           throw new Error(notification.error);

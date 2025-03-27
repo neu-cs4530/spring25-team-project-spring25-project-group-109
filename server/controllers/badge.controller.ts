@@ -83,7 +83,7 @@ const badgeController = (socket: FakeSOSocket) => {
       const notificationPromises = badges.map(async badge => {
         const notification = await saveNotification({
           username,
-          text: `You have earned the badge ${badge.name}!`,
+          text: `You have earned the badge ${badge.name}: ${badge.description}!`,
           seen: false,
           type: 'badge',
           link: `/user/${username}`,
