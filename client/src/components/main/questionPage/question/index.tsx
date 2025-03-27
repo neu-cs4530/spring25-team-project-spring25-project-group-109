@@ -80,10 +80,12 @@ const QuestionView = ({ question }: QuestionProps) => {
         </Stack>
 
         <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <Avatar alt='No Photo' src={question.askedBy.profilePhoto} />
-          <Typography variant='body2' color='text.secondary'>
-            Asked by <strong>{question.askedBy.username}</strong>
-          </Typography>
+          <Stack spacing={1} direction='row' justifyContent='space-between' alignItems='center'>
+            <Avatar alt='No Photo' src={question.askedBy.profilePhoto} />
+            <Typography variant='body2' color='text.secondary'>
+              <strong>{question.askedBy.username}</strong>
+            </Typography>
+          </Stack>
           <Typography variant='body2' color='text.secondary'>
             {getMetaData(new Date(question.askDateTime))}
           </Typography>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Button, Collapse, Paper, TextField, Typography, Avatar } from '@mui/material';
+import { Box, Button, Collapse, Paper, TextField, Typography, Avatar, Stack } from '@mui/material';
 import { getMetaData } from '../../../tool';
 import { Comment, DatabaseComment, DatabaseUser } from '../../../types/types';
 import './index.css';
@@ -61,10 +61,21 @@ const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => 
             comments.map(comment => (
               <Box key={String(comment._id)} sx={{ mb: 1 }}>
                 <Typography variant='body1'>{comment.text}</Typography>
-                <Avatar alt='No Photo' src={comment.commentBy.profilePhoto} />
-                <Typography variant='caption' color='textSecondary'>
-                  {comment.commentBy.username}, {getMetaData(new Date(comment.commentDateTime))}
-                </Typography>
+                <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                  <Stack
+                    spacing={1}
+                    direction='row'
+                    justifyContent='space-between'
+                    alignItems='center'>
+                    <Avatar alt='No Photo' src={comment.commentBy.profilePhoto} />
+                    <Typography variant='subtitle2' color='primary'>
+                      {comment.commentBy.username}
+                    </Typography>
+                  </Stack>
+                  <Typography variant='caption' color='text.secondary'>
+                    {getMetaData(new Date(comment.commentDateTime))}
+                  </Typography>
+                </Stack>
               </Box>
             ))
           ) : (
