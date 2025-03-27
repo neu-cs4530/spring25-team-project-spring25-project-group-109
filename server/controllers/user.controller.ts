@@ -401,7 +401,7 @@ const userController = (socket: FakeSOSocket) => {
       }
 
       const result1 = await updateUser(follower, {
-        following: [...(followerUser.following || []), followee],
+        following: [...followerUser.following, followee],
       });
       const result2 = await updateUser(followee, {
         followers: [...followeeUser.followers, follower],
@@ -460,7 +460,7 @@ const userController = (socket: FakeSOSocket) => {
       }
 
       const result1 = await updateUser(follower, {
-        following: (followerUser.following || []).filter(user => user !== followee),
+        following: followerUser.following.filter(user => user !== followee),
       });
 
       if ('error' in result1) {
