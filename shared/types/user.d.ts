@@ -28,6 +28,7 @@ export interface EarnedBadge {
  * - `dateJoined`: The date when the user registered.
  * - `biography`: A short description or bio of the user (optional).
  * - `profilePhoto`: A path to the user's profile photo.
+ * - `badgesEarned`: An array of objects containing badgeId and dateEarned.
  * - `following`: A list of usernames representing the users this user is following.
  * - `followers`: A list of usernames representing the users that follow this user.
  */
@@ -123,6 +124,12 @@ export interface UpdateProfilePhotoRequest extends Request {
     profilePhoto: string;
   };
 }
+
+export interface RankedUser extends SafeDatabaseUser {
+  count: number; // counting the number of answers by the user
+}
+
+export type RankedUsersResponse = RankedUser[] | { error: string };
 
 /**
  * Express request handling following and unfollowing of users.
