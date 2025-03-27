@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Alert,
   Avatar,
@@ -19,7 +19,10 @@ import {
   Typography,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
+import { useTheme } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
+import { Link } from 'react-router-dom';
 import useProfileSettings from '../../hooks/useProfileSettings';
 import modalStyle from './styles';
 
@@ -39,6 +42,7 @@ const ProfileSettings: React.FC = () => {
     showConfirmation,
     pendingAction,
     canEditProfile,
+    followsCurrentUser,
     showPassword,
     togglePasswordVisibility,
     allBadges,
@@ -47,6 +51,7 @@ const ProfileSettings: React.FC = () => {
     setShowFollowers,
     showFollowing,
     setShowFollowing,
+    permissions,
 
     setEditBioMode,
     setEditProfilePhotoMode,
@@ -59,15 +64,15 @@ const ProfileSettings: React.FC = () => {
     handleUpdateBiography,
     handleDeleteUser,
     handleUpdateProfilePhoto,
+    handleUploadProfilePhoto,
     handleFollowUser,
     handleUnfollowUser,
   } = useProfileSettings();
 
   const numEarnedBadges = userData?.badgesEarned ? userData.badgesEarned.length : 0;
 
-  const handleButtonClick = () => {
-    setEditProfilePhotoMode(!editProfilePhotoMode);
-  };
+  const theme = useTheme();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (loading) {
     return (
@@ -105,18 +110,41 @@ const ProfileSettings: React.FC = () => {
                   alignItems: 'center',
                   direction: 'column',
                 }}>
-                <Avatar
-                  sx={{ width: 120, height: 120 }}
-                  src={profilePhoto || '/images/avatars/default-avatar.png'}
-                />
+                <Avatar sx={{ width: 120, height: 120 }} src={profilePhoto} />
                 {canEditProfile && (
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={handleButtonClick}
-                    sx={{ mt: 2 }}>
-                    {editProfilePhotoMode ? 'Cancel' : 'Change Photo'}
-                  </Button>
+                  <>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={() => setEditProfilePhotoMode(!editProfilePhotoMode)}
+                      sx={{ mt: 2 }}>
+                      {editProfilePhotoMode ? 'Cancel' : 'Change Photo'}
+                    </Button>
+
+                    {editProfilePhotoMode && permissions.customPhoto && (
+                      <>
+                        <input
+                          type='file'
+                          accept='image/*'
+                          ref={fileInputRef}
+                          style={{ display: 'none' }}
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            const file = event.target.files?.[0];
+                            if (file) {
+                              handleUploadProfilePhoto(file);
+                            }
+                          }}
+                        />
+                        <Button
+                          variant='outlined'
+                          color='secondary'
+                          onClick={() => fileInputRef.current?.click()}
+                          sx={{ mt: 1 }}>
+                          Upload Profile Photo
+                        </Button>
+                      </>
+                    )}
+                  </>
                 )}
               </Stack>
 
@@ -132,65 +160,100 @@ const ProfileSettings: React.FC = () => {
                   }}>
                   {availableAvatars.map(avatar => (
                     <Avatar
+                      sx={{ cursor: 'pointer' }}
                       key={avatar}
                       src={avatar}
-                      className={`avatar-option ${profilePhoto === avatar ? 'selected' : ''}`}
                       onClick={() => {
                         handleUpdateProfilePhoto(avatar);
                       }}
                     />
                   ))}
+                  <IconButton
+                    onClick={() => handleUpdateProfilePhoto('')}
+                    sx={{
+                      'width': 40,
+                      'height': 40,
+                      'display': 'flex',
+                      'border': '1px solid gray',
+                      'backgroundColor': 'white',
+                      '&:hover': { backgroundColor: '#f0f0f0' },
+                    }}>
+                    <CloseIcon />
+                  </IconButton>
                 </Container>
               )}
 
               {/* ---- Follower/Following Section ---- */}
-
               <Box display={'flex'} flexDirection={'column'} mt={2} alignItems='center'>
-                <Box display='flex' justifyContent='center'>
-                  <Button
-                    className='follow-count'
-                    variant='text'
-                    onClick={() => setShowFollowers(true)}
-                    sx={{ textAlign: 'center' }}>
-                    <Typography variant='subtitle1'>
-                      <span style={{ fontWeight: 'bold' }}>{userData.followers.length}</span>{' '}
-                      Followers
-                    </Typography>
-                  </Button>
-                  <Button
-                    className='follow-count'
-                    variant='text'
-                    onClick={() => setShowFollowing(true)}
-                    sx={{ textAlign: 'center' }}>
-                    <Typography variant='subtitle1'>
-                      <span style={{ fontWeight: 'bold' }}>{userData?.following?.length}</span>{' '}
-                      Following
-                    </Typography>
-                  </Button>
+                <Box display='flex' justifyContent='center' alignItems='center' gap={2}>
+                  <Typography
+                    variant='subtitle1'
+                    onClick={() => (followsCurrentUser || canEditProfile) && setShowFollowers(true)}
+                    sx={{ cursor: followsCurrentUser ? 'pointer' : 'default' }}>
+                    <strong>{userData.followers.length}</strong> Followers
+                  </Typography>
+
+                  <Typography
+                    variant='subtitle1'
+                    onClick={() => (followsCurrentUser || canEditProfile) && setShowFollowing(true)}
+                    sx={{ cursor: followsCurrentUser ? 'pointer' : 'default' }}>
+                    <strong>{userData.following.length}</strong> Following
+                  </Typography>
                 </Box>
 
-                {!canEditProfile && (
-                  <Button
-                    variant='contained'
-                    color={isFollowing ? 'error' : 'primary'}
-                    onClick={isFollowing ? handleUnfollowUser : handleFollowUser}
-                    sx={{ maxWidth: 200, mt: 1 }}>
-                    {isFollowing ? 'Unfollow' : 'Follow'}
-                  </Button>
+                {/* Show privacy notice if user cannot see the lists */}
+                {!followsCurrentUser && !canEditProfile && (
+                  <Typography variant='caption' color='text.secondary' sx={{ m: 1 }}>
+                    User&apos;s followers and following lists are private unless they follow you.
+                  </Typography>
                 )}
+
+                {/* Follow/Unfollow Button */}
+                {!canEditProfile &&
+                  (isFollowing ? (
+                    <Button variant='outlined' onClick={handleUnfollowUser} sx={{ mt: 1 }}>
+                      Unfollow
+                    </Button>
+                  ) : (
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={handleFollowUser}
+                      sx={{ mt: 1 }}>
+                      Follow
+                    </Button>
+                  ))}
               </Box>
 
-              <Modal open={showFollowers} onClose={() => setShowFollowers(false)}>
+              <Modal
+                open={showFollowers && (canEditProfile || followsCurrentUser)}
+                onClose={() => setShowFollowers(false)}>
                 <Box sx={modalStyle}>
                   <Typography variant='h4'>Followers</Typography>
                   {userData.followers.length > 0 ? (
-                    <ul>
+                    <ul
+                      style={{
+                        listStyleType: 'none',
+                        padding: 0,
+                        textAlign: 'center',
+                        margin: '0 auto',
+                      }}>
                       {userData.followers.map(follower => (
-                        <li key={follower}>{follower}</li>
+                        <li key={follower}>
+                          <Link
+                            to={`/user/${follower}`}
+                            onClick={() => setShowFollowers(false)}
+                            style={{
+                              textDecoration: 'none',
+                              color: theme.palette.success.main,
+                            }}>
+                            {follower}
+                          </Link>
+                        </li>
                       ))}
                     </ul>
                   ) : (
-                    <p>No followers yet.</p>
+                    <p style={{ textAlign: 'center' }}>No followers yet.</p>
                   )}
                   <Button
                     variant='contained'
@@ -201,15 +264,35 @@ const ProfileSettings: React.FC = () => {
                 </Box>
               </Modal>
 
-              <Modal open={showFollowing} onClose={() => setShowFollowing(false)}>
+              <Modal
+                open={showFollowing && (canEditProfile || followsCurrentUser)}
+                onClose={() => setShowFollowing(false)}>
                 <Box sx={modalStyle}>
                   <Typography variant='h4'>Following</Typography>
-                  {(userData?.following?.length ?? 0) > 0 ? (
-                    <ul>
-                      {userData?.following?.map(following => <li key={following}>{following}</li>)}
+                  {userData.following.length > 0 ? (
+                    <ul
+                      style={{
+                        listStyleType: 'none',
+                        padding: 0,
+                        textAlign: 'center',
+                        margin: '0 auto',
+                      }}>
+                      {userData.following.map(following => (
+                        <li key={following}>
+                          <Link
+                            to={`/user/${following}`}
+                            onClick={() => setShowFollowing(false)}
+                            style={{
+                              textDecoration: 'none',
+                              color: theme.palette.success.main,
+                            }}>
+                            {following}
+                          </Link>
+                        </li>
+                      ))}
                     </ul>
                   ) : (
-                    <p>Not following anyone yet.</p>
+                    <p style={{ textAlign: 'center' }}>Not following anyone yet.</p>
                   )}
                   <Button
                     variant='contained'
@@ -275,7 +358,6 @@ const ProfileSettings: React.FC = () => {
             </Box>
 
             {/* ---- Badges Section ---- */}
-            {/* Future work will render only earned badges in color. Can be accessed from useData.earnedBadges */}
             <Box>
               <Paper variant='outlined' sx={{ padding: 2, borderRadius: 4 }}>
                 <Box mb={2} gap={1} display='flex' alignItems='center'>
@@ -289,25 +371,42 @@ const ProfileSettings: React.FC = () => {
                 </Box>
                 <Box display='flex' flexWrap='wrap' gap={3} justifyContent={'center'}>
                   {allBadges && allBadges.length > 0 ? (
-                    allBadges.map(badge => (
-                      <Box
-                        key={String(badge._id)}
-                        display='flex'
-                        flexDirection='column'
-                        alignItems='center'
-                        textAlign='center'
-                        sx={{ filter: 'grayscale(100%)', opacity: 0.3 }}>
+                    allBadges.map(badge => {
+                      const earnedBadge = userData.badgesEarned?.find(
+                        earned => earned.badgeId === badge._id.toString(),
+                      );
+                      const dateEarned = earnedBadge?.dateEarned
+                        ? new Date(earnedBadge.dateEarned).toLocaleDateString()
+                        : null;
+
+                      return (
                         <Box
-                          component='img'
-                          src={badge.imagePath}
-                          alt={badge.name}
-                          sx={{ width: 95, height: 95, borderRadius: '50%' }}
-                        />
-                        <Typography width={90} mt={1} variant='body2'>
-                          {badge.description}
-                        </Typography>
-                      </Box>
-                    ))
+                          key={String(badge._id)}
+                          display='flex'
+                          flexDirection='column'
+                          alignItems='center'
+                          textAlign='center'
+                          sx={{
+                            filter: earnedBadge ? 'none' : 'grayscale(100%)',
+                            opacity: earnedBadge ? 1 : 0.3,
+                          }}>
+                          <Box
+                            component='img'
+                            src={badge.imagePath}
+                            alt={badge.name}
+                            sx={{ width: 95, height: 95, borderRadius: '50%' }}
+                          />
+                          <Typography width={90} mt={1} variant='body2'>
+                            {badge.description}
+                          </Typography>
+                          {earnedBadge && dateEarned && (
+                            <Typography width={90} variant='caption' color='text.secondary'>
+                              {dateEarned}
+                            </Typography>
+                          )}
+                        </Box>
+                      );
+                    })
                   ) : (
                     <Typography>No badges available yet.</Typography>
                   )}

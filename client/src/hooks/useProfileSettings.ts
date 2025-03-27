@@ -8,17 +8,19 @@ import {
   updateProfilePhoto,
   follow,
   unfollow,
+  uploadProfilePhoto,
 } from '../services/userService';
 import { getBadges } from '../services/badgeService';
 import { DatabaseBadge, SafeDatabaseUser } from '../types/types';
 import useUserContext from './useUserContext';
+import { getUserStore } from '../services/storeService';
 
 const AVAILABLE_AVATARS = [
-  '/images/avatars/default-avatar.png',
   '/images/avatars/avatar1.png',
   '/images/avatars/avatar2.png',
   '/images/avatars/avatar3.png',
   '/images/avatars/avatar4.png',
+  '/images/avatars/avatar5.png',
 ];
 
 /**
@@ -39,11 +41,12 @@ const useProfileSettings = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [editProfilePhotoMode, setEditProfilePhotoMode] = useState(false);
-  const [profilePhoto, setProfilePhoto] = useState<string>('/images/avatars/default-avatar.png');
+  const [profilePhoto, setProfilePhoto] = useState<string>('');
   const [allBadges, setAllBadges] = useState<DatabaseBadge[] | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
+  const [permissions, setPermissions] = useState<{ customPhoto: boolean }>({ customPhoto: false });
 
   // For delete-user confirmation modal
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -53,6 +56,8 @@ const useProfileSettings = () => {
   const canEditProfile =
     currentUser.username && userData?.username ? currentUser.username === userData.username : false;
 
+  const followsCurrentUser = userData?.following.includes(currentUser.username) || false;
+
   useEffect(() => {
     if (!username) return;
 
@@ -61,7 +66,11 @@ const useProfileSettings = () => {
         setLoading(true);
         const data = await getUserByUsername(username);
         setUserData(data);
-        setProfilePhoto(data.profilePhoto || '/images/avatars/default-avatar.png');
+        setProfilePhoto(String(data.profilePhoto));
+        const userStore = await getUserStore(currentUser.username);
+        setPermissions({
+          customPhoto: userStore.unlockedFeatures.includes('Custom Profile Photo'),
+        });
       } catch (error) {
         setErrorMessage('Error fetching user profile');
         setUserData(null);
@@ -82,7 +91,7 @@ const useProfileSettings = () => {
 
     fetchUserData();
     fetchBadges();
-  }, [username]);
+  }, [username, currentUser.username]);
 
   useEffect(() => {
     if (userData) {
@@ -154,7 +163,7 @@ const useProfileSettings = () => {
   };
 
   const handleUpdateProfilePhoto = async (avatar: string) => {
-    if (!username || !avatar) return;
+    if (!username) return;
     try {
       const updatedUser = await updateProfilePhoto(username, avatar);
       await new Promise(resolve => {
@@ -167,6 +176,21 @@ const useProfileSettings = () => {
       setErrorMessage(null);
     } catch (error) {
       setErrorMessage('Failed to update profile photo.');
+      setSuccessMessage(null);
+    }
+  };
+
+  const handleUploadProfilePhoto = async (file: File) => {
+    if (!username || !file) return;
+    try {
+      const newPhotoUrl = await uploadProfilePhoto(username, file);
+      setUserData(prev => (prev ? { ...prev, profilePhoto: newPhotoUrl } : null));
+      setProfilePhoto(newPhotoUrl);
+      setEditProfilePhotoMode(false);
+      setSuccessMessage('Profile photo uploaded successfully!');
+      setErrorMessage(null);
+    } catch (error) {
+      setErrorMessage('Failed to upload profile photo.');
       setSuccessMessage(null);
     }
   };
@@ -257,6 +281,7 @@ const useProfileSettings = () => {
     pendingAction,
     setPendingAction,
     canEditProfile,
+    followsCurrentUser,
     showPassword,
     togglePasswordVisibility,
     handleResetPassword,
@@ -264,6 +289,8 @@ const useProfileSettings = () => {
     handleDeleteUser,
     handleFollowUser,
     handleUnfollowUser,
+    handleUploadProfilePhoto,
+    permissions,
   };
 };
 

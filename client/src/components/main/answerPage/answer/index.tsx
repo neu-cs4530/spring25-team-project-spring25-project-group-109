@@ -40,10 +40,12 @@ const AnswerView = ({ text, ansBy, meta, comments, handleAddComment }: AnswerPro
             {text}
           </Typography>
           <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mt: 1 }}>
-            <Avatar alt='No Photo' src={ansBy.profilePhoto} />
-            <Typography variant='subtitle2' color='primary'>
-              {ansBy.username}
-            </Typography>
+            <Stack spacing={1} direction='row' justifyContent='space-between' alignItems='center'>
+              <Avatar alt='No Photo' src={ansBy.profilePhoto} />
+              <Typography variant='subtitle2' color='primary'>
+                {ansBy.username}
+              </Typography>
+            </Stack>
             <Typography variant='caption' color='text.secondary'>
               {meta}
             </Typography>

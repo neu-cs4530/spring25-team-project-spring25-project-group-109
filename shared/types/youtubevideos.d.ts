@@ -7,3 +7,8 @@ export interface YouTubeVideo {
   thumbnail: string;
   channelTitle: string;
 }
+
+/**
+ * Represents a Youtube video response from a tag
+ */
+export type YoutubeResponse = YouTubeVideo[] | { error: string };

@@ -1,6 +1,6 @@
 import React from 'react';
 import './index.css';
-import { Box, Divider, Typography, Avatar } from '@mui/material';
+import { Box, Divider, Typography, Avatar, Stack } from '@mui/material';
 import { handleHyperlink } from '../../../../tool';
 import { DatabaseUser } from '../../../../types/types';
 
@@ -35,10 +35,12 @@ const QuestionBody = ({ views, text, askby, meta }: QuestionBodyProps) => (
       {handleHyperlink(text)}
     </Typography>
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <Avatar alt='No Photo' src={askby.profilePhoto} />
-      <Typography variant='body2' fontWeight='bold'>
-        {askby.username}, {views} views
-      </Typography>
+      <Stack spacing={1} direction='row' justifyContent='space-between' alignItems='center'>
+        <Avatar alt='No Photo' src={askby.profilePhoto} />
+        <Typography variant='body2' fontWeight='bold'>
+          {askby.username}, {views} views
+        </Typography>
+      </Stack>
       <Typography variant='caption' color='textSecondary'>
         asked {meta}
       </Typography>
