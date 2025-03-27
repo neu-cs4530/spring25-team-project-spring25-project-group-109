@@ -342,7 +342,7 @@ const populate = async () => {
 
     await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.', ['Nim']);
     await userCreate('kyle', 'kyle', new Date('2022-12-11T03:30:00'), 'I am a software engineer.', ['Nim']);
-    await userCreate('nitsa', 'nitsa', new Date('2023-12-11T03:30:00'), 'I am a designer.');
+    await userCreate('nitsa', 'nitsa', new Date('2023-12-11T03:30:00'), 'I am a designer.', ['Custom Profile Photo']);
     await userCreate('annabelle', 'annabelle', new Date('2022-12-11T03:30:00'), 'I am a manager.');
 
     const t1 = await tagCreate(strings.T1_NAME, strings.T1_DESC);
@@ -370,6 +370,28 @@ const populate = async () => {
       new Date('2022-01-20T03:00:00'),
       ['annabelle', 'kyle'],
       [c3],
+    );
+
+    await questionCreate(
+      strings.Q2_DESC,
+      strings.Q2_TXT,
+      [t3, t4],
+      [],
+      'annabelle',
+      new Date('2023-11-20T03:24:42'),
+      [],
+      [],
+    );
+
+    await questionCreate(
+      strings.Q3_DESC,
+      strings.Q3_TXT,
+      [t5, t6],
+      [],
+      'nitsa',
+      new Date('2023-11-23T08:24:00'),
+      [],
+      [],
     );
 
     await notificationCreate('sama', `annabelle answered your question: "${q1.title}"`, false, 'answer');
