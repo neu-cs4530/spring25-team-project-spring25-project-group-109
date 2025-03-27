@@ -8,6 +8,7 @@ import {
   VoteRequest,
   FakeSOSocket,
   PopulatedDatabaseQuestion,
+  VoteInterface,
 } from '../types/types';
 import {
   addVoteToQuestion,
@@ -19,6 +20,8 @@ import {
 } from '../services/question.service';
 import { processTags } from '../services/tag.service';
 import { populateDocument } from '../utils/database.util';
+import QuestionModel from '../models/questions.model';
+import { saveNotification } from '../services/notification.service';
 
 const questionController = (socket: FakeSOSocket) => {
   const router = express.Router();
@@ -200,6 +203,26 @@ const questionController = (socket: FakeSOSocket) => {
 
       if (status && 'error' in status) {
         throw new Error(status.error);
+      }
+
+      if ((status as VoteInterface).msg.includes('Question upvoted successfully')) {
+        const question = await QuestionModel.findOne({ _id: qid });
+        if (!question) {
+          throw Error('Question not found');
+        }
+
+        const notification = await saveNotification({
+          username: question.askedBy,
+          text: `${username} upvoted your question: "${question.title}"`,
+          seen: false,
+          type: 'upvote',
+          link: `/question/${qid}`,
+        });
+        if ('error' in notification) {
+          throw new Error(notification.error);
+        }
+
+        socket.emit('notificationUpdate', { notification, type: 'created' });
       }
 
       // Emit the updated vote counts to all connected clients

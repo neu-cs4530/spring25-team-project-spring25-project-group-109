@@ -1,5 +1,4 @@
 import supertest from 'supertest';
-import { NotificationType } from '@fake-stack-overflow/shared';
 import { app } from '../../app';
 import * as util from '../../services/notification.service';
 import { mockDatabaseNotification, mockNotificationJSONResponse } from '../mockData.models';
@@ -13,7 +12,7 @@ describe('POST /createNotification', () => {
       username: 'user1',
       text: 'notification1',
       seen: false,
-      type: 'badge' as NotificationType,
+      type: 'badge',
     };
 
     createNotificationSpy.mockResolvedValueOnce({ ...mockDatabaseNotification });
@@ -31,7 +30,7 @@ describe('POST /createNotification', () => {
     const mockReqBody = {
       text: 'notification1',
       seen: false,
-      type: 'badge' as NotificationType,
+      type: 'badge',
     };
 
     const response = await supertest(app)
@@ -47,7 +46,7 @@ describe('POST /createNotification', () => {
       username: '',
       text: 'notification1',
       seen: false,
-      type: 'badge' as NotificationType,
+      type: 'badge',
     };
 
     const response = await supertest(app)
@@ -62,7 +61,7 @@ describe('POST /createNotification', () => {
     const mockReqBody = {
       username: 'user1',
       seen: false,
-      type: 'badge' as NotificationType,
+      type: 'badge',
     };
 
     const response = await supertest(app)
@@ -78,7 +77,7 @@ describe('POST /createNotification', () => {
       username: 'user1',
       text: 'notification1',
       seen: false,
-      type: 'badge' as NotificationType,
+      type: 'badge',
     };
 
     createNotificationSpy.mockResolvedValueOnce({ error: 'Error saving notification' });

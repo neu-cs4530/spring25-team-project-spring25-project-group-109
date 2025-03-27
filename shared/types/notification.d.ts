@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import { ObjectId } from 'mongodb';
 
-export type NotificationType = 'badge' | 'answer' | 'follow' | 'comment';
+export type NotificationType = 'badge' | 'answer' | 'follow' | 'comment' | 'upvote';
 
 /**
  * Represents a nofication.

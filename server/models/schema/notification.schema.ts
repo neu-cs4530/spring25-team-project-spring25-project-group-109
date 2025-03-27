@@ -27,7 +27,7 @@ const notificationSchema: Schema = new Schema(
     type: {
       type: String,
       required: true,
-      enum: ['badge', 'answer', 'follow', 'comment'],
+      enum: ['badge', 'answer', 'follow', 'comment', 'upvote'],
     },
     link: {
       type: String,

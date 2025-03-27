@@ -42,6 +42,7 @@ const NotificationsPage = () => {
           <Tab label='Follows' value='follow' />
           <Tab label='Answers' value='answer' />
           <Tab label='Comments' value='comment' />
+          <Tab label='Upvotes' value='upvote' />
           <Tab label='Badges' value='badge' />
         </Tabs>
 
