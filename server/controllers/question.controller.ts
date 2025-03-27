@@ -8,10 +8,12 @@ import {
   VoteRequest,
   FakeSOSocket,
   PopulatedDatabaseQuestion,
+  QuestionFeedRequest,
 } from '../types/types';
 import {
   addVoteToQuestion,
   fetchAndIncrementQuestionViewsById,
+  fetchQuestionsByFollowing,
   filterQuestionsByAskedBy,
   filterQuestionsBySearch,
   getQuestionsByOrder,
@@ -19,6 +21,7 @@ import {
 } from '../services/question.service';
 import { processTags } from '../services/tag.service';
 import { populateDocument } from '../utils/database.util';
+import { getUserByUsername } from '../services/user.service';
 
 const questionController = (socket: FakeSOSocket) => {
   const router = express.Router();
@@ -237,13 +240,48 @@ const questionController = (socket: FakeSOSocket) => {
     voteQuestion(req, res, 'downvote');
   };
 
+  /**
+   * Backend logic to return a feed of questoins and answers that the given user is following, sorted by date
+   */
+  const getQuestionFeed = async (req: QuestionFeedRequest, res: Response): Promise<void> => {
+    if (!req.params.username) {
+      res.status(400).send('Invalid username');
+    }
+
+    try {
+      const userResponse = await getUserByUsername(req.params.username);
+
+      if ('error' in userResponse) {
+        throw new Error(userResponse.error);
+      }
+
+      const { following } = userResponse;
+      if (!following) {
+        res.send([]);
+        return;
+      }
+
+      const questions = await fetchQuestionsByFollowing(following);
+
+      if ('error' in questions) {
+        throw new Error(questions.error);
+      }
+
+      res.json(questions);
+    } catch (error) {
+      res
+        .status(500)
+        .send(`Error when fetching question feed by username: ${(error as Error).message}`);
+    }
+  };
+
   // add appropriate HTTP verbs and their endpoints to the router
   router.get('/getQuestion', getQuestionsByFilter);
   router.get('/getQuestionById/:qid', getQuestionById);
   router.post('/addQuestion', addQuestion);
   router.post('/upvoteQuestion', upvoteQuestion);
   router.post('/downvoteQuestion', downvoteQuestion);
-
+  router.get('/getQuestionFeed/:username', getQuestionFeed);
   return router;
 };
 

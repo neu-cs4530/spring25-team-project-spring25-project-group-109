@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { ObjectId } from 'mongodb';
-import { Comment, DatabaseComment } from './comment';
+import { Comment } from './comment';
 
 /**
  * Represents an answer to a question.
@@ -52,3 +52,11 @@ export interface AddAnswerRequest extends Request {
  * - Either a `DatabaseAnswer` object or an error message.
  */
 export type AnswerResponse = DatabaseAnswer | { error: string };
+
+/**
+ * Interface for requesting a user's answer feed (by username).
+ */
+
+export interface AnswerFeedRequest extends Request {
+  params: { username: string };
+}

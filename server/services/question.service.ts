@@ -329,3 +329,60 @@ export const addVoteToQuestion = async (
     };
   }
 };
+
+/**
+ * Gather all the questions of the users that the user is following.
+ */
+
+export const fetchQuestionsByFollowing = async (
+  following: string[],
+): Promise<PopulatedDatabaseQuestion[] | { error: string }> => {
+  try {
+    const questions = await QuestionModel.find({ askedBy: { $in: following } })
+      .populate<{
+        tags: DatabaseTag[];
+        answers: PopulatedDatabaseAnswer[];
+        comments: PopulatedDatabaseComment[];
+        askedBy: DatabaseUser;
+      }>([
+        { path: 'tags', model: TagModel },
+        {
+          path: 'answers',
+          model: AnswerModel,
+          populate: [
+            {
+              path: 'comments',
+              model: CommentModel,
+              populate: {
+                path: 'commentBy',
+                model: UserModel,
+                localField: 'commentBy',
+                foreignField: 'username',
+              },
+            },
+            { path: 'ansBy', model: UserModel, localField: 'ansBy', foreignField: 'username' },
+          ],
+        },
+        {
+          path: 'comments',
+          model: CommentModel,
+          populate: {
+            path: 'commentBy',
+            model: UserModel,
+            localField: 'commentBy',
+            foreignField: 'username',
+          },
+        },
+        { path: 'askedBy', model: UserModel, localField: 'askedBy', foreignField: 'username' },
+      ])
+      .sort({ askDateTime: -1 });
+
+    if (!questions) {
+      return [];
+    }
+
+    return questions;
+  } catch (error) {
+    return { error: 'Error when fetching questions by following!' };
+  }
+};
