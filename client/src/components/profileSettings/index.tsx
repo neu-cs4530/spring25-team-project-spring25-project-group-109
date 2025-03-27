@@ -401,7 +401,7 @@ const ProfileSettings: React.FC = () => {
                           </Typography>
                           {earnedBadge && dateEarned && (
                             <Typography width={90} variant='caption' color='text.secondary'>
-                              Earned on {dateEarned}
+                              {dateEarned}
                             </Typography>
                           )}
                         </Box>
