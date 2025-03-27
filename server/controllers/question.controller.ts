@@ -44,10 +44,11 @@ const questionController = (socket: FakeSOSocket) => {
       if (askedBy) {
         qlist = filterQuestionsByAskedBy(qlist, askedBy);
       }
-
+      if (search) {
+        qlist = filterQuestionsBySearch(qlist, search);
+      }
       // Filter by search keyword and tags
-      const resqlist: PopulatedDatabaseQuestion[] = filterQuestionsBySearch(qlist, search);
-      res.json(resqlist);
+      res.json(qlist);
     } catch (err: unknown) {
       if (err instanceof Error) {
         res.status(500).send(`Error when fetching questions by filter: ${err.message}`);

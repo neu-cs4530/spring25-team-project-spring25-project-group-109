@@ -1,11 +1,12 @@
 import { ObjectId } from 'mongodb';
 import { QueryOptions } from 'mongoose';
 import {
-  DatabaseComment,
   DatabaseQuestion,
   DatabaseTag,
+  DatabaseUser,
   OrderType,
   PopulatedDatabaseAnswer,
+  PopulatedDatabaseComment,
   PopulatedDatabaseQuestion,
   Question,
   QuestionResponse,
@@ -25,6 +26,7 @@ import {
   sortQuestionsByUnanswered,
 } from '../utils/sort.util';
 import UserStatsModel from '../models/userstats.model';
+import UserModel from '../models/users.model';
 
 /**
  * Checks if keywords exist in a question's title or text.
@@ -53,11 +55,38 @@ export const getQuestionsByOrder = async (
     const qlist: PopulatedDatabaseQuestion[] = await QuestionModel.find().populate<{
       tags: DatabaseTag[];
       answers: PopulatedDatabaseAnswer[];
-      comments: DatabaseComment[];
+      comments: PopulatedDatabaseComment[];
+      askedBy: DatabaseUser;
     }>([
       { path: 'tags', model: TagModel },
-      { path: 'answers', model: AnswerModel, populate: { path: 'comments', model: CommentModel } },
-      { path: 'comments', model: CommentModel },
+      {
+        path: 'answers',
+        model: AnswerModel,
+        populate: [
+          {
+            path: 'comments',
+            model: CommentModel,
+            populate: {
+              path: 'commentBy',
+              model: UserModel,
+              localField: 'commentBy',
+              foreignField: 'username',
+            },
+          },
+          { path: 'ansBy', model: UserModel, localField: 'ansBy', foreignField: 'username' },
+        ],
+      },
+      {
+        path: 'comments',
+        model: CommentModel,
+        populate: {
+          path: 'commentBy',
+          model: UserModel,
+          localField: 'commentBy',
+          foreignField: 'username',
+        },
+      },
+      { path: 'askedBy', model: UserModel, localField: 'askedBy', foreignField: 'username' },
     ]);
 
     switch (order) {
@@ -135,11 +164,38 @@ export const fetchAndIncrementQuestionViewsById = async (
     ).populate<{
       tags: DatabaseTag[];
       answers: PopulatedDatabaseAnswer[];
-      comments: DatabaseComment[];
+      comments: PopulatedDatabaseComment[];
+      askedBy: DatabaseUser;
     }>([
       { path: 'tags', model: TagModel },
-      { path: 'answers', model: AnswerModel, populate: { path: 'comments', model: CommentModel } },
-      { path: 'comments', model: CommentModel },
+      {
+        path: 'answers',
+        model: AnswerModel,
+        populate: [
+          {
+            path: 'comments',
+            model: CommentModel,
+            populate: {
+              path: 'commentBy',
+              model: UserModel,
+              localField: 'commentBy',
+              foreignField: 'username',
+            },
+          },
+          { path: 'ansBy', model: UserModel, localField: 'ansBy', foreignField: 'username' },
+        ],
+      },
+      {
+        path: 'comments',
+        model: CommentModel,
+        populate: {
+          path: 'commentBy',
+          model: UserModel,
+          localField: 'commentBy',
+          foreignField: 'username',
+        },
+      },
+      { path: 'askedBy', model: UserModel, localField: 'askedBy', foreignField: 'username' },
     ]);
 
     if (!q) {
