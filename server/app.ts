@@ -24,6 +24,7 @@ import badgeController from './controllers/badge.controller';
 import collectionController from './controllers/collection.controller';
 import featureController from './controllers/feature.controller';
 import notificationController from './controllers/notification.controller';
+import youtubeController from './controllers/youtubevideos.controller';
 
 dotenv.config();
 
@@ -75,6 +76,7 @@ app.use(
 
 app.use(express.json());
 app.use('/images', express.static(path.join(__dirname, '../client/public/images')));
+app.use('/uploads', express.static(path.join(__dirname, '../client/public/uploads')));
 
 app.get('/', (_: Request, res: Response) => {
   res.send('hello world');
@@ -91,9 +93,10 @@ app.use('/chat', chatController(socket));
 app.use('/games', gameController(socket));
 app.use('/store', storeController());
 app.use('/badge', badgeController());
-app.use('/collection', collectionController());
+app.use('/collection', collectionController(socket));
 app.use('/features', featureController());
 app.use('/notification', notificationController())
+app.use('/videos', youtubeController())
 
 // Export the app instance
 export { app, server, startServer };

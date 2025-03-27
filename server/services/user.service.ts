@@ -3,10 +3,8 @@ import UserModel from '../models/users.model';
 import UserStatsModel from '../models/userstats.model';
 import {
   DatabaseStore,
-  AnswerResponse,
   DatabaseUser,
   DatabaseUserStats,
-  PopulatedDatabaseQuestion,
   SafeDatabaseUser,
   User,
   UserCredentials,

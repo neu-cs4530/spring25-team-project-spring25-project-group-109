@@ -30,8 +30,3 @@ export interface TagData {
 export interface DatabaseTag extends Tag {
   _id: ObjectId;
 }
-
-/**
- * Represents a Youtube video response from a tag
- */
-export type YoutubeResponse = YouTubeVideo[] | { error: string };

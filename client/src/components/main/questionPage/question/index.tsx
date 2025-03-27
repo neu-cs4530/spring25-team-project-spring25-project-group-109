@@ -1,49 +1,39 @@
-import React from 'react';
+import { useState } from 'react';
 import { ObjectId } from 'mongodb';
 import { useNavigate } from 'react-router-dom';
-import './index.css';
-import { Box, Card, CardContent, Chip, Stack, Typography, Avatar } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Chip,
+  Stack,
+  Typography,
+  Avatar,
+  Button,
+  Modal,
+} from '@mui/material';
 import { getMetaData } from '../../../../tool';
 import { PopulatedDatabaseQuestion } from '../../../../types/types';
+import SaveToCollection from '../../saveToCollection';
 
-/**
- * Interface representing the props for the Question component.
- *
- * q - The question object containing details about the question.
- */
 interface QuestionProps {
   question: PopulatedDatabaseQuestion;
 }
 
-/**
- * Question component renders the details of a question including its title, tags, author, answers, and views.
- * Clicking on the component triggers the handleAnswer function,
- * and clicking on a tag triggers the clickTag function.
- *
- * @param q - The question object containing question details.
- */
 const QuestionView = ({ question }: QuestionProps) => {
   const navigate = useNavigate();
+  const [showSaveModal, setShowSaveModal] = useState(false);
 
-  /**
-   * Function to navigate to the home page with the specified tag as a search parameter.
-   *
-   * @param tagName - The name of the tag to be added to the search parameters.
-   */
   const clickTag = (tagName: string) => {
     const searchParams = new URLSearchParams();
     searchParams.set('tag', tagName);
-
     navigate(`/home?${searchParams.toString()}`);
   };
 
-  /**
-   * Function to navigate to the specified question page based on the question ID.
-   *
-   * @param questionID - The ID of the question to navigate to.
-   */
   const handleAnswer = (questionID: ObjectId) => {
-    navigate(`/question/${questionID}`);
+    if (!showSaveModal) {
+      navigate(`/question/${questionID}`);
+    }
   };
 
   return (
@@ -98,7 +88,27 @@ const QuestionView = ({ question }: QuestionProps) => {
             {getMetaData(new Date(question.askDateTime))}
           </Typography>
         </Box>
+
+        <Button
+          variant='contained'
+          color='secondary'
+          sx={{ mt: 2 }}
+          onClick={e => {
+            e.stopPropagation();
+            setShowSaveModal(true);
+          }}>
+          Save to Collection
+        </Button>
       </CardContent>
+
+      <Modal open={showSaveModal} onClose={() => setShowSaveModal(false)}>
+        <Box onClick={e => e.stopPropagation()}>
+          <SaveToCollection
+            questionId={String(question._id)}
+            onClose={() => setShowSaveModal(false)}
+          />
+        </Box>
+      </Modal>
     </Card>
   );
 };

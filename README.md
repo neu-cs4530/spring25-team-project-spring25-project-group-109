@@ -53,10 +53,11 @@ A class diagram for the schema definition is shown below:
 
 ### `/tag`
 
-| Endpoint                   | Method | Description                                   |
-| -------------------------- | ------ | --------------------------------------------- |
-| /getTagsWithQuestionNumber | GET    | Fetch tags along with the number of questions |
-| /getTagByName/             | GET    | Fetch a specific tag by name                  |
+| Endpoint                            | Method | Description                                                  |
+| ----------------------------------- | ------ | ------------------------------------------------------------ |
+| /getTagsWithQuestionNumber          | GET    | Fetch tags along with the number of questions                |
+| /getTagByName/                      | GET    | Fetch a specific tag by name                                 |
+| /getMostRecentQuestionTags/:askedBy | GET    | Get the tags of the most recent question posted by this user |
 
 ### `/user`
 
@@ -70,6 +71,7 @@ A class diagram for the schema definition is shown below:
 | /deleteUser/        | DELETE | Delete a user by username             |
 | /updateBiography    | PATCH  | Update user biography                 |
 | /updateProfilePhoto | PATCH  | Update user profile photo             |
+| /uploadProfilePhoto | POST   | Upload a custom profile photo         |
 | /follow             | PATCH  | Update user's following (add item)    |
 | /unfollow           | PATCH  | Update user's following (remove item) |
 
@@ -117,9 +119,9 @@ A class diagram for the schema definition is shown below:
 
 ### `/features`
 
-| Endpoint     | Method | Description           |
-| ------------ | ------ | --------------------- |
-| /getFeatures | GET    | Gets all features     |
+| Endpoint     | Method | Description       |
+| ------------ | ------ | ----------------- |
+| /getFeatures | GET    | Gets all features |
 
 ### `/notification `
 
@@ -127,6 +129,12 @@ A class diagram for the schema definition is shown below:
 | --------------------------- | ------ | ------------------------------- |
 | /createNotification         | POST   | Create a new notification       |
 | /getNotifications/:username | GET    | Gets all notifications for user |
+
+### `/videos`
+
+| Endpoint                   | Method | Description                |
+| -------------------------- | ------ | -------------------------- |
+| /getYoutubeVideos/:askedBy | GET    | Get YouTube videos by user |
 
 ## Running Stryker Mutation Testing
 

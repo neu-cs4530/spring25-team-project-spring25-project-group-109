@@ -1,7 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { QueryOptions } from 'mongoose';
 import {
-  DatabaseComment,
   DatabaseQuestion,
   DatabaseTag,
   DatabaseUser,

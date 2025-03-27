@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 /**
  * Represents user credentials for authentication.
  * - `username`: The unique username of the user.
- * - `password`: The user's passw ord.
+ * - `password`: The user's password.
  */
 export interface UserCredentials {
   username: string;
@@ -26,8 +26,7 @@ export interface EarnedBadge {
  * - `username`: The unique username of the user.
  * - `password`: The user's password.
  * - `dateJoined`: The date when the user registered.
- * - `biography`: A short description or bio of th e user (optional).
- * - 'following': A string[] of who the user is following
+ * - `biography`: A short description or bio of the user (optional).
  * - `profilePhoto`: A path to the user's profile photo.
  * - `badgesEarned`: An array of objects containing badgeId and dateEarned.
  * - `following`: A list of usernames representing the users this user is following.
@@ -36,7 +35,6 @@ export interface EarnedBadge {
 export interface User extends UserCredentials {
   dateJoined: Date;
   biography?: string;
-  following?: string[]; // An array of usernames the user is following
   profilePhoto?: string;
   badgesEarned: EarnedBadge[];
   followers: string[];
@@ -76,7 +74,7 @@ export interface UserRequest extends Request {
 
 /**
  * Express request for querying a user by their username.
- * - `u  sername`: The username provided as a route parameter.
+ * - `username`: The username provided as a route parameter.
  */
 export interface UserByUsernameRequest extends Request {
   params: {
@@ -85,27 +83,27 @@ export interface UserByUsernameRequest extends Request {
 }
 
 /**
- * Represents a "safe" user   object that excludes sensitive information like the password.
+ * Represents a "safe" user object that excludes sensitive information like the password.
  */
 export type SafeDatabaseUser = Omit<DatabaseUser, 'password'>;
 
 /**
  * Represents the response for user-related operations.
- * - `SafeDatabaseUser`: A user object without sensitive data if the operation i  s successful.
+ * - `SafeDatabaseUser`: A user object without sensitive data if the operation is successful.
  * - `error`: An error message if the operation fails.
  */
 export type UserResponse = SafeDatabaseUser | { error: string };
 
 /**
  * Represents the response for multiple user-related operations.
- * - `SafeDatabaseUser[]`: A list of user objects without sensitive data if the oper ation is successful.
- * - `error`: An error message if the operation fail s.
+ * - `SafeDatabaseUser[]`: A list of user objects without sensitive data if the operation is successful.
+ * - `error`: An error message if the operation fails.
  */
 export type UsersResponse = SafeDatabaseUser[] | { error: string };
 
 /**
  * Express request for updating a user's biography.
- * - `username`: The username whose biography is b  eing updated (body).
+ * - `username`: The username whose biography is being updated (body).
  * - `biography`: The new biography content to be set (body).
  */
 export interface UpdateBiographyRequest extends Request {
@@ -114,25 +112,6 @@ export interface UpdateBiographyRequest extends Request {
     biography: string;
   };
 }
-
-/**
- * Express request for following another user.
- * - `username`: The username of the user who is following someo ne (in the body).
- * - `followUsername`: The username of the user being followed (in the body).
- */
-export interface FollowUserRequest extends Request {
-  body: {
-    username: string;
-    followUsername: string;
-  };
-}
-
-/**
- * Response for a follow action.
- * - `success`: Boolean indicati ng if the follow action was successful.
- * - `error`: An optional error message if the follow action fails.
- */
-export type FollowUserResponse = { success: boolean } | { error: string };
 
 /**
  * Express request for updating a user's profile photo.
@@ -151,6 +130,7 @@ export interface RankedUser extends SafeDatabaseUser {
 }
 
 export type RankedUsersResponse = RankedUser[] | { error: string };
+
 /**
  * Express request handling following and unfollowing of users.
  * - `follower`: The username whose is following/unfollowing (body).
