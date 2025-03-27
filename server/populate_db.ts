@@ -249,7 +249,6 @@ async function userCreate(
   password: string,
   dateJoined: Date,
   biography?: string,
-  following?: string[],
   unlockedFeatures?: FeatureType[],
 ): Promise<DatabaseUser> {
   if (username === '' || password === '' || dateJoined === null) {
@@ -261,9 +260,9 @@ async function userCreate(
     password,
     dateJoined,
     biography: biography ?? '',
-    following: following ?? [],
     badgesEarned: [],
     followers: [],
+    following: [],
   };
 
   const user = await UserModel.create(userDetail);
