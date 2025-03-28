@@ -23,6 +23,14 @@ const AVAILABLE_AVATARS = [
   '/images/avatars/avatar5.png',
 ];
 
+const ADDITIONAL_AVATARS = [
+  '/images/avatars/additional/avatar1.png',
+  '/images/avatars/additional/avatar2.png',
+  '/images/avatars/additional/avatar3.png',
+  '/images/avatars/additional/avatar4.png',
+  '/images/avatars/additional/avatar5.png',
+];
+
 /**
  * A custom hook to encapsulate all logic/state for the ProfileSettings component.
  */
@@ -46,7 +54,10 @@ const useProfileSettings = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
-  const [permissions, setPermissions] = useState<{ customPhoto: boolean }>({ customPhoto: false });
+  const [permissions, setPermissions] = useState<{
+    customPhoto: boolean;
+    additionalAvatars: boolean;
+  }>({ customPhoto: false, additionalAvatars: false });
 
   // For delete-user confirmation modal
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -70,6 +81,7 @@ const useProfileSettings = () => {
         const userStore = await getUserStore(currentUser.username);
         setPermissions({
           customPhoto: userStore.unlockedFeatures.includes('Custom Profile Photo'),
+          additionalAvatars: userStore.unlockedFeatures.includes('Additional Avatars'),
         });
       } catch (error) {
         setErrorMessage('Error fetching user profile');
@@ -256,7 +268,9 @@ const useProfileSettings = () => {
     userData,
     profilePhoto,
     handleUpdateProfilePhoto,
-    availableAvatars: AVAILABLE_AVATARS,
+    availableAvatars: permissions.additionalAvatars
+      ? AVAILABLE_AVATARS.concat(ADDITIONAL_AVATARS)
+      : AVAILABLE_AVATARS,
     editProfilePhotoMode,
     setEditProfilePhotoMode,
     isFollowing,
