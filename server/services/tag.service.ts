@@ -137,6 +137,8 @@ export async function getMostRecentQuestionTags(
     // Query the database for all questions asked by the user
     const questions = await QuestionModel.find({ askedBy }).sort({ askDateTime: -1 }); // Sort by askDateTime descending (most recent first)
 
+    if (questions.length === 0) throw new Error('No questions found for the user');
+
     // Take the most recent question
     const mostRecentQuestion = questions[0];
     const mostRecentQTags = mostRecentQuestion.tags;

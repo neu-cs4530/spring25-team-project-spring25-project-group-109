@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Stack, TextField, Typography, Autocomplete } from '@mui/material';
 import useNewQuestion from '../../../hooks/useNewQuestion';
 import './index.css';
 
@@ -19,6 +19,7 @@ const NewQuestionPage = () => {
     textErr,
     tagErr,
     postQuestion,
+    existingTags, // List of predefined tags
   } = useNewQuestion();
 
   return (
@@ -53,15 +54,17 @@ const NewQuestionPage = () => {
           />
         </Box>
         <Box>
-          <TextField
-            fullWidth
-            label='Tags'
-            placeholder='Add keywords separated by whitespace'
-            id='formTagInput'
-            value={tagNames}
-            onChange={e => setTagNames(e.target.value)}
-            error={Boolean(tagErr)}
-            helperText={tagErr}
+          <Autocomplete
+            multiple
+            id='tags'
+            options={existingTags} // Predefined tags
+            freeSolo
+            value={tagNames} // Array of selected tags
+            onChange={(event, newValue) => setTagNames(newValue)} // Update the tags
+            renderInput={params => (
+              <TextField {...params} label='Tags' error={Boolean(tagErr)} helperText={tagErr} />
+            )}
+            isOptionEqualToValue={(option, value) => option === value} // Ensures custom input is treated as a valid option
           />
         </Box>
         <Box>

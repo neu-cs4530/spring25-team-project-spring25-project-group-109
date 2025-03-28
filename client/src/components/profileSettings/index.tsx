@@ -370,7 +370,6 @@ const ProfileSettings: React.FC = () => {
             </Box>
 
             {/* ---- Badges Section ---- */}
-            {/* Future work will render only earned badges in color. Can be accessed from useData.earnedBadges */}
             <Box>
               <Paper variant='outlined' sx={{ padding: 2, borderRadius: 4 }}>
                 <Box mb={2} gap={1} display='flex' alignItems='center'>
@@ -384,25 +383,42 @@ const ProfileSettings: React.FC = () => {
                 </Box>
                 <Box display='flex' flexWrap='wrap' gap={3} justifyContent={'center'}>
                   {allBadges && allBadges.length > 0 ? (
-                    allBadges.map(badge => (
-                      <Box
-                        key={String(badge._id)}
-                        display='flex'
-                        flexDirection='column'
-                        alignItems='center'
-                        textAlign='center'
-                        sx={{ filter: 'grayscale(100%)', opacity: 0.3 }}>
+                    allBadges.map(badge => {
+                      const earnedBadge = userData.badgesEarned?.find(
+                        earned => earned.badgeId === badge._id.toString(),
+                      );
+                      const dateEarned = earnedBadge?.dateEarned
+                        ? new Date(earnedBadge.dateEarned).toLocaleDateString()
+                        : null;
+
+                      return (
                         <Box
-                          component='img'
-                          src={badge.imagePath}
-                          alt={badge.name}
-                          sx={{ width: 95, height: 95, borderRadius: '50%' }}
-                        />
-                        <Typography width={90} mt={1} variant='body2'>
-                          {badge.description}
-                        </Typography>
-                      </Box>
-                    ))
+                          key={String(badge._id)}
+                          display='flex'
+                          flexDirection='column'
+                          alignItems='center'
+                          textAlign='center'
+                          sx={{
+                            filter: earnedBadge ? 'none' : 'grayscale(100%)',
+                            opacity: earnedBadge ? 1 : 0.2,
+                          }}>
+                          <Box
+                            component='img'
+                            src={badge.imagePath}
+                            alt={badge.name}
+                            sx={{ width: 95, height: 95, borderRadius: '50%' }}
+                          />
+                          <Typography width={90} mt={1} variant='body2'>
+                            {badge.description}
+                          </Typography>
+                          {earnedBadge && dateEarned && (
+                            <Typography width={90} variant='caption' color='text.secondary'>
+                              {dateEarned}
+                            </Typography>
+                          )}
+                        </Box>
+                      );
+                    })
                   ) : (
                     <Typography>No badges available yet.</Typography>
                   )}

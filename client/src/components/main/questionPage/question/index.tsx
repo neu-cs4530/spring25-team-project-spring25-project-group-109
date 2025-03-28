@@ -1,8 +1,19 @@
 import { useState } from 'react';
 import { ObjectId } from 'mongodb';
 import { useNavigate } from 'react-router-dom';
-import { Box, Card, CardContent, Chip, Stack, Typography, IconButton, Modal } from '@mui/material';
 import { BookmarkBorder } from '@mui/icons-material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Chip,
+  Stack,
+  Typography,
+  Avatar,
+  Button,
+  Modal,
+  IconButton,
+} from '@mui/material';
 import { getMetaData } from '../../../../tool';
 import { PopulatedDatabaseQuestion } from '../../../../types/types';
 import SaveToCollection from '../../saveToCollection';
@@ -85,12 +96,28 @@ const QuestionView = ({ question }: QuestionProps) => {
           ))}
         </Stack>
 
-        <Typography variant='body2' color='text.secondary'>
-          Asked by <strong>{question.askedBy}</strong>
-        </Typography>
-        <Typography variant='body2' color='text.secondary'>
-          {getMetaData(new Date(question.askDateTime))}
-        </Typography>
+        <Box display='flex' justifyContent='space-between' alignItems='center'>
+          <Stack spacing={1} direction='row' justifyContent='space-between' alignItems='center'>
+            <Avatar alt='No Photo' src={question.askedBy.profilePhoto} />
+            <Typography variant='body2' color='text.secondary'>
+              <strong>{question.askedBy.username}</strong>
+            </Typography>
+          </Stack>
+          <Typography variant='body2' color='text.secondary'>
+            {getMetaData(new Date(question.askDateTime))}
+          </Typography>
+        </Box>
+
+        <Button
+          variant='contained'
+          color='secondary'
+          sx={{ mt: 2 }}
+          onClick={e => {
+            e.stopPropagation();
+            setShowSaveModal(true);
+          }}>
+          Save to Collection
+        </Button>
       </CardContent>
 
       <Modal open={showSaveModal} onClose={() => setShowSaveModal(false)}>

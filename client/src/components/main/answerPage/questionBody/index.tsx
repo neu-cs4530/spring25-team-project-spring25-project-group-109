@@ -1,7 +1,8 @@
 import React from 'react';
 import './index.css';
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Divider, Typography, Avatar, Stack } from '@mui/material';
 import { handleHyperlink } from '../../../../tool';
+import { DatabaseUser } from '../../../../types/types';
 
 /**
  * Interface representing the props for the QuestionBody component.
@@ -14,7 +15,7 @@ import { handleHyperlink } from '../../../../tool';
 interface QuestionBodyProps {
   views: number;
   text: string;
-  askby: string;
+  askby: DatabaseUser;
   meta: string;
 }
 
@@ -34,9 +35,12 @@ const QuestionBody = ({ views, text, askby, meta }: QuestionBodyProps) => (
       {handleHyperlink(text)}
     </Typography>
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <Typography variant='body2' fontWeight='bold'>
-        {askby}, {views} views
-      </Typography>
+      <Stack spacing={1} direction='row' justifyContent='space-between' alignItems='center'>
+        <Avatar alt='No Photo' src={askby.profilePhoto} />
+        <Typography variant='body2' fontWeight='bold'>
+          {askby.username}, {views} views
+        </Typography>
+      </Stack>
       <Typography variant='caption' color='textSecondary'>
         asked {meta}
       </Typography>

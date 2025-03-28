@@ -4,6 +4,7 @@ import { app } from '../../app';
 import * as questionUtil from '../../services/question.service';
 import * as tagUtil from '../../services/tag.service';
 import * as databaseUtil from '../../utils/database.util';
+import * as userUtil from '../../services/user.service';
 import {
   Answer,
   DatabaseQuestion,
@@ -12,6 +13,7 @@ import {
   PopulatedDatabaseQuestion,
   Question,
   Tag,
+  UserResponse,
   VoteResponse,
 } from '../../types/types';
 
@@ -165,6 +167,10 @@ const simplifyQuestion = (question: PopulatedDatabaseQuestion) => ({
 const EXPECTED_QUESTIONS = MOCK_POPULATED_QUESTIONS.map(question => simplifyQuestion(question));
 
 describe('Test questionController', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.resetAllMocks();
+  });
   describe('POST /addQuestion', () => {
     it('should add a new question', async () => {
       jest.spyOn(tagUtil, 'processTags').mockResolvedValue([dbTag1, dbTag2]);
@@ -730,6 +736,111 @@ describe('Test questionController', () => {
 
       // Asserting the response
       expect(response.status).toBe(500);
+    });
+  });
+
+  describe('GET /getQuestionFeed/:username', () => {
+    const mockUser = { username: 'testuser1', _id: 'fakeid', following: ['testuser2'] };
+    it('should return a question array of questions the user is following when the username is passed as the request parameter', async () => {
+      // Mock request parameters
+
+      const mockReqParams = {
+        username: 'question3_user',
+      };
+
+      // Provide mock question data
+      jest
+        .spyOn(questionUtil, 'fetchQuestionsByFollowing')
+        .mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+
+      jest
+        .spyOn(userUtil, 'getUserByUsername')
+        .mockResolvedValueOnce(mockUser as unknown as UserResponse);
+
+      // Making the request
+      const response = await supertest(app).get(
+        `/question/getQuestionFeed/${mockReqParams.username}`,
+      );
+
+      // Asserting the response
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(EXPECTED_QUESTIONS);
+    });
+
+    it('should return bad request error if the username is not provided', async () => {
+      // Making the request
+      const response = await supertest(app).get(`/question/getQuestionFeed/`);
+
+      // Asserting the response
+      expect(response.status).toBe(404);
+    });
+
+    it('should return database error if the user fetch fails', async () => {
+      // Mock request parameters
+      const mockReqParams = {
+        username: 'question3_user',
+      };
+
+      jest
+        .spyOn(userUtil, 'getUserByUsername')
+        .mockResolvedValueOnce({ error: 'Failed to get user.' });
+
+      // Making the request
+      const response = await supertest(app).get(
+        `/question/getQuestionFeed/${mockReqParams.username}`,
+      );
+
+      // Asserting the response
+      expect(response.status).toBe(500);
+      expect(response.text).toBe(
+        'Error when fetching question feed by username: Failed to get user.',
+      );
+    });
+
+    it('should return database error when fetching the questions', async () => {
+      // Mock request parameters
+      const mockReqParams = {
+        username: 'question3_user',
+      };
+
+      jest
+        .spyOn(userUtil, 'getUserByUsername')
+        .mockResolvedValueOnce(mockUser as unknown as UserResponse);
+
+      jest
+        .spyOn(questionUtil, 'fetchQuestionsByFollowing')
+        .mockResolvedValueOnce({ error: 'Failed to get questions.' });
+
+      // Making the request
+      const response = await supertest(app).get(
+        `/question/getQuestionFeed/${mockReqParams.username}`,
+      );
+
+      // Asserting the response
+      expect(response.status).toBe(500);
+      expect(response.text).toBe(
+        'Error when fetching question feed by username: Failed to get questions.',
+      );
+    });
+
+    it('should empty array when no questions', async () => {
+      // Mock request parameters
+      const mockReqParams = {
+        username: 'question3_user',
+      };
+
+      jest
+        .spyOn(userUtil, 'getUserByUsername')
+        .mockResolvedValueOnce({ username: 'mockUserOne' } as UserResponse);
+
+      // Making the request
+      const response = await supertest(app).get(
+        `/question/getQuestionFeed/${mockReqParams.username}`,
+      );
+
+      // Asserting the response
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([]);
     });
   });
 });
