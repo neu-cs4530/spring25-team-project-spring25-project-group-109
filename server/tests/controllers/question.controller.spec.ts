@@ -1,9 +1,11 @@
 import mongoose from 'mongoose';
 import supertest from 'supertest';
+import { ObjectId } from 'mongodb';
 import { app } from '../../app';
 import * as questionUtil from '../../services/question.service';
 import * as tagUtil from '../../services/tag.service';
 import * as databaseUtil from '../../utils/database.util';
+import * as notifUtil from '../../services/notification.service';
 import {
   Answer,
   DatabaseQuestion,
@@ -14,6 +16,7 @@ import {
   Tag,
   VoteResponse,
 } from '../../types/types';
+import QuestionModel from '../../models/questions.model';
 
 const addVoteToQuestionSpy = jest.spyOn(questionUtil, 'addVoteToQuestion');
 const getQuestionsByOrderSpy: jest.SpyInstance = jest.spyOn(questionUtil, 'getQuestionsByOrder');
@@ -21,6 +24,7 @@ const filterQuestionsBySearchSpy: jest.SpyInstance = jest.spyOn(
   questionUtil,
   'filterQuestionsBySearch',
 );
+const saveNotificationSpy = jest.spyOn(notifUtil, 'saveNotification');
 
 const tag1: Tag = {
   name: 'tag1',
@@ -319,6 +323,17 @@ describe('Test questionController', () => {
         downVotes: [],
       };
 
+      QuestionModel.findOne = jest.fn().mockResolvedValue(mockQuestion);
+      saveNotificationSpy.mockResolvedValue({
+        _id: new ObjectId(),
+        username: 'original-user',
+        text: 'new-user upvoted your question: "Sample Question"',
+        seen: false,
+        type: 'upvote',
+        link: '/question/65e9b5a995b6c7045a30d823',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
       addVoteToQuestionSpy.mockResolvedValueOnce(mockResponse);
 
       const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);

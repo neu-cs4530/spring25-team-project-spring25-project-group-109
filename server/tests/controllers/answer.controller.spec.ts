@@ -4,10 +4,16 @@ import { ObjectId } from 'mongodb';
 import { app } from '../../app';
 import * as answerUtil from '../../services/answer.service';
 import * as databaseUtil from '../../utils/database.util';
+import * as notifUtil from '../../services/notification.service';
+import QuestionModel from '../../models/questions.model';
 
 const saveAnswerSpy = jest.spyOn(answerUtil, 'saveAnswer');
 const addAnswerToQuestionSpy = jest.spyOn(answerUtil, 'addAnswerToQuestion');
 const popDocSpy = jest.spyOn(databaseUtil, 'populateDocument');
+const saveNotificationSpy = jest.spyOn(notifUtil, 'saveNotification');
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mockingoose = require('mockingoose');
 
 describe('POST /addAnswer', () => {
   it('should add a new answer to the question', async () => {
@@ -31,7 +37,7 @@ describe('POST /addAnswer', () => {
     };
     saveAnswerSpy.mockResolvedValueOnce(mockAnswer);
 
-    addAnswerToQuestionSpy.mockResolvedValueOnce({
+    const mockQuestion = {
       _id: validQid,
       title: 'This is a test question',
       text: 'This is a test question',
@@ -43,7 +49,9 @@ describe('POST /addAnswer', () => {
       downVotes: [],
       answers: [mockAnswer._id],
       comments: [],
-    });
+    };
+
+    addAnswerToQuestionSpy.mockResolvedValueOnce(mockQuestion);
 
     popDocSpy.mockResolvedValueOnce({
       _id: validQid,
@@ -59,6 +67,18 @@ describe('POST /addAnswer', () => {
       comments: [],
     });
 
+    mockingoose(QuestionModel).toReturn(mockQuestion, 'findOne');
+    saveNotificationSpy.mockResolvedValueOnce({
+      _id: new mongoose.Types.ObjectId(),
+      username: 'user1',
+      text: 'user2 answered your question: "question"',
+      seen: false,
+      type: 'answer',
+      link: '/question/1234',
+      createdAt: new Date('2025-01-01'),
+      updatedAt: new Date('2025-01-01'),
+    });
+
     const response = await supertest(app).post('/answer/addAnswer').send(mockReqBody);
 
     expect(response.status).toBe(200);
@@ -69,6 +89,7 @@ describe('POST /addAnswer', () => {
       ansDateTime: mockAnswer.ansDateTime.toISOString(),
       comments: [],
     });
+    expect(saveNotificationSpy).toHaveBeenCalled();
   });
 
   it('should return bad request error if answer text property is missing', async () => {

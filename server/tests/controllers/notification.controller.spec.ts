@@ -5,6 +5,7 @@ import { mockDatabaseNotification, mockNotificationJSONResponse } from '../mockD
 
 const createNotificationSpy = jest.spyOn(util, 'saveNotification');
 const getNotificationsByUsernameSpy = jest.spyOn(util, 'getNotificationsByUsername');
+const updateNotificationSeenSpy = jest.spyOn(util, 'updateNotificationSeen');
 
 describe('POST /createNotification', () => {
   it('should create a new notification given correct arguments', async () => {
@@ -123,6 +124,38 @@ describe('GET /getNotificationsByUser', () => {
   });
   it('should return 404 for a missing username', async () => {
     const response = await supertest(app).get(`/notification/getNotifications`);
+    expect(response.status).toBe(404);
+  });
+});
+
+describe('PATCH /notification/toggleSeen/:id', () => {
+  const notificationId = mockDatabaseNotification._id;
+  const endpoint = `/notification/toggleSeen/${notificationId}`;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should toggle the seen status of a notification', async () => {
+    updateNotificationSeenSpy.mockResolvedValueOnce(mockDatabaseNotification);
+
+    const response = await supertest(app).patch(endpoint);
+
+    expect(response.status).toBe(200);
+  });
+
+  it('should return 500 if updateNotificationSeen fails', async () => {
+    updateNotificationSeenSpy.mockRejectedValueOnce(new Error('Database error'));
+
+    const response = await supertest(app).patch(endpoint);
+
+    expect(response.status).toBe(500);
+    expect(response.text).toContain('Error toggling notification seen status: Database error');
+  });
+
+  it('should return 404 if notification ID is not provided', async () => {
+    const response = await supertest(app).patch(`/notification/toggleSeen`);
+
     expect(response.status).toBe(404);
   });
 });

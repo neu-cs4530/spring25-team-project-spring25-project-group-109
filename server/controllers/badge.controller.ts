@@ -70,7 +70,11 @@ const badgeController = (socket: FakeSOSocket) => {
     }
   };
 
-  // todo
+  /**
+   * Updates the badges earned for the given user.
+   * @param res The response, either returning the badges or an error.
+   * @returns A promise resolving to void.
+   */
   const updateBadges = async (req: UpdateBadgeByUsernameRequest, res: Response): Promise<void> => {
     try {
       const { username } = req.params;
