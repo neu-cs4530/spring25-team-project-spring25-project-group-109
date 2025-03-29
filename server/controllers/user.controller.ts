@@ -14,6 +14,7 @@ import {
 } from '../types/types';
 import {
   deleteUserByUsername,
+  getRankedUsersList,
   getUserByUsername,
   getUsersList,
   loginUser,
@@ -356,6 +357,20 @@ const userController = (socket: FakeSOSocket) => {
     }
   };
 
+  const getRankedUsers = async (req: Request, res: Response) => {
+    try {
+      const users = await getRankedUsersList();
+
+      if ('error' in users) {
+        throw Error(users.error);
+      }
+
+      res.status(200).json(users);
+    } catch (error) {
+      res.status(500).send(`Error when getting ranked users: ${error}`);
+    }
+  };
+
   /**
    * Adds a user to another user's followers and vice versa for following.
    * @param req The request containing the two usernames in the body.
@@ -489,6 +504,7 @@ const userController = (socket: FakeSOSocket) => {
   router.delete('/deleteUser/:username', deleteUser);
   router.patch('/updateBiography', updateBiography);
   router.patch('/updateProfilePhoto', updateProfilePhoto);
+  router.get('/getUsers/ranking', getRankedUsers);
   router.patch('/follow', follow);
   router.patch('/unfollow', unfollow);
   router.post('/uploadProfilePhoto', upload.single('file'), uploadProfilePhoto);

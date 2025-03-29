@@ -1,10 +1,21 @@
 import express, { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { Answer, AddAnswerRequest, FakeSOSocket, PopulatedDatabaseAnswer } from '../types/types';
-import { addAnswerToQuestion, saveAnswer } from '../services/answer.service';
+import {
+  Answer,
+  AddAnswerRequest,
+  FakeSOSocket,
+  PopulatedDatabaseAnswer,
+  AnswerFeedRequest,
+} from '../types/types';
+import {
+  addAnswerToQuestion,
+  fetchAnswersByFollowing,
+  saveAnswer,
+} from '../services/answer.service';
 import { populateDocument } from '../utils/database.util';
-import QuestionModel from '../models/questions.model';
+import { getUserByUsername } from '../services/user.service';
 import { saveNotification } from '../services/notification.service';
+import QuestionModel from '../models/questions.model';
 
 const answerController = (socket: FakeSOSocket) => {
   const router = express.Router();
@@ -101,8 +112,44 @@ const answerController = (socket: FakeSOSocket) => {
     }
   };
 
+  /**
+   * Backend logic to return a feed of answers and answers that the given user is following, sorted by date
+   */
+  const getAnswerFeed = async (req: AnswerFeedRequest, res: Response): Promise<void> => {
+    if (!req.params.username) {
+      res.status(400).send('Invalid username');
+    }
+
+    try {
+      const userResponse = await getUserByUsername(req.params.username);
+
+      if ('error' in userResponse) {
+        throw new Error(userResponse.error);
+      }
+
+      const { following } = userResponse;
+      if (!following) {
+        res.send([]);
+        return;
+      }
+
+      const answers = await fetchAnswersByFollowing(following);
+
+      if ('error' in answers) {
+        throw new Error(answers.error);
+      }
+
+      res.json(answers);
+    } catch (error) {
+      res
+        .status(500)
+        .send(`Error when fetching answer feed by username: ${(error as Error).message}`);
+    }
+  };
+
   // add appropriate HTTP verbs and their endpoints to the router.
   router.post('/addAnswer', addAnswer);
+  router.get('/getAnswerFeed/:username', getAnswerFeed);
 
   return router;
 };

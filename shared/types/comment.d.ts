@@ -43,3 +43,11 @@ export interface AddCommentRequest extends Request {
  * - Either a `DatabaseComment` object or an error message.
  */
 export type CommentResponse = DatabaseComment | { error: string };
+
+/**
+ * Type represents the response from the service to the UI where the 'commnetBy' is a User object instead of string (username)
+ * to give access to profile photo/other fields
+ */
+export interface PopulatedDatabaseComment extends DatabaseComment {
+  commentBy: DatabaseUser;
+}

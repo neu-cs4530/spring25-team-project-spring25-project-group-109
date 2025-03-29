@@ -77,6 +77,7 @@ const loginUserSpy = jest.spyOn(util, 'loginUser');
 const updatedUserSpy = jest.spyOn(util, 'updateUser');
 const getUserByUsernameSpy = jest.spyOn(util, 'getUserByUsername');
 const getUsersListSpy = jest.spyOn(util, 'getUsersList');
+const getRankedUsersListSpy = jest.spyOn(util, 'getRankedUsersList');
 const deleteUserByUsernameSpy = jest.spyOn(util, 'deleteUserByUsername');
 const saveNotificationSpy = jest.spyOn(notifUtil, 'saveNotification');
 const existsSyncSpy = jest.spyOn(fs, 'existsSync');
@@ -932,6 +933,26 @@ describe('Test userController', () => {
       getUserByUsernameSpy.mockResolvedValueOnce({ error: 'Error getting user' });
 
       const response = await supertest(app).patch('/user/unfollow').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+    });
+  });
+
+  describe('GET /getRankedUsers', () => {
+    it('should return the users from the database', async () => {
+      getRankedUsersListSpy.mockResolvedValueOnce([{ ...mockSafeUser, count: 1 }]);
+
+      const response = await supertest(app).get(`/user/getUsers/ranking`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([{ ...mockUserJSONResponse, count: 1 }]);
+      expect(getRankedUsersListSpy).toHaveBeenCalled();
+    });
+
+    it('should return 500 if database error while finding users', async () => {
+      getRankedUsersListSpy.mockResolvedValueOnce({ error: 'Error finding users' });
+
+      const response = await supertest(app).get(`/user/getUsers/ranking`);
 
       expect(response.status).toBe(500);
     });

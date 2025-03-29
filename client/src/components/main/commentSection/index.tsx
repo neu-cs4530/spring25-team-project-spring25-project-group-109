@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Box, Button, Collapse, Paper, TextField, Typography } from '@mui/material';
+import { Box, Button, Collapse, Paper, TextField, Typography, Avatar, Stack } from '@mui/material';
 import { getMetaData } from '../../../tool';
-import { Comment, DatabaseComment } from '../../../types/types';
+import { Comment, DatabaseComment, DatabaseUser } from '../../../types/types';
 import './index.css';
 import useUserContext from '../../../hooks/useUserContext';
+
+type EnhancedComment = DatabaseComment & { commentBy: DatabaseUser };
 
 /**
  * Interface representing the props for the Comment Section component.
@@ -12,7 +14,7 @@ import useUserContext from '../../../hooks/useUserContext';
  * - handleAddComment - a function that handles adding a new comment, taking a Comment object as an argument
  */
 interface CommentSectionProps {
-  comments: DatabaseComment[];
+  comments: EnhancedComment[];
   handleAddComment: (comment: Comment) => void;
 }
 
@@ -59,9 +61,21 @@ const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => 
             comments.map(comment => (
               <Box key={String(comment._id)} sx={{ mb: 1 }}>
                 <Typography variant='body1'>{comment.text}</Typography>
-                <Typography variant='caption' color='textSecondary'>
-                  {comment.commentBy}, {getMetaData(new Date(comment.commentDateTime))}
-                </Typography>
+                <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                  <Stack
+                    spacing={1}
+                    direction='row'
+                    justifyContent='space-between'
+                    alignItems='center'>
+                    <Avatar alt='No Photo' src={comment.commentBy.profilePhoto} />
+                    <Typography variant='subtitle2' color='primary'>
+                      {comment.commentBy.username}
+                    </Typography>
+                  </Stack>
+                  <Typography variant='caption' color='text.secondary'>
+                    {getMetaData(new Date(comment.commentDateTime))}
+                  </Typography>
+                </Stack>
               </Box>
             ))
           ) : (

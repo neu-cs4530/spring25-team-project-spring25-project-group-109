@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import { Request } from 'express';
 import { Answer, PopulatedDatabaseAnswer } from './answer';
 import { DatabaseTag, Tag } from './tag';
-import { Comment, DatabaseComment } from './comment';
+import { Comment, PopulatedDatabaseComment } from './comment';
 
 /**
  * Type representing the possible ordering options for questions.
@@ -57,13 +57,14 @@ export interface DatabaseQuestion extends Omit<Question, 'tags' | 'answers' | 'c
  * Represents a fully populated question from the database.
  * - `tags`: An array of populated `DatabaseTag` objects.
  * - `answers`: An array of populated `PopulatedDatabaseAnswer` objects.
- * - `comments`: An array of populated `DatabaseComment` objects.
+ * - `comments`: An array of populated `PopulatedDatabaseComment` objects.
  */
 export interface PopulatedDatabaseQuestion
   extends Omit<DatabaseQuestion, 'tags' | 'answers' | 'comments'> {
   tags: DatabaseTag[];
   answers: PopulatedDatabaseAnswer[];
-  comments: DatabaseComment[];
+  comments: PopulatedDatabaseComment[];
+  askedBy: DatabaseUser;
 }
 
 /**
@@ -130,4 +131,12 @@ export interface VoteRequest extends Request {
     qid: string;
     username: string;
   };
+}
+
+/**
+ * Interface for requesting a user's question feed (by username).
+ */
+
+export interface QuestionFeedRequest extends Request {
+  params: { username: string };
 }

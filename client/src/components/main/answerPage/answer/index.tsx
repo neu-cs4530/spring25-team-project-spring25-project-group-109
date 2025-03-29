@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent, Paper, Stack, Typography } from '@mui/material';
+import { Card, CardContent, Paper, Stack, Typography, Avatar } from '@mui/material';
 import CommentSection from '../../commentSection';
 import './index.css';
-import { Comment, DatabaseComment } from '../../../../types/types';
+import { Comment, DatabaseUser, PopulatedDatabaseComment } from '../../../../types/types';
 
 /**
  * Interface representing the props for the AnswerView component.
@@ -15,9 +15,9 @@ import { Comment, DatabaseComment } from '../../../../types/types';
  */
 interface AnswerProps {
   text: string;
-  ansBy: string;
+  ansBy: DatabaseUser;
   meta: string;
-  comments: DatabaseComment[];
+  comments: PopulatedDatabaseComment[];
   handleAddComment: (comment: Comment) => void;
 }
 
@@ -40,9 +40,12 @@ const AnswerView = ({ text, ansBy, meta, comments, handleAddComment }: AnswerPro
             {text}
           </Typography>
           <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mt: 1 }}>
-            <Typography variant='subtitle2' color='primary'>
-              {ansBy}
-            </Typography>
+            <Stack spacing={1} direction='row' justifyContent='space-between' alignItems='center'>
+              <Avatar alt='No Photo' src={ansBy.profilePhoto} />
+              <Typography variant='subtitle2' color='primary'>
+                {ansBy.username}
+              </Typography>
+            </Stack>
             <Typography variant='caption' color='text.secondary'>
               {meta}
             </Typography>
