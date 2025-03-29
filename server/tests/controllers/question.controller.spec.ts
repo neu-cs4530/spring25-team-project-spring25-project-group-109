@@ -367,6 +367,17 @@ describe('Test questionController', () => {
       };
 
       addVoteToQuestionSpy.mockResolvedValueOnce(mockFirstResponse);
+      QuestionModel.findOne = jest.fn().mockResolvedValue(mockQuestion);
+      saveNotificationSpy.mockResolvedValue({
+        _id: new ObjectId(),
+        username: 'original-user',
+        text: 'new-user upvoted your question: "Sample Question"',
+        seen: false,
+        type: 'upvote',
+        link: '/question/65e9b5a995b6c7045a30d823',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
       const firstResponse = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
       expect(firstResponse.status).toBe(200);
@@ -396,6 +407,17 @@ describe('Test questionController', () => {
       };
 
       addVoteToQuestionSpy.mockResolvedValueOnce(mockResponseWithBothVotes);
+      QuestionModel.findOne = jest.fn().mockResolvedValue(mockQuestion);
+      saveNotificationSpy.mockResolvedValue({
+        _id: new ObjectId(),
+        username: 'original-user',
+        text: 'new-user upvoted your question: "Sample Question"',
+        seen: false,
+        type: 'upvote',
+        link: '/question/65e9b5a995b6c7045a30d823',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
       let response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
 
@@ -446,7 +468,7 @@ describe('Test questionController', () => {
       };
 
       const mockResponse = {
-        msg: 'Question upvoted successfully',
+        msg: 'Question downvoted successfully',
         downVotes: ['new-user'],
         upVotes: [],
       };
@@ -523,6 +545,17 @@ describe('Test questionController', () => {
       };
 
       addVoteToQuestionSpy.mockResolvedValueOnce(mockResponse);
+      QuestionModel.findOne = jest.fn().mockResolvedValue(mockQuestion);
+      saveNotificationSpy.mockResolvedValue({
+        _id: new ObjectId(),
+        username: 'original-user',
+        text: 'new-user upvoted your question: "Sample Question"',
+        seen: false,
+        type: 'upvote',
+        link: '/question/65e9b5a995b6c7045a30d823',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
       response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
 
