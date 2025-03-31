@@ -32,9 +32,28 @@ const populateQuestion = async (questionID: string): Promise<PopulatedDatabaseQu
     {
       path: 'answers',
       model: AnswerModel,
-      populate: { path: 'comments', model: CommentModel },
+      populate: {
+        path: 'comments',
+        model: CommentModel,
+        populate: {
+          path: 'commentBy',
+          model: UserModel,
+          localField: 'commentBy',
+          foreignField: 'username',
+        },
+      },
     },
-    { path: 'comments', model: CommentModel },
+    {
+      path: 'comments',
+      model: CommentModel,
+      populate: {
+        path: 'commentBy',
+        model: UserModel,
+        localField: 'commentBy',
+        foreignField: 'username',
+      },
+    },
+    { path: 'askedBy', model: UserModel, localField: 'askedBy', foreignField: 'username' },
   ]);
 
   return result;
@@ -49,7 +68,19 @@ const populateQuestion = async (questionID: string): Promise<PopulatedDatabaseQu
 const populateAnswer = async (answerID: string): Promise<PopulatedDatabaseAnswer | null> => {
   const result = await AnswerModel.findOne({ _id: answerID }).populate<{
     comments: DatabaseComment[];
-  }>([{ path: 'comments', model: CommentModel }]);
+  }>([
+    {
+      path: 'comments',
+      model: CommentModel,
+      populate: {
+        path: 'commentBy',
+        model: UserModel,
+        localField: 'commentBy',
+        foreignField: 'username',
+      },
+    },
+    { path: 'ansBy', model: UserModel, localField: 'askedBy', foreignField: 'username' },
+  ]);
 
   return result;
 };
