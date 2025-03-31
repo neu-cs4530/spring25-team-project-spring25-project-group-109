@@ -11,7 +11,6 @@ import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
 import CommentModel from '../models/comments.model';
 import UserStatsModel from '../models/userstats.model';
-import { saveNotification } from './notification.service';
 
 /**
  * Saves a new comment to the database.
@@ -71,26 +70,6 @@ export const addComment = async (
     );
     if (!userStats) {
       throw new Error('Error updating user stats');
-    }
-
-    if (type === 'question') {
-      result = result as DatabaseQuestion;
-      // send a notification to the question asker when this comment is added
-      await saveNotification({
-        username: result.askedBy,
-        text: `${comment.commentBy} commented on your question: "${result.title}"`,
-        seen: false,
-        type: 'comment',
-      });
-    } else {
-      result = result as DatabaseAnswer;
-      // send a notification to the answer poster when this comment is added
-      await saveNotification({
-        username: result.ansBy,
-        text: `${comment.commentBy} commented on your answer!`,
-        seen: false,
-        type: 'comment',
-      });
     }
 
     return result;
