@@ -153,7 +153,7 @@ async function questionCreate(
   text: string,
   tags: DatabaseTag[],
   answers: DatabaseAnswer[],
-  askedBy: DatabaseUser,
+  askedBy: string,
   askDateTime: Date,
   views: string[],
   comments: Comment[],
@@ -338,10 +338,10 @@ const populate = async () => {
     await badgeCreate(strings.BN5_NAME, strings.BN5_DESCRIPTION, 'nim', 5, `/images/badges/nim/5.png`);
     await badgeCreate(strings.BN10_NAME, strings.BN10_DESCRIPTION, 'nim', 10, `/images/badges/nim/10.png`);
 
-    const sama = await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.', ['Nim']);
+    await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.', ['Nim']);
     await userCreate('kyle', 'kyle', new Date('2022-12-11T03:30:00'), 'I am a software engineer.', ['Nim']);
-    const nitsa = await userCreate('nitsa', 'nitsa', new Date('2023-12-11T03:30:00'), 'I am a designer.', ['Custom Profile Photo']);
-    const annabelle = await userCreate('annabelle', 'annabelle', new Date('2022-12-11T03:30:00'), 'I am a manager.');
+    await userCreate('nitsa', 'nitsa', new Date('2023-12-11T03:30:00'), 'I am a designer.', ['Custom Profile Photo']);
+    await userCreate('annabelle', 'annabelle', new Date('2022-12-11T03:30:00'), 'I am a manager.');
 
     const t1 = await tagCreate(strings.T1_NAME, strings.T1_DESC);
     const t2 = await tagCreate(strings.T2_NAME, strings.T2_DESC);
@@ -364,7 +364,7 @@ const populate = async () => {
       strings.Q1_TXT,
       [t1, t2],
       [a1, a2],
-      sama,
+      'sama',
       new Date('2022-01-20T03:00:00'),
       ['annabelle', 'kyle'],
       [c3],
@@ -375,7 +375,7 @@ const populate = async () => {
       strings.Q2_TXT,
       [t3, t4],
       [],
-      annabelle,
+      'annabelle',
       new Date('2023-11-20T03:24:42'),
       [],
       [],
@@ -386,7 +386,7 @@ const populate = async () => {
       strings.Q3_TXT,
       [t5, t6],
       [],
-      nitsa,
+      'nitsa',
       new Date('2023-11-23T08:24:00'),
       [],
       [],
