@@ -244,10 +244,6 @@ const questionController = (socket: FakeSOSocket) => {
    * Backend logic to return a feed of questoins and answers that the given user is following, sorted by date
    */
   const getQuestionFeed = async (req: QuestionFeedRequest, res: Response): Promise<void> => {
-    if (!req.params.username) {
-      res.status(400).send('Invalid username');
-    }
-
     try {
       const userResponse = await getUserByUsername(req.params.username);
 

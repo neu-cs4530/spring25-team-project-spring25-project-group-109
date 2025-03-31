@@ -212,6 +212,21 @@ describe('Test userController', () => {
 
       expect(response.status).toBe(500);
     });
+    it('should return error if saveUserStore has error', async () => {
+      const mockReqBody = {
+        username: mockUser.username,
+        password: mockUser.password,
+        biography: 'This is a test biography',
+      };
+
+      saveUserSpy.mockResolvedValueOnce({ ...mockSafeUser, biography: mockReqBody.biography });
+      saveUserStatsSpy.mockResolvedValueOnce(mockUserStats);
+      saveUserStoreSpy.mockResolvedValueOnce({ error: 'Error saving user store' });
+
+      const response = await supertest(app).post('/user/signup').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+    });
   });
 
   describe('POST /login', () => {
@@ -601,6 +616,30 @@ describe('Test userController', () => {
         'Error when updating user profile photo: Error: Error updating user',
       );
     });
+
+    it('should return 500 error if getUserByUsername returns an error', async () => {
+      getUserByUsernameSpy.mockResolvedValue({ error: 'Error getting user' });
+
+      const response = await supertest(app)
+        .patch('/user/updateProfilePhoto')
+        .send({ username: mockUser.username, profilePhoto: '/images/avatars/avatar1.png' });
+
+      expect(response.status).toBe(500);
+      expect(response.text).toContain('Error getting user');
+    });
+    it('should delete old profile photo if it exists', async () => {
+      getUserByUsernameSpy.mockResolvedValue({ ...mockSafeUser, profilePhoto: '/uploads/old.png' });
+      updatedUserSpy.mockResolvedValue({ ...mockSafeUser, profilePhoto: '/uploads/new.png' });
+      existsSyncSpy.mockReturnValue(true);
+
+      const response = await supertest(app)
+        .patch('/user/updateProfilePhoto')
+        .send({ username: mockUser.username, profilePhoto: '/images/avatars/avatar1.png' });
+
+      expect(response.status).toBe(200);
+      expect(existsSyncSpy).toHaveBeenCalled();
+      expect(unlinkSyncSpy).toHaveBeenCalled();
+    });
   });
 
   describe('uploadProfilePhoto', () => {
@@ -934,6 +973,28 @@ describe('Test userController', () => {
       const response = await supertest(app).patch('/user/unfollow').send(mockReqBody);
 
       expect(response.status).toBe(500);
+    });
+    it('should call updateUser with the correct arguments where users are filtered', async () => {
+      const mockReqBody = {
+        follower: mockUser.username,
+        followee: mockUser2.username,
+      };
+
+      getUserByUsernameSpy.mockResolvedValueOnce(mockSafeUser);
+      getUserByUsernameSpy.mockResolvedValueOnce(mockSafeUser2);
+
+      updatedUserSpy.mockResolvedValueOnce(mockSafeUser);
+      updatedUserSpy.mockResolvedValueOnce(mockSafeUser2);
+
+      const response = await supertest(app).patch('/user/unfollow').send(mockReqBody);
+
+      expect(response.status).toBe(200);
+      expect(updatedUserSpy).toHaveBeenCalledWith(mockUser.username, {
+        following: [],
+      });
+      expect(updatedUserSpy).toHaveBeenCalledWith(mockUser2.username, {
+        followers: [],
+      });
     });
   });
 
