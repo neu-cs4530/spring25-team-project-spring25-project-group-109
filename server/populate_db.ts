@@ -162,7 +162,7 @@ async function questionCreate(
     title === '' ||
     text === '' ||
     tags.length === 0 ||
-    askedBy === null ||
+    askedBy === '' ||
     askDateTime == null ||
     comments == null
   )
