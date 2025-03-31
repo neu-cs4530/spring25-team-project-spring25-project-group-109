@@ -1,8 +1,9 @@
 import express, { Request, Response, Router } from 'express';
 import { checkAndAwardBadges, getBadgesList, saveBadge } from '../services/badge.service';
-import { BadgeRequest, UpdateBadgeByUsernameRequest } from '../types/types';
+import { BadgeRequest, FakeSOSocket, UpdateBadgeByUsernameRequest } from '../types/types';
+import { saveNotification } from '../services/notification.service';
 
-const badgeController = () => {
+const badgeController = (socket: FakeSOSocket) => {
   const router: Router = express.Router();
 
   /**
@@ -69,7 +70,11 @@ const badgeController = () => {
     }
   };
 
-  // todo
+  /**
+   * Updates the badges earned for the given user.
+   * @param res The response, either returning the badges or an error.
+   * @returns A promise resolving to void.
+   */
   const updateBadges = async (req: UpdateBadgeByUsernameRequest, res: Response): Promise<void> => {
     try {
       const { username } = req.params;
@@ -77,6 +82,26 @@ const badgeController = () => {
       if ('error' in badges) {
         throw Error(badges.error);
       }
+
+      // send a notification for each badge earned
+      const notificationPromises = badges.map(async badge => {
+        const notification = await saveNotification({
+          username,
+          text: `You have earned the badge ${badge.name}: ${badge.description}!`,
+          seen: false,
+          type: 'badge',
+          link: `/user/${username}`,
+        });
+        if ('error' in notification) {
+          throw new Error(notification.error);
+        }
+
+        socket.emit('notificationUpdate', { notification, type: 'created' });
+        return notification;
+      });
+
+      await Promise.all(notificationPromises);
+
       res.status(200).json({ badges });
     } catch (error) {
       res.status(500).json({ error: 'Failed to update badges' });

@@ -5,6 +5,7 @@ import { DatabaseCollection } from './collection';
 import { PopulatedDatabaseQuestion } from './question';
 import { SafeDatabaseUser } from './user';
 import { BaseMove, GameInstance, GameInstanceID, GameMove, GameState } from './game';
+import { DatabaseNotification } from './notification';
 
 /**
  * Payload for an answer update event.
@@ -106,6 +107,16 @@ export interface GameMovePayload {
 }
 
 /**
+ * Payload for a notification update event.
+ * - `notification`: The updated notification object.
+ * - `type`: The type of modification (`'created'` or `'updated'`).
+ */
+export interface NotificationUpdatePayload {
+  notification: DatabaseNotification;
+  type: 'created' | 'updated';
+}
+
+/**
  * Interface representing the events the client can emit to the server.
  * - `makeMove`: Client can emit a move in the game.
  * - `joinGame`: Client can join a game.
@@ -134,6 +145,7 @@ export interface ClientToServerEvents {
  * - `gameError`: Server sends error message related to game operation.
  * - `chatUpdate`: Server sends updated chat.
  * - `collectionUpdate`: Server sends an updated collection.
+ * - `notificationUpdate`: Server sends an updated notification.
  */
 export interface ServerToClientEvents {
   questionUpdate: (question: PopulatedDatabaseQuestion) => void;
@@ -147,4 +159,5 @@ export interface ServerToClientEvents {
   gameError: (error: GameErrorPayload) => void;
   chatUpdate: (chat: ChatUpdatePayload) => void;
   collectionUpdate: (collection: CollectionUpdatePayload) => void;
+  notificationUpdate: (notification: NotificationUpdatePayload) => void;
 }

@@ -1,9 +1,10 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AppBar, Button, TextField, Toolbar, Typography } from '@mui/material';
+import { AppBar, Badge, Button, IconButton, TextField, Toolbar, Typography } from '@mui/material';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import useHeader from '../../hooks/useHeader';
 import './index.css';
 import useUserContext from '../../hooks/useUserContext';
+import useNotifications from '../../hooks/useNotificationPage';
 
 /**
  * Header component that renders the main title and a search bar.
@@ -14,10 +15,16 @@ const Header = () => {
   const { val, handleInputChange, handleKeyDown, handleSignOut } = useHeader();
   const { user: currentUser } = useUserContext();
   const navigate = useNavigate();
+  const { notifications } = useNotifications(currentUser.username);
+  const unseenCount = notifications.filter(n => !n.seen).length;
+
   return (
     <AppBar position='static' color='primary'>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
-        <Typography variant='h3' sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+        <Typography
+          variant='h3'
+          sx={{ flexGrow: 1, fontWeight: 'bold', cursor: 'pointer' }}
+          onClick={() => navigate('/home')}>
           Stack Overflow
         </Typography>
 
@@ -32,15 +39,21 @@ const Header = () => {
           sx={{ width: 200, bgcolor: 'white', borderRadius: 1 }}
         />
 
-        <Button variant='outlined' onClick={handleSignOut}>
-          Log out
-        </Button>
+        <IconButton onClick={() => navigate('/notifications')} color='inherit'>
+          <Badge badgeContent={unseenCount} color='error' invisible={unseenCount <= 0}>
+            <NotificationsIcon />
+          </Badge>
+        </IconButton>
+
         <Button
           variant='outlined'
           onClick={() => {
             navigate(`/user/${currentUser.username}`);
           }}>
           View Profile
+        </Button>
+        <Button variant='outlined' onClick={handleSignOut}>
+          Log out
         </Button>
       </Toolbar>
     </AppBar>
