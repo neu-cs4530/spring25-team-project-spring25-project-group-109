@@ -1,18 +1,15 @@
-import { DatabaseNotification, Notification } from '@fake-stack-overflow/shared';
+import { DatabaseNotification } from '../../types/types';
 import NotificationModel from '../../models/notification.model';
-import { getNotificationsByUsername, saveNotification } from '../../services/notification.service';
-import { mockDatabaseNotification, user } from '../mockData.models';
+import {
+  getNotificationsByUsername,
+  saveNotification,
+  updateNotificationSeen,
+} from '../../services/notification.service';
+import { notification, mockDatabaseNotification, user } from '../mockData.models';
 import UserModel from '../../models/users.model';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
-
-const notification: Notification = {
-  username: 'user1',
-  text: 'notification1',
-  seen: false,
-  type: 'badge',
-};
 
 describe('NotificationService', () => {
   beforeEach(() => {
@@ -80,6 +77,49 @@ describe('NotificationService', () => {
       expect(result).toEqual({
         error: 'Error getting notifications (Notification model error)',
       });
+    });
+  });
+
+  describe('updateNotificationSeen', () => {
+    beforeEach(() => {
+      mockingoose.resetAll();
+      jest.clearAllMocks();
+    });
+
+    it('should successfully toggle the seen status of a notification', async () => {
+      const updatedNotification = {
+        ...mockDatabaseNotification,
+        seen: !mockDatabaseNotification.seen,
+      };
+
+      mockingoose(NotificationModel).toReturn(mockDatabaseNotification, 'findOne');
+      mockingoose(NotificationModel).toReturn(updatedNotification, 'findOneAndUpdate');
+
+      const result = await updateNotificationSeen(String(mockDatabaseNotification._id));
+
+      expect(result.username).toEqual(updatedNotification.username);
+      expect(result.text).toEqual(updatedNotification.text);
+      expect(result.seen).toEqual(updatedNotification.seen);
+      expect(result.link).toEqual(updatedNotification.link);
+      expect(result.type).toEqual(updatedNotification.type);
+    });
+
+    it('should throw an error if the provided ID is invalid', async () => {
+      const invalidId = 'invalid_id';
+
+      await expect(updateNotificationSeen(invalidId)).rejects.toThrow(
+        `Invalid ObjectId: ${invalidId}`,
+      );
+    });
+
+    it('should throw an error if the notification does not exist', async () => {
+      const nonExistentId = '60d5ec49f16e1b35d8f2b1b5';
+
+      mockingoose(NotificationModel).toReturn(null, 'findOne');
+
+      await expect(updateNotificationSeen(nonExistentId)).rejects.toThrow(
+        'Notification does not exist',
+      );
     });
   });
 });

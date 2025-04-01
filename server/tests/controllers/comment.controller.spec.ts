@@ -1,12 +1,20 @@
 import mongoose from 'mongoose';
 import supertest from 'supertest';
+import { ObjectId } from 'mongodb';
 import { app } from '../../app';
 import * as commentUtil from '../../services/comment.service';
 import * as databaseUtil from '../../utils/database.util';
+import * as notificationUtil from '../../services/notification.service';
+import QuestionModel from '../../models/questions.model';
+import AnswerModel from '../../models/answers.model';
 
 const saveCommentSpy = jest.spyOn(commentUtil, 'saveComment');
 const addCommentSpy = jest.spyOn(commentUtil, 'addComment');
 const popDocSpy = jest.spyOn(databaseUtil, 'populateDocument');
+const saveNotificationSpy = jest.spyOn(notificationUtil, 'saveNotification');
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mockingoose = require('mockingoose');
 
 describe('POST /addComment', () => {
   it('should add a new comment to the question', async () => {
@@ -58,6 +66,34 @@ describe('POST /addComment', () => {
       comments: [mockComment],
     });
 
+    mockingoose(QuestionModel).toReturn(
+      {
+        _id: validQid,
+        title: 'This is a test question',
+        text: 'This is a test question',
+        tags: [],
+        askedBy: 'dummyUserId',
+        askDateTime: new Date('2024-06-03'),
+        views: [],
+        upVotes: [],
+        downVotes: [],
+        answers: [],
+        comments: [],
+      },
+      'findOne',
+    );
+
+    saveNotificationSpy.mockResolvedValueOnce({
+      _id: new mongoose.Types.ObjectId(),
+      username: 'user1',
+      text: 'user2 answered your question: "question"',
+      seen: false,
+      type: 'answer',
+      link: '/question/1234',
+      createdAt: new Date('2025-01-01'),
+      updatedAt: new Date('2025-01-01'),
+    });
+
     const response = await supertest(app).post('/comment/addComment').send(mockReqBody);
 
     expect(response.status).toBe(200);
@@ -105,6 +141,27 @@ describe('POST /addComment', () => {
       ansBy: 'dummyUserId',
       ansDateTime: new Date('2024-06-03'),
       comments: [mockComment],
+    });
+
+    mockingoose(AnswerModel).toReturn(
+      {
+        _id: validAid,
+        text: 'This is a test answer',
+        ansBy: 'dummyUserId',
+        ansDateTime: new Date('2024-06-03'),
+        comments: [],
+      },
+      'findOne',
+    );
+    saveNotificationSpy.mockResolvedValueOnce({
+      _id: new ObjectId(),
+      username: 'original-user',
+      text: 'new-user commented on your answer on "Sample Question"',
+      seen: false,
+      type: 'comment',
+      link: '/question/65e9b5a995b6c7045a30d823',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     const response = await supertest(app).post('/comment/addComment').send(mockReqBody);

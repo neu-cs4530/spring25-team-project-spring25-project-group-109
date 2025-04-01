@@ -1,11 +1,11 @@
 import supertest from 'supertest';
-import { NotificationType } from '@fake-stack-overflow/shared';
 import { app } from '../../app';
 import * as util from '../../services/notification.service';
 import { mockDatabaseNotification, mockNotificationJSONResponse } from '../mockData.models';
 
 const createNotificationSpy = jest.spyOn(util, 'saveNotification');
 const getNotificationsByUsernameSpy = jest.spyOn(util, 'getNotificationsByUsername');
+const updateNotificationSeenSpy = jest.spyOn(util, 'updateNotificationSeen');
 
 describe('POST /createNotification', () => {
   it('should create a new notification given correct arguments', async () => {
@@ -13,7 +13,7 @@ describe('POST /createNotification', () => {
       username: 'user1',
       text: 'notification1',
       seen: false,
-      type: 'badge' as NotificationType,
+      type: 'badge',
     };
 
     createNotificationSpy.mockResolvedValueOnce({ ...mockDatabaseNotification });
@@ -31,7 +31,7 @@ describe('POST /createNotification', () => {
     const mockReqBody = {
       text: 'notification1',
       seen: false,
-      type: 'badge' as NotificationType,
+      type: 'badge',
     };
 
     const response = await supertest(app)
@@ -47,7 +47,7 @@ describe('POST /createNotification', () => {
       username: '',
       text: 'notification1',
       seen: false,
-      type: 'badge' as NotificationType,
+      type: 'badge',
     };
 
     const response = await supertest(app)
@@ -62,7 +62,7 @@ describe('POST /createNotification', () => {
     const mockReqBody = {
       username: 'user1',
       seen: false,
-      type: 'badge' as NotificationType,
+      type: 'badge',
     };
 
     const response = await supertest(app)
@@ -78,7 +78,7 @@ describe('POST /createNotification', () => {
       username: 'user1',
       text: 'notification1',
       seen: false,
-      type: 'badge' as NotificationType,
+      type: 'badge',
     };
 
     createNotificationSpy.mockResolvedValueOnce({ error: 'Error saving notification' });
@@ -124,6 +124,38 @@ describe('GET /getNotificationsByUser', () => {
   });
   it('should return 404 for a missing username', async () => {
     const response = await supertest(app).get(`/notification/getNotifications`);
+    expect(response.status).toBe(404);
+  });
+});
+
+describe('PATCH /notification/toggleSeen/:id', () => {
+  const notificationId = mockDatabaseNotification._id;
+  const endpoint = `/notification/toggleSeen/${notificationId}`;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should toggle the seen status of a notification', async () => {
+    updateNotificationSeenSpy.mockResolvedValueOnce(mockDatabaseNotification);
+
+    const response = await supertest(app).patch(endpoint);
+
+    expect(response.status).toBe(200);
+  });
+
+  it('should return 500 if updateNotificationSeen fails', async () => {
+    updateNotificationSeenSpy.mockRejectedValueOnce(new Error('Database error'));
+
+    const response = await supertest(app).patch(endpoint);
+
+    expect(response.status).toBe(500);
+    expect(response.text).toContain('Error toggling notification seen status: Database error');
+  });
+
+  it('should return 404 if notification ID is not provided', async () => {
+    const response = await supertest(app).patch(`/notification/toggleSeen`);
+
     expect(response.status).toBe(404);
   });
 });
