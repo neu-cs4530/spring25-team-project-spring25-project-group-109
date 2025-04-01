@@ -71,7 +71,8 @@ const badgeController = (socket: FakeSOSocket) => {
   };
 
   /**
-   * Updates the badges earned for the given user.
+   * Updates the badges for a user.
+   * @param req The request, which should contain the username in the params.
    * @param res The response, either returning the badges or an error.
    * @returns A promise resolving to void.
    */
