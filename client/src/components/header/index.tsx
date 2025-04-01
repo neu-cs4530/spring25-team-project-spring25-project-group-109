@@ -1,10 +1,23 @@
 import { useNavigate } from 'react-router-dom';
-import { AppBar, Badge, Button, IconButton, TextField, Toolbar, Typography } from '@mui/material';
+import {
+  AppBar,
+  Avatar,
+  Badge,
+  Button,
+  Chip,
+  IconButton,
+  TextField,
+  Toolbar,
+  Typography,
+} from '@mui/material';
+import { useEffect, useState } from 'react';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import useHeader from '../../hooks/useHeader';
 import './index.css';
 import useUserContext from '../../hooks/useUserContext';
 import useNotifications from '../../hooks/useNotificationPage';
+import { getUserStore } from '../../services/storeService';
+import { DatabaseStore } from '../../types/types';
 
 /**
  * Header component that renders the main title and a search bar.
@@ -17,6 +30,21 @@ const Header = () => {
   const navigate = useNavigate();
   const { notifications } = useNotifications(currentUser.username);
   const unseenCount = notifications.filter(n => !n.seen).length;
+  const [store, setStore] = useState<DatabaseStore>();
+
+  useEffect(() => {
+    const fetchUserStore = async () => {
+      if (!currentUser.username) return;
+      try {
+        const userStore = await getUserStore(currentUser.username);
+        setStore(userStore);
+      } catch (err) {
+        /* empty */
+      }
+    };
+
+    fetchUserStore();
+  }, [currentUser.username]);
 
   return (
     <AppBar position='static' color='primary'>
@@ -44,6 +72,13 @@ const Header = () => {
             <NotificationsIcon />
           </Badge>
         </IconButton>
+
+        <Chip
+          avatar={<Avatar alt='Coin' src='/images/icons/coin.png' />}
+          label={`${store?.coinCount || 0} ${store?.coinCount === 1 ? 'Coin' : 'Coins'}`}
+          variant='outlined'
+          sx={{ fontSize: '1rem', padding: '10px', height: '40px' }}
+        />
 
         <Button
           variant='outlined'
