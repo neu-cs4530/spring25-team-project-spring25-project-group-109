@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import { ObjectId } from 'mongodb';
 
-export type NotificationType = 'badge' | 'answer' | 'follow' | 'comment';
+export type NotificationType = 'badge' | 'answer' | 'follow' | 'comment' | 'upvote';
 
 /**
  * Represents a nofication.
@@ -9,12 +9,14 @@ export type NotificationType = 'badge' | 'answer' | 'follow' | 'comment';
  * - `text`: The notification text.
  * - `seen`: Indicator if the notification has been seen or not.
  * - `type`: The notification type.
+ * - `link`: The link to the notification activity.
  */
 export interface Notification {
   username: string;
   text: string;
   seen: boolean;
   type: NotificationType;
+  link: string;
 }
 
 /**
@@ -43,6 +45,16 @@ export interface CreateNotificationRequest extends Request {
 export interface GetNotificationsForUserRequest extends Request {
   params: {
     username: string;
+  };
+}
+
+/**
+ * Express request for toggling the seen status of a notification.
+ * - `params`: contains the id of the notification
+ */
+export interface ToggleNotificationSeenRequest extends Request {
+  params: {
+    id: string;
   };
 }
 
