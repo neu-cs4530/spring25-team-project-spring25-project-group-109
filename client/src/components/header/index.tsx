@@ -25,7 +25,7 @@ const Header = () => {
           variant='h3'
           sx={{ flexGrow: 1, fontWeight: 'bold', cursor: 'pointer' }}
           onClick={() => navigate('/home')}>
-          Stack Overflow
+          Threadscape
         </Typography>
 
         <TextField
