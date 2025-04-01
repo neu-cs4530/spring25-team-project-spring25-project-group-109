@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { RankedUser } from '@fake-stack-overflow/shared';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 import getRankedLeaderboard from '../services/leaderboardService';
 
 const useLeaderboard = (
