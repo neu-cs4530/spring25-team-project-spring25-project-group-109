@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import { PipelineStage } from 'mongoose';
 import UserModel from '../models/users.model';
 import UserStatsModel from '../models/userstats.model';
 import {
@@ -201,9 +202,18 @@ export const updateUser = async (
   }
 };
 
-export const getRankedUsersList = async (): Promise<RankedUsersResponse> => {
+export const getRankedUsersList = async (
+  startDate?: string | null,
+  endDate?: string | null,
+): Promise<RankedUsersResponse> => {
   try {
-    const users = await AnswerModel.aggregate([
+    const pipeline = [];
+    if (startDate && endDate) {
+      pipeline.push({
+        $match: { ansDateTime: { $gte: new Date(startDate), $lte: new Date(endDate) } },
+      });
+    }
+    pipeline.push(
       { $group: { _id: '$ansBy', count: { $sum: 1 } } },
       {
         $lookup: {
@@ -219,7 +229,8 @@ export const getRankedUsersList = async (): Promise<RankedUsersResponse> => {
       {
         $sort: { count: -1 },
       },
-    ]);
+    );
+    const users = await AnswerModel.aggregate(pipeline as PipelineStage[]);
     if (!users) {
       throw Error('Ranked users list could not be retrieved');
     }

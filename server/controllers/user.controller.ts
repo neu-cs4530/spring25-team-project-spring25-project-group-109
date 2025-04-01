@@ -2,6 +2,7 @@ import express, { Request, Response, Router } from 'express';
 import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
+import dayjs from 'dayjs';
 import {
   UserRequest,
   User,
@@ -359,7 +360,22 @@ const userController = (socket: FakeSOSocket) => {
 
   const getRankedUsers = async (req: Request, res: Response) => {
     try {
-      const users = await getRankedUsersList();
+      let startDate = null;
+      let endDate = null;
+      if (req.query.dateFilter) {
+        if (req.query.dateFilter === 'custom') {
+          startDate = req.query.startDate as string;
+          endDate = req.query.endDate as string;
+        } else if (req.query.dateFilter === 'week') {
+          startDate = dayjs().subtract(7, 'day').toISOString();
+          endDate = dayjs().toISOString();
+        } else if (req.query.dateFilter === 'month') {
+          startDate = dayjs().subtract(1, 'month').toISOString();
+          endDate = dayjs().toISOString();
+        }
+      }
+
+      const users = await getRankedUsersList(startDate, endDate);
 
       if ('error' in users) {
         throw Error(users.error);
