@@ -22,7 +22,9 @@ const AnswerPage = () => {
 
   return (
     <Box sx={{ p: 4 }}>
-      <AnswerHeader question={question} />
+      <Box display='flex' justifyContent='space-between' alignItems='center' width='100%'>
+        <AnswerHeader question={question} />
+      </Box>
       <Box mt={3}>
         <QuestionBody
           views={question.views.length}

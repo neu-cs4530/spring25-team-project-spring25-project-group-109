@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ObjectId } from 'mongodb';
 import { useNavigate } from 'react-router-dom';
+import { BookmarkBorder } from '@mui/icons-material';
 import {
   Box,
   Card,
@@ -9,8 +10,8 @@ import {
   Stack,
   Typography,
   Avatar,
-  Button,
   Modal,
+  IconButton,
 } from '@mui/material';
 import { getMetaData } from '../../../../tool';
 import { PopulatedDatabaseQuestion } from '../../../../types/types';
@@ -50,13 +51,28 @@ const QuestionView = ({ question }: QuestionProps) => {
         if (question._id) handleAnswer(question._id);
       }}>
       <CardContent>
-        <Box display='flex' gap={2} mb={1} color='text.secondary'>
-          <Typography variant='body2'>
-            <strong>{question.answers.length || 0}</strong> answers
-          </Typography>
-          <Typography variant='body2'>
-            <strong>{question.views.length}</strong> views
-          </Typography>
+        <Box
+          display='flex'
+          justifyContent='space-between'
+          alignItems='center'
+          mb={1}
+          color='text.secondary'>
+          <Box display='flex' gap={2}>
+            <Typography variant='body2'>
+              <strong>{question.answers.length || 0}</strong> answers
+            </Typography>
+            <Typography variant='body2'>
+              <strong>{question.views.length}</strong> views
+            </Typography>
+          </Box>
+          <IconButton
+            color='secondary'
+            onClick={e => {
+              e.stopPropagation();
+              setShowSaveModal(true);
+            }}>
+            <BookmarkBorder />
+          </IconButton>
         </Box>
 
         <Typography variant='h6' color='primary' sx={{ fontWeight: 'bold', mb: 1 }}>
@@ -90,17 +106,6 @@ const QuestionView = ({ question }: QuestionProps) => {
             {getMetaData(new Date(question.askDateTime))}
           </Typography>
         </Box>
-
-        <Button
-          variant='contained'
-          color='secondary'
-          sx={{ mt: 2 }}
-          onClick={e => {
-            e.stopPropagation();
-            setShowSaveModal(true);
-          }}>
-          Save to Collection
-        </Button>
       </CardContent>
 
       <Modal open={showSaveModal} onClose={() => setShowSaveModal(false)}>

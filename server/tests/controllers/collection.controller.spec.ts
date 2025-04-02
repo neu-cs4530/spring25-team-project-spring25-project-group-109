@@ -89,16 +89,50 @@ describe('Test Collection Controller', () => {
   });
 
   describe('GET /getCollectionsByUser/:username', () => {
+    beforeAll(() => {
+      jest.clearAllMocks();
+    });
+
     it('should return all collections of a user given correct arguments', async () => {
       getCollectionsByUserSpy.mockResolvedValueOnce([mockDatabaseCollection]);
 
       const response = await supertest(app).get(
-        `/collection/getCollectionsByUser/${mockCollection.username}`,
+        `/collection/getCollectionsByUser/user1?requestingUser=${mockCollection.username}`,
       );
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual([mockCollectionJSONResponse]);
       expect(getCollectionsByUserSpy).toHaveBeenCalledWith(mockCollection.username);
+    });
+    it('should filter out private collections if requestingUser is not the same as the username', async () => {
+      const questionId = new mongoose.Types.ObjectId();
+      const populatedQuestion = {
+        _id: questionId,
+        title: 'What is TypeScript?',
+        content: 'How do I learn TypeScript effectively?',
+        postedBy: 'user123',
+        createdAt: new Date(),
+        views: 100,
+        answers: 5,
+      };
+
+      const privateCollection: DatabaseCollection = {
+        _id: new mongoose.Types.ObjectId(),
+        name: 'favorites',
+        username: 'user1',
+        questions: [questionId],
+        visibility: 'private',
+      };
+
+      getCollectionsByUserSpy.mockResolvedValueOnce([privateCollection]);
+      (populateDocument as jest.Mock).mockResolvedValue(populatedQuestion);
+
+      const response = await supertest(app).get(
+        `/collection/getCollectionsByUser/user1?requestingUser=user2`,
+      );
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveLength(0);
     });
 
     it('should return collections with populated questions', async () => {
@@ -124,7 +158,9 @@ describe('Test Collection Controller', () => {
       getCollectionsByUserSpy.mockResolvedValueOnce([collectionWithQuestion]);
       (populateDocument as jest.Mock).mockResolvedValue(populatedQuestion);
 
-      const response = await supertest(app).get(`/collection/getCollectionsByUser/user1`);
+      const response = await supertest(app).get(
+        `/collection/getCollectionsByUser/user1?requestingUser=${mockCollection.username}`,
+      );
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveLength(1);
@@ -152,6 +188,20 @@ describe('Test Collection Controller', () => {
 
       const response = await supertest(app).get(
         `/collection/getCollectionsByUser/${mockCollection.username}`,
+      );
+
+      expect(response.status).toBe(500);
+    });
+
+    it('should return 500 if requestingUser not provided', async () => {
+      const response = await supertest(app).get(`/collection/getCollectionsByUser/user1`);
+
+      expect(response.status).toBe(500);
+    });
+
+    it('should return 500 if requestingUser is an empty string', async () => {
+      const response = await supertest(app).get(
+        `/collection/getCollectionsByUser/user1?requestingUser=`,
       );
 
       expect(response.status).toBe(500);
