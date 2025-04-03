@@ -9,6 +9,9 @@ import {
 } from '../types/types';
 import { addComment, saveComment } from '../services/comment.service';
 import { populateDocument } from '../utils/database.util';
+import QuestionModel from '../models/questions.model';
+import { saveNotification } from '../services/notification.service';
+import AnswerModel from '../models/answers.model';
 
 const commentController = (socket: FakeSOSocket) => {
   const router = express.Router();
@@ -93,6 +96,49 @@ const commentController = (socket: FakeSOSocket) => {
 
       if (populatedDoc && 'error' in populatedDoc) {
         throw new Error(populatedDoc.error);
+      }
+
+      // send a notification when this comment is added
+      if (type === 'question') {
+        const question = await QuestionModel.findOne({ _id: id });
+        if (!question) {
+          throw Error('Question not found');
+        }
+
+        const notification = await saveNotification({
+          username: question.askedBy,
+          text: `${comment.commentBy} commented on your question: "${question.title}"`,
+          seen: false,
+          type: 'comment',
+          link: `/question/${id}`,
+        });
+        if ('error' in notification) {
+          throw new Error(notification.error);
+        }
+
+        socket.emit('notificationUpdate', { notification, type: 'created' });
+      } else {
+        const answer = await AnswerModel.findOne({ _id: id });
+        if (!answer) {
+          throw Error('Answer not found');
+        }
+        const question = await QuestionModel.findOne({ answers: id });
+        if (!question) {
+          throw new Error('Question not found');
+        }
+
+        const notification = await saveNotification({
+          username: answer.ansBy,
+          text: `${comment.commentBy} commented on your answer on "${question.title}"`,
+          seen: false,
+          type: 'comment',
+          link: `/question/${question._id}`,
+        });
+        if ('error' in notification) {
+          throw new Error(notification.error);
+        }
+
+        socket.emit('notificationUpdate', { notification, type: 'created' });
       }
 
       socket.emit('commentUpdate', {

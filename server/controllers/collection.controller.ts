@@ -100,7 +100,8 @@ const collectionController = (socket: FakeSOSocket) => {
   };
 
   /**
-   * Retrieves collections of a user based on their username.
+   * Retrieves collections of a user based on their username. Returns only public collections if the user
+   * requesting the data is not the owner of the collections.
    *
    * @param req the request object containing the username parameter in `req.params`.
    * @param res the response object to send the result, either the collections or an error message.
@@ -113,6 +114,11 @@ const collectionController = (socket: FakeSOSocket) => {
     const { username } = req.params;
 
     try {
+      if (!req.query || !req.query.requestingUser || req.query.requestingUser === '') {
+        throw new Error('Requesting user not provided');
+      }
+      const { requestingUser } = req.query;
+
       const collections = await getCollectionsByUser(username);
 
       if ('error' in collections) {
@@ -130,7 +136,11 @@ const collectionController = (socket: FakeSOSocket) => {
         })),
       );
 
-      res.status(200).json(populatedCollections);
+      let result = populatedCollections;
+      if (username !== requestingUser) {
+        result = result.filter(collection => collection.visibility === 'public');
+      }
+      res.status(200).json(result);
     } catch (err: unknown) {
       res.status(500).send(`Error retrieving collections: ${(err as Error).message}`);
     }

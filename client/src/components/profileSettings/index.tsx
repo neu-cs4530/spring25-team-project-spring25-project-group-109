@@ -18,13 +18,14 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { AddCircle, Visibility, VisibilityOff } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
 import { Link } from 'react-router-dom';
 import useProfileSettings from '../../hooks/useProfileSettings';
 import modalStyle from './styles';
+import CollectionView from './collection';
 
 const ProfileSettings: React.FC = () => {
   const {
@@ -42,15 +43,21 @@ const ProfileSettings: React.FC = () => {
     showConfirmation,
     pendingAction,
     canEditProfile,
+    collectionName,
     followsCurrentUser,
     showPassword,
     togglePasswordVisibility,
     allBadges,
+    collections,
     isFollowing,
     showFollowers,
     setShowFollowers,
     showFollowing,
+    setShowAddCollection,
+    showAddCollection,
     setShowFollowing,
+    clickQuestion,
+    handleAddCollection,
     permissions,
 
     setEditBioMode,
@@ -60,6 +67,7 @@ const ProfileSettings: React.FC = () => {
     setConfirmNewPassword,
     setShowConfirmation,
 
+    handleUpdateCollection,
     handleResetPassword,
     handleUpdateBiography,
     handleDeleteUser,
@@ -67,6 +75,10 @@ const ProfileSettings: React.FC = () => {
     handleUploadProfilePhoto,
     handleFollowUser,
     handleUnfollowUser,
+    handleCollectionInputChange,
+    handleDeleteCollection,
+    handleTogglePrivacy,
+    handleRemoveQuestion,
   } = useProfileSettings();
 
   const numEarnedBadges = userData?.badgesEarned ? userData.badgesEarned.length : 0;
@@ -388,7 +400,7 @@ const ProfileSettings: React.FC = () => {
                           textAlign='center'
                           sx={{
                             filter: earnedBadge ? 'none' : 'grayscale(100%)',
-                            opacity: earnedBadge ? 1 : 0.3,
+                            opacity: earnedBadge ? 1 : 0.2,
                           }}>
                           <Box
                             component='img'
@@ -413,6 +425,65 @@ const ProfileSettings: React.FC = () => {
                 </Box>
               </Paper>
             </Box>
+
+            {/* ---- Collections Section ---- */}
+            <Box>
+              <Paper variant='outlined' sx={{ padding: 2, borderRadius: 4 }}>
+                <Box display='flex' justifyContent='space-between' alignItems='center'>
+                  <Typography variant='h4'>Collections</Typography>
+                  {canEditProfile && (
+                    <IconButton onClick={() => setShowAddCollection(true)}>
+                      <AddCircle color='primary' />
+                    </IconButton>
+                  )}
+                </Box>
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                    gap: 2,
+                    mt: 1,
+                  }}>
+                  {collections.length > 0 ? (
+                    collections.map(collection => (
+                      <CollectionView
+                        key={String(collection._id)}
+                        collection={collection}
+                        canEditProfile={canEditProfile}
+                        clickQuestion={clickQuestion}
+                        handleUpdateCollection={handleUpdateCollection}
+                        handleDeleteCollection={handleDeleteCollection}
+                        handleTogglePrivacy={handleTogglePrivacy}
+                        handleRemoveQuestion={handleRemoveQuestion}
+                      />
+                    ))
+                  ) : (
+                    <Typography>No collections available.</Typography>
+                  )}
+                </Box>
+              </Paper>
+            </Box>
+
+            <Dialog open={showAddCollection} onClose={() => setShowAddCollection(false)}>
+              <DialogContent>
+                <Box component={'form'} onSubmit={handleAddCollection}>
+                  <Typography variant='h4'>Add Collection</Typography>
+                  <TextField
+                    label='Collection Name'
+                    fullWidth
+                    type='text'
+                    required
+                    sx={{ mt: 2 }}
+                    variant='outlined'
+                    value={collectionName}
+                    onChange={handleCollectionInputChange}
+                  />
+                  <Button type='submit' variant='contained' color='primary' sx={{ mt: 2 }}>
+                    Add
+                  </Button>
+                </Box>
+              </DialogContent>
+            </Dialog>
 
             {/* ---- Reset Password Section ---- */}
             <Box>

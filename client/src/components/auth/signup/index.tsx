@@ -31,7 +31,7 @@ const Signup = () => {
   return (
     <div className='container'>
       <Typography variant='h1' sx={{ mb: 3 }}>
-        Stack Overflow
+        Threadscape
       </Typography>
       <Box
         component='form'

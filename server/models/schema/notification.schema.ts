@@ -8,7 +8,7 @@ import { Schema } from 'mongoose';
  * - `text`: The notification text.
  * - `seen`: Indicator if the notification has been seen or not.
  * - `type`: The notification type.
-
+ * - `link`: The link to the notification activity.
  */
 const notificationSchema: Schema = new Schema(
   {
@@ -27,7 +27,11 @@ const notificationSchema: Schema = new Schema(
     type: {
       type: String,
       required: true,
-      enum: ['badge', 'answer', 'follow', 'comment'],
+      enum: ['badge', 'answer', 'follow', 'comment', 'upvote'],
+    },
+    link: {
+      type: String,
+      required: true,
     },
   },
   {
