@@ -70,7 +70,7 @@ const useProfileSettings = () => {
   const [showAddCollection, setShowAddCollection] = useState(false);
   const [collections, setCollections] = useState<DatabaseCollection[]>([]);
   const [collectionName, setCollectionName] = useState<string>('');
-  
+
   // For delete-user confirmation modal
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
