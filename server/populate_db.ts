@@ -325,31 +325,9 @@ const populate = async () => {
     await featureCreate("Additional Avatars", strings.AVATAR_FEATURE_DESCRIPTION, 10);
     await featureCreate("Custom Profile Photo", strings.PROFILE_FEATURE_DESCRIPTION, 15);
     
-    await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
+    const q1badge = await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
     await badgeCreate(strings.BQ10_NAME, strings.BQ10_DESCRIPTION, 'question', 10, `/images/badges/question/10.png`);
     await badgeCreate(strings.BQ50_NAME, strings.BQ50_DESCRIPTION, 'question', 50, `/images/badges/question/50.png`);
-       
-    const q1badge = await badgeCreate(
-      strings.BQ1_NAME,
-      strings.BQ1_DESCRIPTION,
-      'question',
-      1,
-      `/images/badges/question/1.png`,
-    );
-    await badgeCreate(
-      strings.BQ10_NAME,
-      strings.BQ10_DESCRIPTION,
-      'question',
-      10,
-      `/images/badges/question/10.png`,
-    );
-    await badgeCreate(
-      strings.BQ50_NAME,
-      strings.BQ50_DESCRIPTION,
-      'question',
-      50,
-      `/images/badges/question/50.png`,
-    );
 
     const a1badge = await badgeCreate(
       strings.BA1_NAME,
