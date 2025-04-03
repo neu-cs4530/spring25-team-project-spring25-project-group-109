@@ -1,11 +1,10 @@
 import mongoose from 'mongoose';
 import supertest from 'supertest';
 import { ObjectId } from 'mongodb';
-import { PopulatedDatabaseAnswer, UserResponse } from '@fake-stack-overflow/shared';
+import { PopulatedDatabaseAnswer } from '@fake-stack-overflow/shared';
 import { app } from '../../app';
 import * as answerUtil from '../../services/answer.service';
 import * as databaseUtil from '../../utils/database.util';
-import * as userUtil from '../../services/user.service';
 
 const saveAnswerSpy = jest.spyOn(answerUtil, 'saveAnswer');
 const addAnswerToQuestionSpy = jest.spyOn(answerUtil, 'addAnswerToQuestion');
@@ -254,98 +253,5 @@ describe('POST /addAnswer', () => {
     const response = await supertest(app).post('/answer/addAnswer').send(mockReqBody);
 
     expect(response.status).toBe(500);
-  });
-});
-
-describe('GET /getAnswerFeed/:username', () => {
-  const mockUser = { username: 'testuser1', _id: 'fakeid', following: ['testuser2'] };
-  it('should return a answer array of answers the user is following when the username is passed as the request parameter', async () => {
-    // Mock request parameters
-
-    const mockReqParams = {
-      username: 'answer3_user',
-    };
-
-    // Provide mock question data
-    jest.spyOn(answerUtil, 'fetchAnswersByFollowing').mockResolvedValueOnce(MOCK_POPULATED_ANSWERS);
-
-    jest
-      .spyOn(userUtil, 'getUserByUsername')
-      .mockResolvedValueOnce(mockUser as unknown as UserResponse);
-
-    // Making the request
-    const response = await supertest(app).get(`/answer/getAnswerFeed/${mockReqParams.username}`);
-
-    // Asserting the response
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual(EXPECTED_ANSWERS);
-  });
-
-  it('should return bad request error if the username is not provided', async () => {
-    // Making the request
-    const response = await supertest(app).get(`/answer/getAnswerFeed/`);
-
-    // Asserting the response
-    expect(response.status).toBe(404);
-  });
-
-  it('should return database error if the user fetch fails', async () => {
-    // Mock request parameters
-    const mockReqParams = {
-      username: 'answer3_user',
-    };
-
-    jest
-      .spyOn(userUtil, 'getUserByUsername')
-      .mockResolvedValueOnce({ error: 'Failed to get user.' });
-
-    // Making the request
-    const response = await supertest(app).get(`/answer/getAnswerFeed/${mockReqParams.username}`);
-
-    // Asserting the response
-    expect(response.status).toBe(500);
-    expect(response.text).toBe('Error when fetching answer feed by username: Failed to get user.');
-  });
-
-  it('should return database error when fetching the answers', async () => {
-    // Mock request parameters
-    const mockReqParams = {
-      username: 'answer3_user',
-    };
-
-    jest
-      .spyOn(userUtil, 'getUserByUsername')
-      .mockResolvedValueOnce(mockUser as unknown as UserResponse);
-
-    jest
-      .spyOn(answerUtil, 'fetchAnswersByFollowing')
-      .mockResolvedValueOnce({ error: 'Failed to get answers.' });
-
-    // Making the request
-    const response = await supertest(app).get(`/answer/getAnswerFeed/${mockReqParams.username}`);
-
-    // Asserting the response
-    expect(response.status).toBe(500);
-    expect(response.text).toBe(
-      'Error when fetching answer feed by username: Failed to get answers.',
-    );
-  });
-
-  it('should empty array when no answers', async () => {
-    // Mock request parameters
-    const mockReqParams = {
-      username: 'answer3_user',
-    };
-
-    jest
-      .spyOn(userUtil, 'getUserByUsername')
-      .mockResolvedValueOnce({ username: 'mockUserOne' } as UserResponse);
-
-    // Making the request
-    const response = await supertest(app).get(`/answer/getAnswerFeed/${mockReqParams.username}`);
-
-    // Asserting the response
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual([]);
   });
 });

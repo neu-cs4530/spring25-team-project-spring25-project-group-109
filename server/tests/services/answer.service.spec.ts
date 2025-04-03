@@ -1,11 +1,7 @@
 import mongoose from 'mongoose';
 import AnswerModel from '../../models/answers.model';
 import QuestionModel from '../../models/questions.model';
-import {
-  saveAnswer,
-  addAnswerToQuestion,
-  fetchAnswersByFollowing,
-} from '../../services/answer.service';
+import { saveAnswer, addAnswerToQuestion } from '../../services/answer.service';
 import { DatabaseAnswer, DatabaseQuestion, PopulatedDatabaseAnswer } from '../../types/types';
 import { QUESTIONS, ans1, ans4, mockUserStats } from '../mockData.models';
 import UserStatsModel from '../../models/userstats.model';
@@ -156,46 +152,6 @@ describe('Answer model', () => {
       expect(addAnswerToQuestion(qid, invalidAnswer as DatabaseAnswer)).resolves.toEqual({
         error: 'Error when adding answer to question',
       });
-    });
-  });
-
-  describe('fetchAnswersByFollowing', () => {
-    test('get answer by following, sorted by most recent', async () => {
-      mockingoose(AnswerModel).toReturn(MOCK_POPULATED_ANSWERS.slice(0, 3), 'find');
-      AnswerModel.schema.path('comments', Object);
-
-      const result = (await fetchAnswersByFollowing([
-        'user1',
-        'user2',
-        'user3',
-      ])) as PopulatedDatabaseAnswer[];
-
-      expect(result.length).toEqual(3);
-      expect(result[0]._id.toString()).toEqual('65e9b58910afe6e94fc6e6dd');
-      expect(result[1]._id.toString()).toEqual('65e9b58910afe6e94fc6e6df');
-      expect(result[2]._id.toString()).toEqual('65e9b58910afe6e94fc6e6de');
-    });
-
-    test('fetchAnswersByFollowing should return empty list if find throws an error', async () => {
-      mockingoose(AnswerModel).toReturn(new Error('error'), 'find');
-
-      const result = (await fetchAnswersByFollowing(['user1', 'user2', 'user3'])) as {
-        error: string;
-      };
-
-      expect(result.error).toEqual('Error when fetching answers by following!');
-    });
-
-    test('fetchAnswersByFollowing should return empty list if find returns null', async () => {
-      mockingoose(AnswerModel).toReturn(null, 'find');
-
-      const result = (await fetchAnswersByFollowing([
-        'user1',
-        'user2',
-        'user3',
-      ])) as PopulatedDatabaseAnswer[];
-
-      expect(result.length).toEqual(0);
     });
   });
 });
