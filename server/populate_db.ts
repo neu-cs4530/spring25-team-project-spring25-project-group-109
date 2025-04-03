@@ -20,7 +20,6 @@ import {
   User,
   UserStats,
   BadgeType,
-  EarnedBadge,
   Store,
   Feature,
   DatabaseFeature,
@@ -249,6 +248,7 @@ async function userCreate(
   dateJoined: Date,
   biography?: string,
   unlockedFeatures?: FeatureType[],
+  profilePhoto?: string,
 ): Promise<DatabaseUser> {
   if (username === '' || password === '' || dateJoined === null) {
     throw new Error('Invalid User Format');
@@ -262,6 +262,7 @@ async function userCreate(
     badgesEarned: [],
     followers: [],
     following: [],
+    profilePhoto: profilePhoto ?? '',
   };
 
   const user = await UserModel.create(userDetail);
@@ -320,31 +321,13 @@ async function collectionCreate(
  * Logs the status of the operation to the console.
  */
 const populate = async () => {
-  try {
-    await featureCreate('Nim', strings.NIM_FEATURE_DESCRIPTION, 5);
-    await featureCreate('Custom Profile Photo', strings.PROFILE_FEATURE_DESCRIPTION, 10);
-
-    const q1badge = await badgeCreate(
-      strings.BQ1_NAME,
-      strings.BQ1_DESCRIPTION,
-      'question',
-      1,
-      `/images/badges/question/1.png`,
-    );
-    await badgeCreate(
-      strings.BQ10_NAME,
-      strings.BQ10_DESCRIPTION,
-      'question',
-      10,
-      `/images/badges/question/10.png`,
-    );
-    await badgeCreate(
-      strings.BQ50_NAME,
-      strings.BQ50_DESCRIPTION,
-      'question',
-      50,
-      `/images/badges/question/50.png`,
-    );
+  try {    await featureCreate("Nim", strings.NIM_FEATURE_DESCRIPTION, 5);
+    await featureCreate("Additional Avatars", strings.AVATAR_FEATURE_DESCRIPTION, 10);
+    await featureCreate("Custom Profile Photo", strings.PROFILE_FEATURE_DESCRIPTION, 15);
+    
+    const q1badge = await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
+    await badgeCreate(strings.BQ10_NAME, strings.BQ10_DESCRIPTION, 'question', 10, `/images/badges/question/10.png`);
+    await badgeCreate(strings.BQ50_NAME, strings.BQ50_DESCRIPTION, 'question', 50, `/images/badges/question/50.png`);
 
     const a1badge = await badgeCreate(
       strings.BA1_NAME,
@@ -412,14 +395,15 @@ const populate = async () => {
       `/images/badges/nim/10.png`,
     );
 
-    await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.', ['Nim']);
-    await userCreate('kyle', 'kyle', new Date('2022-12-11T03:30:00'), 'I am a software engineer.', [
-      'Nim',
-    ]);
-    await userCreate('nitsa', 'nitsa', new Date('2023-12-11T03:30:00'), 'I am a designer.', [
-      'Custom Profile Photo',
-    ]);
-    await userCreate('annabelle', 'annabelle', new Date('2022-12-11T03:30:00'), 'I am a manager.');
+    await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.', ['Nim'], '/images/avatars/avatar1.png');
+    await userCreate('kyle', 'kyle', new Date('2022-12-11T03:30:00'), 'I am a software engineer.', ['Nim'], '/images/avatars/avatar2.png');
+    await userCreate('nitsa', 'nitsa', new Date('2023-12-11T03:30:00'), 'I am a designer.', ['Custom Profile Photo'], '/images/avatars/avatar3.png');
+    await userCreate('annabelle', 'annabelle', new Date('2022-12-11T03:30:00'), 'I am a manager.', [], '/images/avatars/avatar4.png');
+    await userCreate('james', 'james', new Date('2023-12-11T03:30:00'), 'I am a teacher.', ['Additional Avatars'], '/images/avatars/additional/avatar1.png');
+    await userCreate('kristen', 'kristen', new Date(), 'I am a doctor.', [], '/images/avatars/avatar5.png');
+    await userCreate('julia', 'julia', new Date(), 'I am a lawyer.', [], '/images/avatars/additional/avatar2.png');
+    await userCreate('eric', 'eric', new Date(), 'I am a chef.', [], '/images/avatars/additional/avatar3.png');
+    await userCreate('lee', 'lee', new Date(), 'I am a scientist.', [], '/images/avatars/additional/avatar4.png');
 
     const t1 = await tagCreate(strings.T1_NAME, strings.T1_DESC);
     const t2 = await tagCreate(strings.T2_NAME, strings.T2_DESC);

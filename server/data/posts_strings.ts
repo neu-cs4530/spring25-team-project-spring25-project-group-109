@@ -114,3 +114,5 @@ export const NIM_FEATURE_DESCRIPTION =
 
 export const PROFILE_FEATURE_DESCRIPTION =
   'Make your profile truly yours and upload your own photo instead of picking from the default avatars!';
+
+export const AVATAR_FEATURE_DESCRIPTION = 'Unlock additional avatars to personalize your profile!';
