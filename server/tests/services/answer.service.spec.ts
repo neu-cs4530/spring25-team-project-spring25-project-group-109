@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import AnswerModel from '../../models/answers.model';
 import QuestionModel from '../../models/questions.model';
 import { saveAnswer, addAnswerToQuestion } from '../../services/answer.service';
-import { DatabaseAnswer, DatabaseQuestion, PopulatedDatabaseAnswer } from '../../types/types';
+import { DatabaseAnswer, DatabaseQuestion } from '../../types/types';
 import { QUESTIONS, ans1, ans4, mockUserStats } from '../mockData.models';
 import UserStatsModel from '../../models/userstats.model';
 
@@ -12,32 +12,6 @@ const mockingoose = require('mockingoose');
 jest.mock('../../services/store.service', () => ({
   updateCoins: jest.fn().mockResolvedValue({ coinCount: 100 }),
 }));
-
-const ans2: PopulatedDatabaseAnswer = {
-  _id: new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6dd'),
-  text: 'Answer 2 Text',
-  ansBy: 'answer2_user',
-  ansDateTime: new Date('2024-06-10'),
-  comments: [],
-};
-
-const ans3: PopulatedDatabaseAnswer = {
-  _id: new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6df'),
-  text: 'Answer 3 Text',
-  ansBy: 'answer3_user',
-  ansDateTime: new Date('2024-06-11'),
-  comments: [],
-};
-
-const ans5: PopulatedDatabaseAnswer = {
-  _id: new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6de'),
-  text: 'Answer 4 Text',
-  ansBy: 'answer4_user',
-  ansDateTime: new Date('2024-06-14'),
-  comments: [],
-};
-
-const MOCK_POPULATED_ANSWERS = [ans2, ans3, ans5];
 
 describe('Answer model', () => {
   beforeEach(() => {

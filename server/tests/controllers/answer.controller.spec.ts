@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import supertest from 'supertest';
 import { ObjectId } from 'mongodb';
-import { PopulatedDatabaseAnswer } from '@fake-stack-overflow/shared';
 import { app } from '../../app';
 import * as answerUtil from '../../services/answer.service';
 import * as databaseUtil from '../../utils/database.util';
@@ -15,40 +14,6 @@ const saveNotificationSpy = jest.spyOn(notifUtil, 'saveNotification');
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
-
-const ans2: PopulatedDatabaseAnswer = {
-  _id: new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6dd'),
-  text: 'Answer 2 Text',
-  ansBy: 'answer2_user',
-  ansDateTime: new Date('2024-06-10'),
-  comments: [],
-};
-
-const ans3: PopulatedDatabaseAnswer = {
-  _id: new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6df'),
-  text: 'Answer 3 Text',
-  ansBy: 'answer3_user',
-  ansDateTime: new Date('2024-06-11'),
-  comments: [],
-};
-
-const ans4: PopulatedDatabaseAnswer = {
-  _id: new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6de'),
-  text: 'Answer 4 Text',
-  ansBy: 'answer4_user',
-  ansDateTime: new Date('2024-06-14'),
-  comments: [],
-};
-
-const MOCK_POPULATED_ANSWERS = [ans2, ans3, ans4];
-
-const simplifyAnswer = (answer: PopulatedDatabaseAnswer) => ({
-  ...answer,
-  _id: answer._id.toString(), // Converting ObjectId to string
-  ansDateTime: answer.ansDateTime.toISOString(),
-});
-
-const EXPECTED_ANSWERS = MOCK_POPULATED_ANSWERS.map(answer => simplifyAnswer(answer));
 
 describe('POST /addAnswer', () => {
   it('should add a new answer to the question', async () => {
