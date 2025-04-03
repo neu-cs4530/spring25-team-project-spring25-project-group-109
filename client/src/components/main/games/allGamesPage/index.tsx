@@ -1,5 +1,4 @@
 import React from 'react';
-import './index.css';
 import { Alert, Box, Button, Modal, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import useAllGamesPage from '../../../../hooks/useAllGamesPage';

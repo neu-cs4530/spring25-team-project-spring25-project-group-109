@@ -1,5 +1,4 @@
 import React from 'react';
-import './index.css';
 import { Box, Paper, Stack, Typography, useTheme } from '@mui/material';
 import { DatabaseMessage } from '../../../types/types';
 import { getMetaData } from '../../../tool';

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, CardContent, Paper, Stack, Typography, Avatar } from '@mui/material';
 import CommentSection from '../../commentSection';
-import './index.css';
 import { Comment, DatabaseUser, PopulatedDatabaseComment } from '../../../../types/types';
 
 /**

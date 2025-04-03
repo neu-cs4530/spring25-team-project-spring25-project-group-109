@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Button, Stack, TextField, Typography, Autocomplete } from '@mui/material';
 import useNewQuestion from '../../../hooks/useNewQuestion';
-import './index.css';
 
 /**
  * NewQuestionPage component allows users to submit a new question with a title,
