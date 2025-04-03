@@ -78,12 +78,17 @@ const StorePage = () => {
         unlock cool features to level up your experience!
       </Typography>
 
-      <Chip
-        avatar={<Avatar alt='Coin' src='/images/icons/coin.png' />}
-        label={`${store?.coinCount || 0} ${store?.coinCount === 1 ? 'Coin' : 'Coins'}`}
-        variant='outlined'
-        sx={{ fontSize: '1rem', padding: '10px', height: '40px', mt: 2 }}
-      />
+      <Stack direction='row' alignItems='center' spacing={1} mt={2}>
+        <Typography variant='body1' fontWeight='bold'>
+          Balance:
+        </Typography>
+        <Chip
+          avatar={<Avatar alt='Coin' src='/images/icons/coin.png' />}
+          label={`${store?.coinCount || 0} ${store?.coinCount === 1 ? 'Coin' : 'Coins'}`}
+          variant='outlined'
+          sx={{ fontSize: '1rem', padding: '10px', height: '40px' }}
+        />
+      </Stack>
 
       <Stack mt={4} gap={2}>
         {features.map(feature => (

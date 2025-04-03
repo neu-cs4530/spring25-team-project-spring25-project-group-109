@@ -4,6 +4,7 @@ import {
   Avatar,
   Box,
   Button,
+  Card,
   Chip,
   CircularProgress,
   Container,
@@ -243,27 +244,45 @@ const ProfileSettings: React.FC = () => {
                 <Box sx={modalStyle}>
                   <Typography variant='h4'>Followers</Typography>
                   {userData.followers.length > 0 ? (
-                    <ul
-                      style={{
-                        listStyleType: 'none',
-                        padding: 0,
-                        textAlign: 'center',
-                        margin: '0 auto',
-                      }}>
+                    <Box sx={{ alignItems: 'center' }}>
                       {userData.followers.map(follower => (
-                        <li key={follower}>
-                          <Link
-                            to={`/user/${follower}`}
-                            onClick={() => setShowFollowers(false)}
-                            style={{
-                              textDecoration: 'none',
-                              color: theme.palette.success.main,
+                        <Link
+                          to={`/user/${follower}`}
+                          onClick={() => setShowFollowers(false)}
+                          style={{ textDecoration: 'none', color: 'inherit' }}
+                          key={follower}>
+                          <Card
+                            sx={{
+                              'display': 'flex',
+                              'padding': 1,
+                              'cursor': 'pointer',
+                              'boxShadow': 3,
+                              'borderRadius': 2,
+                              '&:hover': { boxShadow: 6 },
+                              'marginY': 1,
+                              'width': '100%',
+                              'pr': 20,
                             }}>
-                            {follower}
-                          </Link>
-                        </li>
+                            <Avatar
+                              src={''}
+                              alt={`${follower}'s profile`}
+                              sx={{ width: 48, height: 48, marginRight: 2 }}
+                            />
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                width: '100%',
+                              }}>
+                              <Typography variant='h6' component='div' sx={{ fontWeight: 'bold' }}>
+                                {follower}
+                              </Typography>
+                            </Box>
+                          </Card>
+                        </Link>
                       ))}
-                    </ul>
+                    </Box>
                   ) : (
                     <p style={{ textAlign: 'center' }}>No followers yet.</p>
                   )}
@@ -282,27 +301,45 @@ const ProfileSettings: React.FC = () => {
                 <Box sx={modalStyle}>
                   <Typography variant='h4'>Following</Typography>
                   {userData.following.length > 0 ? (
-                    <ul
-                      style={{
-                        listStyleType: 'none',
-                        padding: 0,
-                        textAlign: 'center',
-                        margin: '0 auto',
-                      }}>
+                    <Box sx={{ alignItems: 'center' }}>
                       {userData.following.map(following => (
-                        <li key={following}>
-                          <Link
-                            to={`/user/${following}`}
-                            onClick={() => setShowFollowing(false)}
-                            style={{
-                              textDecoration: 'none',
-                              color: theme.palette.success.main,
+                        <Link
+                          to={`/user/${following}`}
+                          onClick={() => setShowFollowing(false)}
+                          style={{ textDecoration: 'none', color: 'inherit' }}
+                          key={following}>
+                          <Card
+                            sx={{
+                              'display': 'flex',
+                              'padding': 1,
+                              'cursor': 'pointer',
+                              'boxShadow': 3,
+                              'borderRadius': 2,
+                              '&:hover': { boxShadow: 6 },
+                              'marginY': 1,
+                              'width': '100%',
+                              'pr': 20,
                             }}>
-                            {following}
-                          </Link>
-                        </li>
+                            <Avatar
+                              src={''}
+                              alt={`${following}'s profile`}
+                              sx={{ width: 48, height: 48, marginRight: 2 }}
+                            />
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                width: '100%',
+                              }}>
+                              <Typography variant='h6' component='div' sx={{ fontWeight: 'bold' }}>
+                                {following}
+                              </Typography>
+                            </Box>
+                          </Card>
+                        </Link>
                       ))}
-                    </ul>
+                    </Box>
                   ) : (
                     <p style={{ textAlign: 'center' }}>Not following anyone yet.</p>
                   )}
