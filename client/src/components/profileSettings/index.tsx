@@ -83,8 +83,6 @@ const ProfileSettings: React.FC = () => {
   } = useProfileSettings();
 
   const numEarnedBadges = userData?.badgesEarned ? userData.badgesEarned.length : 0;
-
-  const theme = useTheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (loading) {
