@@ -18,6 +18,7 @@ import useUserContext from '../../hooks/useUserContext';
 import useNotifications from '../../hooks/useNotificationPage';
 import { getUserStore } from '../../services/storeService';
 import { DatabaseStore } from '../../types/types';
+import useStore from '../../hooks/useStorePage';
 
 /**
  * Header component that renders the main title and a search bar.
@@ -29,8 +30,11 @@ const Header = () => {
   const { user: currentUser } = useUserContext();
   const navigate = useNavigate();
   const { notifications } = useNotifications(currentUser.username);
+  const { store: count } = useStore(currentUser.username);
   const unseenCount = notifications.filter(n => !n.seen).length;
   const [store, setStore] = useState<DatabaseStore>();
+
+  console.log(count?.coinCount);
 
   useEffect(() => {
     const fetchUserStore = async () => {

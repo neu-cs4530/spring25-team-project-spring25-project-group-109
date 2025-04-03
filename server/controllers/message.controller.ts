@@ -60,6 +60,7 @@ const messageController = (socket: FakeSOSocket) => {
       }
 
       socket.emit('messageUpdate', { msg: msgFromDb });
+      socket.emit('storeUpdate', { type: 'addition', username: msg.msgFrom, count: 1 });
 
       res.json(msgFromDb);
     } catch (err: unknown) {

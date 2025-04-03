@@ -165,6 +165,7 @@ const questionController = (socket: FakeSOSocket) => {
       }
 
       socket.emit('questionUpdate', populatedQuestion as PopulatedDatabaseQuestion);
+      socket.emit('storeUpdate', { type: 'addition', username: question.askedBy, count: 1 });
       res.json(populatedQuestion);
     } catch (err: unknown) {
       if (err instanceof Error) {

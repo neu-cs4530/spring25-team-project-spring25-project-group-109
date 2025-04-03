@@ -100,7 +100,7 @@ const answerController = (socket: FakeSOSocket) => {
         throw new Error(notification.error);
       }
       socket.emit('notificationUpdate', { notification, type: 'created' });
-
+      socket.emit('storeUpdate', { type: 'addition', username: question.askedBy, count: 2 });
       // Populates the fields of the answer that was added and emits the new object
       socket.emit('answerUpdate', {
         qid: new ObjectId(qid),

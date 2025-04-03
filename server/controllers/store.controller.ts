@@ -1,8 +1,13 @@
 import express, { Response } from 'express';
-import { CreateStoreRequest, GetStoreByUserRequest, UnlockFeatureRequest } from '../types/types';
+import {
+  CreateStoreRequest,
+  FakeSOSocket,
+  GetStoreByUserRequest,
+  UnlockFeatureRequest,
+} from '../types/types';
 import { saveStore, getStore, unlockFeature } from '../services/store.service';
 
-const storeController = () => {
+const storeController = (socket: FakeSOSocket) => {
   const router = express.Router();
 
   const isCreateStoreRequestValid = (req: CreateStoreRequest): boolean => {
@@ -84,6 +89,7 @@ const storeController = () => {
       if ('error' in response) {
         throw new Error(response.error);
       }
+      socket.emit('storeUpdate', { type: 'newCount', username, count: response.coinCount });
       res.status(200).json(response);
     } catch (err: unknown) {
       res.status(500).send(`Error unlocking feature: ${(err as Error).message}`);

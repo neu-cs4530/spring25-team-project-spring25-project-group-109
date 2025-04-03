@@ -117,6 +117,18 @@ export interface NotificationUpdatePayload {
 }
 
 /**
+ * Payload for a store update event.
+ * - `type`: The type of modification (`'newCount'` or `'addition'`).
+ * - `count`: The number of coins to add (addition) or the new total count (newCount).
+ * - `username`: The username of the user whose store is being updated.
+ */
+export interface StoreUpdatePayload {
+  type: 'newCount' | 'addition';
+  count: number;
+  username: string;
+}
+
+/**
  * Interface representing the events the client can emit to the server.
  * - `makeMove`: Client can emit a move in the game.
  * - `joinGame`: Client can join a game.
@@ -160,4 +172,5 @@ export interface ServerToClientEvents {
   chatUpdate: (chat: ChatUpdatePayload) => void;
   collectionUpdate: (collection: CollectionUpdatePayload) => void;
   notificationUpdate: (notification: NotificationUpdatePayload) => void;
+  storeUpdate: (store: StoreUpdatePayload) => void;
 }

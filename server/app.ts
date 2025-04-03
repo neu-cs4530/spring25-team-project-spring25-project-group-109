@@ -91,7 +91,7 @@ app.use('/messaging', messageController(socket));
 app.use('/user', userController(socket));
 app.use('/chat', chatController(socket));
 app.use('/games', gameController(socket));
-app.use('/store', storeController());
+app.use('/store', storeController(socket));
 app.use('/badge', badgeController(socket));
 app.use('/collection', collectionController(socket));
 app.use('/features', featureController());
