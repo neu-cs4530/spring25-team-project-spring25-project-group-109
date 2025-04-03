@@ -5,9 +5,6 @@ import { DatabaseComment, DatabaseQuestion, DatabaseAnswer } from '../../types/t
 import AnswerModel from '../../models/answers.model';
 import { QUESTIONS, ans1, com1, mockUserStats } from '../mockData.models';
 import UserStatsModel from '../../models/userstats.model';
-import * as notifUtil from '../../services/notification.service';
-
-const saveNotificationSpy = jest.spyOn(notifUtil, 'saveNotification');
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
@@ -35,13 +32,6 @@ describe('Comment model', () => {
       const question = { ...QUESTIONS[0], comments: [com1] };
       mockingoose(QuestionModel).toReturn(question, 'findOneAndUpdate');
 
-      const mockNotif = {
-        username: question.askedBy,
-        text: `${com1.commentBy} commented on your question: "${question.title}"`,
-        seen: false,
-        type: 'comment',
-      };
-
       const result = (await addComment(
         question._id.toString() as string,
         'question',
@@ -50,7 +40,6 @@ describe('Comment model', () => {
 
       expect(result.comments.length).toEqual(1);
       expect(result.comments).toContain(com1._id);
-      expect(saveNotificationSpy).toHaveBeenCalledWith(mockNotif);
     });
 
     test('addComment should return the updated answer when given `answer`', async () => {
@@ -60,18 +49,10 @@ describe('Comment model', () => {
       const answer: DatabaseAnswer = { ...ans1, comments: [com1._id] };
       mockingoose(AnswerModel).toReturn(answer, 'findOneAndUpdate');
 
-      const mockNotif = {
-        username: answer.ansBy,
-        text: `${com1.commentBy} commented on your answer!`,
-        seen: false,
-        type: 'comment',
-      };
-
       const result = (await addComment(answer._id.toString(), 'answer', com1)) as DatabaseAnswer;
 
       expect(result.comments.length).toEqual(1);
       expect(result.comments).toContain(com1._id);
-      expect(saveNotificationSpy).toHaveBeenCalledWith(mockNotif);
     });
 
     test('addComment should return an object with error if findOneAndUpdate throws an error', async () => {

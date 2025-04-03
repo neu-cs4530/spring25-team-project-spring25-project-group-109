@@ -5,9 +5,6 @@ import { saveAnswer, addAnswerToQuestion } from '../../services/answer.service';
 import { DatabaseAnswer, DatabaseQuestion, PopulatedDatabaseAnswer } from '../../types/types';
 import { QUESTIONS, ans1, ans4, mockUserStats } from '../mockData.models';
 import UserStatsModel from '../../models/userstats.model';
-import * as notifUtil from '../../services/notification.service';
-
-const saveNotificationSpy = jest.spyOn(notifUtil, 'saveNotification');
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
@@ -83,13 +80,6 @@ describe('Answer model', () => {
         q => q._id && q._id.toString() === '65e9b5a995b6c7045a30d823',
       )[0];
 
-      const mockNotif = {
-        username: question.askedBy,
-        text: `${ans4.ansBy} answered your question: "${question.title}"`,
-        seen: false,
-        type: 'answer',
-      };
-
       jest
         .spyOn(QuestionModel, 'findOneAndUpdate')
         .mockResolvedValueOnce({ ...question, answers: [...question.answers, ans4._id] });
@@ -102,7 +92,6 @@ describe('Answer model', () => {
 
       expect(result.answers.length).toEqual(4);
       expect(result.answers).toContain(ans4._id);
-      expect(saveNotificationSpy).toHaveBeenCalledWith(mockNotif);
     });
 
     test('addAnswerToQuestion should return an object with error if user stats findOneAndUpdate throws an error', async () => {

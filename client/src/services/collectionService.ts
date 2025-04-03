@@ -27,8 +27,13 @@ const createCollection = async (collection: Collection): Promise<DatabaseCollect
  * @throws Error if there is an issue while fetching the collections.
  */
 
-const getCollectionsByUsername = async (username: string): Promise<DatabaseCollection[]> => {
-  const res = await api.get(`${COLLECTION_API_URL}/getCollectionsByUser/${username}`);
+const getCollectionsByUsername = async (
+  username: string,
+  requestingUser: string,
+): Promise<DatabaseCollection[]> => {
+  const res = await api.get(
+    `${COLLECTION_API_URL}/getCollectionsByUser/${username}?requestingUser=${requestingUser}`,
+  );
 
   if (res.status !== 200) {
     throw new Error('Error while fetching collections');
@@ -59,4 +64,62 @@ const addQuestionToCollection = async (
   return res.data;
 };
 
-export { createCollection, getCollectionsByUsername, addQuestionToCollection };
+const removeQuestionFromCollection = async (
+  collectionId: string,
+  questionId: string,
+): Promise<DatabaseCollection> => {
+  const res = await api.patch(`${COLLECTION_API_URL}/removeQuestion/${collectionId}`, {
+    questionId,
+  });
+
+  if (res.status !== 200) {
+    throw new Error('Error while removing question to collection');
+  }
+
+  return res.data;
+};
+
+const renameCollection = async (
+  collectionId: string,
+  name: string,
+): Promise<DatabaseCollection> => {
+  const res = await api.patch(`${COLLECTION_API_URL}/updateCollectionName/${collectionId}`, {
+    name,
+  });
+  if (res.status !== 200) {
+    throw new Error('Error while adding question to collection');
+  }
+
+  return res.data;
+};
+
+const deleteCollection = async (collectionId: string): Promise<DatabaseCollection> => {
+  const res = await api.delete(`${COLLECTION_API_URL}/deleteCollection/${collectionId}`);
+  if (res.status !== 200) {
+    throw new Error('Error while deleting collection');
+  }
+  return res.data;
+};
+
+const updateCollectionVisibility = async (
+  collectionId: string,
+  visibility: string,
+): Promise<DatabaseCollection> => {
+  const res = await api.patch(`${COLLECTION_API_URL}/updateCollectionVisibility/${collectionId}`, {
+    visibility,
+  });
+  if (res.status !== 200) {
+    throw new Error('Error while updating collection visibility');
+  }
+  return res.data;
+};
+
+export {
+  createCollection,
+  getCollectionsByUsername,
+  addQuestionToCollection,
+  renameCollection,
+  deleteCollection,
+  updateCollectionVisibility,
+  removeQuestionFromCollection,
+};

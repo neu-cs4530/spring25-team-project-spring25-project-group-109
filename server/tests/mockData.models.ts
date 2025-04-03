@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 import {
   Badge,
+  Notification,
   DatabaseAnswer,
   DatabaseBadge,
   DatabaseComment,
@@ -337,12 +338,21 @@ export const dbBadge: DatabaseBadge = {
   _id: new ObjectId(),
 };
 
+export const notification: Notification = {
+  username: 'user1',
+  text: 'notification1',
+  seen: false,
+  type: 'badge',
+  link: '/user/user1',
+};
+
 export const mockDatabaseNotification: DatabaseNotification = {
   _id: new ObjectId(),
   username: 'user1',
   text: 'notification1',
   seen: false,
   type: 'badge',
+  link: '/user/user1',
   createdAt: new Date(),
   updatedAt: new Date(),
 };

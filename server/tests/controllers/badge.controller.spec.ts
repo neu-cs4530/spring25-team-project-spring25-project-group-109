@@ -1,18 +1,21 @@
 import supertest from 'supertest';
+import { ObjectId } from 'mongodb';
 import { app } from '../../app';
-import { badge, dbBadge, user } from '../mockData.models';
+import { badge, dbBadge } from '../mockData.models';
 import * as util from '../../services/badge.service';
+import * as notifUtil from '../../services/notification.service';
 
 const saveBadgeSpy = jest.spyOn(util, 'saveBadge');
 const getBadgeSpy = jest.spyOn(util, 'getBadgesList');
 const checkAndAwardBadgesSpy = jest.spyOn(util, 'checkAndAwardBadges');
+const saveNotificationSpy = jest.spyOn(notifUtil, 'saveNotification');
 
 const mockBadgeJSONResponse = {
   ...dbBadge,
   _id: dbBadge._id.toString(),
 };
 
-describe('Test userController', () => {
+describe('Test badgeController', () => {
   describe('POST /addBadge', () => {
     it('should create a new badge given correct arguments', async () => {
       const mockReqBody = badge;
@@ -180,28 +183,58 @@ describe('Test userController', () => {
       expect(response.status).toBe(500);
     });
   });
-  describe('PATCH /getBadges', () => {
-    it('should return the users updated badges', async () => {
-      checkAndAwardBadgesSpy.mockResolvedValueOnce([dbBadge]);
+});
 
-      const response = await supertest(app).patch(`/badge/updateBadges/${user.username}`);
+describe('PATCH /badge/updateBadges/:username', () => {
+  const username = 'testUser';
+  const endpoint = `/badge/updateBadges/${username}`;
 
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({ badges: [mockBadgeJSONResponse] });
-      expect(checkAndAwardBadgesSpy).toHaveBeenCalled();
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should update badges and send notifications', async () => {
+    checkAndAwardBadgesSpy.mockResolvedValueOnce([dbBadge]);
+    saveNotificationSpy.mockResolvedValueOnce({
+      _id: new ObjectId(),
+      username: 'original-user',
+      text: 'You earned a badge',
+      seen: false,
+      type: 'badge',
+      link: '/user/original-user',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
-    it('should return 500 if database error while updating badges', async () => {
-      checkAndAwardBadgesSpy.mockResolvedValueOnce({ error: 'Error finding users' });
-      const response = await supertest(app).patch(`/badge/updateBadges/${user.username}`);
+    const response = await supertest(app).patch(endpoint);
 
-      expect(response.status).toBe(500);
-    });
+    expect(response.status).toBe(200);
+    expect(checkAndAwardBadgesSpy).toHaveBeenCalledWith(username);
+    expect(saveNotificationSpy).toHaveBeenCalled();
+  });
 
-    it('should return 404 if username not found', async () => {
-      const response = await supertest(app).put(`/badge/updateBadges`);
+  it('should return 500 if checkAndAwardBadges fails', async () => {
+    checkAndAwardBadgesSpy.mockResolvedValueOnce({ error: 'Database error' });
 
-      expect(response.status).toBe(404);
-    });
+    const response = await supertest(app).patch(endpoint);
+
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual({ error: 'Failed to update badges' });
+  });
+
+  it('should return 500 if saveNotification fails', async () => {
+    checkAndAwardBadgesSpy.mockResolvedValueOnce([dbBadge]);
+    saveNotificationSpy.mockResolvedValueOnce({ error: 'Notification error' });
+
+    const response = await supertest(app).patch(endpoint);
+
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual({ error: 'Failed to update badges' });
+  });
+
+  it('should return 404 if username is not provided', async () => {
+    const response = await supertest(app).patch(`/badge/updateBadges`);
+
+    expect(response.status).toBe(404);
   });
 });
