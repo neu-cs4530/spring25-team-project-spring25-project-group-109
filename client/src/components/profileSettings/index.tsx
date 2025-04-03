@@ -21,7 +21,6 @@ import {
 } from '@mui/material';
 import { AddCircle, Visibility, VisibilityOff } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
-import { useTheme } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
 import { Link } from 'react-router-dom';
 import useProfileSettings from '../../hooks/useProfileSettings';
