@@ -137,6 +137,12 @@ A class diagram for the schema definition is shown below:
 | -------------------------- | ------ | -------------------------- |
 | /getYoutubeVideos/:askedBy | GET    | Get YouTube videos by user |
 
+### `/feed`
+
+| Endpoint                      | Method | Description                 |
+| ------------------------------| ------ | --------------------------- |
+| /getRecommendedFeed/:username | GET    | Get recommended feed by user|
+
 ## Running Stryker Mutation Testing
 
 Mutation testing helps you measure the effectiveness of your tests by introducing small changes (mutations) to your code and checking if your tests catch them. To run mutation testing with Stryker, use the following command in `server/`:

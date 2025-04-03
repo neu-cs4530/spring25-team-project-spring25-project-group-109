@@ -25,6 +25,7 @@ import collectionController from './controllers/collection.controller';
 import featureController from './controllers/feature.controller';
 import notificationController from './controllers/notification.controller';
 import youtubeController from './controllers/youtubevideos.controller';
+import feedController from './controllers/feed.controller';
 
 dotenv.config();
 
@@ -95,8 +96,9 @@ app.use('/store', storeController());
 app.use('/badge', badgeController(socket));
 app.use('/collection', collectionController(socket));
 app.use('/features', featureController());
-app.use('/notification', notificationController(socket))
-app.use('/videos', youtubeController())
+app.use('/notification', notificationController(socket));
+app.use('/videos', youtubeController());
+app.use('/feed', feedController());
 
 // Export the app instance
 export { app, server, startServer };
