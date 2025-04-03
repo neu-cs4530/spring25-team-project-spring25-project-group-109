@@ -43,7 +43,7 @@ export const getMostRecentAnswerTime = (
 export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
   try {
     const result: DatabaseAnswer = await AnswerModel.create(answer);
-    await updateCoins(answer.ansBy, 1);
+    await updateCoins(answer.ansBy, 2);
 
     return result;
   } catch (error) {
