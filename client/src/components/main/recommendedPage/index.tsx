@@ -37,9 +37,10 @@ const RecommendedPostsPage = () => {
           sx={{ ml: 2 }}
         />
       </Box>
-
-      <Typography variant='body1' mb={2}>
-        A personalized feed from people you follow
+      <Typography variant='body1' mb={2} color='text.secondary'>
+        {filteredQuestions.length === 0
+          ? 'Follow more users to see recommended posts'
+          : 'A personalized feed from people you follow'}
       </Typography>
 
       {error && <Alert severity='error'>{error}</Alert>}
