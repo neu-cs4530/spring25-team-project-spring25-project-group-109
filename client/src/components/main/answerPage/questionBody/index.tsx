@@ -1,5 +1,4 @@
 import React from 'react';
-import './index.css';
 import { Box, Divider, Typography, Avatar, Stack } from '@mui/material';
 import { handleHyperlink } from '../../../../tool';
 import { DatabaseUser } from '../../../../types/types';

@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import { AppBar, Badge, Button, IconButton, TextField, Toolbar, Typography } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import useHeader from '../../hooks/useHeader';
-import './index.css';
 import useUserContext from '../../hooks/useUserContext';
 import useNotifications from '../../hooks/useNotificationPage';
 

@@ -4,7 +4,6 @@ import { getMetaData } from '../../../tool';
 import AnswerView from './answer';
 import AnswerHeader from './header';
 import { Comment } from '../../../types/types';
-import './index.css';
 import QuestionBody from './questionBody';
 import CommentSection from '../commentSection';
 import useAnswerPage from '../../../hooks/useAnswerPage';

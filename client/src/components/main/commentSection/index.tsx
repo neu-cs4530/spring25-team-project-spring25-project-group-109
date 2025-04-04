@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Box, Button, Collapse, Paper, TextField, Typography, Avatar, Stack } from '@mui/material';
 import { getMetaData } from '../../../tool';
 import { Comment, DatabaseComment, DatabaseUser } from '../../../types/types';
-import './index.css';
 import useUserContext from '../../../hooks/useUserContext';
 
 type EnhancedComment = DatabaseComment & { commentBy: DatabaseUser };
