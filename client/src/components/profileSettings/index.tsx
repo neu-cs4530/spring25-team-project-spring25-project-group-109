@@ -26,6 +26,7 @@ import { Link } from 'react-router-dom';
 import useProfileSettings from '../../hooks/useProfileSettings';
 import modalStyle from './styles';
 import CollectionView from './collection';
+import useUsersListPage from '../../hooks/useUsersListPage';
 
 const ProfileSettings: React.FC = () => {
   const {
@@ -80,6 +81,7 @@ const ProfileSettings: React.FC = () => {
     handleTogglePrivacy,
     handleRemoveQuestion,
   } = useProfileSettings();
+  const { userList } = useUsersListPage();
 
   const numEarnedBadges = userData?.badgesEarned ? userData.badgesEarned.length : 0;
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -261,7 +263,10 @@ const ProfileSettings: React.FC = () => {
                               'pr': 20,
                             }}>
                             <Avatar
-                              src={''}
+                              src={
+                                userList.find(user => user.username === follower)?.profilePhoto ||
+                                ''
+                              }
                               alt={`${follower}'s profile`}
                               sx={{ width: 48, height: 48, marginRight: 2 }}
                             />
@@ -318,7 +323,10 @@ const ProfileSettings: React.FC = () => {
                               'pr': 20,
                             }}>
                             <Avatar
-                              src={''}
+                              src={
+                                userList.find(user => user.username === following)?.profilePhoto ||
+                                ''
+                              }
                               alt={`${following}'s profile`}
                               sx={{ width: 48, height: 48, marginRight: 2 }}
                             />
