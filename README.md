@@ -18,7 +18,7 @@ Run `npm install` in the root directory to install all dependencies for the `cli
 The schemas for the database are documented in the directory `server/models/schema`.
 A class diagram for the schema definition is shown below:
 
-![Class Diagram](class-diagram.png)
+<img width="1312" alt="Class Diagram" src="https://github.com/user-attachments/assets/b2c0b2e5-e10b-44c1-84a4-d2e3e7b9e67f" />
 
 ## API Routes
 
