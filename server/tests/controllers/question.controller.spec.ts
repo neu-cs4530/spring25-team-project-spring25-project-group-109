@@ -456,6 +456,27 @@ describe('Test questionController', () => {
 
       expect(response.status).toBe(400);
     });
+
+    it('should return 500 if saveNotification fails', async () => {
+      const mockReqBody = {
+        qid: '65e9b5a995b6c7045a30d823',
+        username: 'new-user',
+      };
+
+      const mockResponse = {
+        msg: 'Question upvoted successfully',
+        upVotes: ['new-user'],
+        downVotes: [],
+      };
+
+      QuestionModel.findOne = jest.fn().mockResolvedValue(mockQuestion);
+      addVoteToQuestionSpy.mockResolvedValueOnce(mockResponse);
+      saveNotificationSpy.mockResolvedValue({ error: 'Error saving notification' });
+
+      const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+    });
   });
 
   describe('POST /downvoteQuestion', () => {

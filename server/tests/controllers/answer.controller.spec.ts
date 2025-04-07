@@ -92,6 +92,123 @@ describe('POST /addAnswer', () => {
     expect(saveNotificationSpy).toHaveBeenCalled();
   });
 
+  it('should return 500 if saveNotification throws an error', async () => {
+    const validQid = new mongoose.Types.ObjectId();
+    const validAid = new mongoose.Types.ObjectId();
+    const mockReqBody = {
+      qid: validQid,
+      ans: {
+        text: 'This is a test answer',
+        ansBy: 'dummyUserId',
+        ansDateTime: new Date('2024-06-03'),
+      },
+    };
+
+    const mockAnswer = {
+      _id: validAid,
+      text: 'This is a test answer',
+      ansBy: 'dummyUserId',
+      ansDateTime: new Date('2024-06-03'),
+      comments: [],
+    };
+    saveAnswerSpy.mockResolvedValueOnce(mockAnswer);
+
+    const mockQuestion = {
+      _id: validQid,
+      title: 'This is a test question',
+      text: 'This is a test question',
+      tags: [],
+      askedBy: 'dummyUserId',
+      askDateTime: new Date('2024-06-03'),
+      views: [],
+      upVotes: [],
+      downVotes: [],
+      answers: [mockAnswer._id],
+      comments: [],
+    };
+
+    addAnswerToQuestionSpy.mockResolvedValueOnce(mockQuestion);
+
+    popDocSpy.mockResolvedValueOnce({
+      _id: validQid,
+      title: 'This is a test question',
+      text: 'This is a test question',
+      tags: [],
+      askedBy: 'dummyUserId',
+      askDateTime: new Date('2024-06-03'),
+      views: [],
+      upVotes: [],
+      downVotes: [],
+      answers: [mockAnswer],
+      comments: [],
+    });
+
+    mockingoose(QuestionModel).toReturn(mockQuestion, 'findOne');
+    saveNotificationSpy.mockResolvedValueOnce({ error: 'error when saving notification' });
+
+    const response = await supertest(app).post('/answer/addAnswer').send(mockReqBody);
+
+    expect(response.status).toBe(500);
+  });
+
+  it('should return 500 if a question is not found', async () => {
+    const validQid = new mongoose.Types.ObjectId();
+    const validAid = new mongoose.Types.ObjectId();
+    const mockReqBody = {
+      qid: validQid,
+      ans: {
+        text: 'This is a test answer',
+        ansBy: 'dummyUserId',
+        ansDateTime: new Date('2024-06-03'),
+      },
+    };
+
+    const mockAnswer = {
+      _id: validAid,
+      text: 'This is a test answer',
+      ansBy: 'dummyUserId',
+      ansDateTime: new Date('2024-06-03'),
+      comments: [],
+    };
+    saveAnswerSpy.mockResolvedValueOnce(mockAnswer);
+
+    const mockQuestion = {
+      _id: validQid,
+      title: 'This is a test question',
+      text: 'This is a test question',
+      tags: [],
+      askedBy: 'dummyUserId',
+      askDateTime: new Date('2024-06-03'),
+      views: [],
+      upVotes: [],
+      downVotes: [],
+      answers: [mockAnswer._id],
+      comments: [],
+    };
+
+    addAnswerToQuestionSpy.mockResolvedValueOnce(mockQuestion);
+
+    popDocSpy.mockResolvedValueOnce({
+      _id: validQid,
+      title: 'This is a test question',
+      text: 'This is a test question',
+      tags: [],
+      askedBy: 'dummyUserId',
+      askDateTime: new Date('2024-06-03'),
+      views: [],
+      upVotes: [],
+      downVotes: [],
+      answers: [mockAnswer],
+      comments: [],
+    });
+
+    mockingoose(QuestionModel).toReturn(null, 'findOne');
+
+    const response = await supertest(app).post('/answer/addAnswer').send(mockReqBody);
+
+    expect(response.status).toBe(500);
+  });
+
   it('should return bad request error if answer text property is missing', async () => {
     const mockReqBody = {
       qid: 'dummyQuestionId',

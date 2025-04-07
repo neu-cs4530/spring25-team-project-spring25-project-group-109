@@ -183,6 +183,16 @@ describe('Test Collection Controller', () => {
       expect(response.status).toBe(404);
     });
 
+    it('should return 500 if getCollectionsByUser returns an error', async () => {
+      getCollectionsByUserSpy.mockResolvedValueOnce({ error: 'Error getting collections' });
+
+      const response = await supertest(app).get(
+        `/collection/getCollectionsByUser/user1?requestingUser=${mockCollection.username}`,
+      );
+
+      expect(response.status).toBe(500);
+    });
+
     it('should return 500 for a database error', async () => {
       getCollectionsByUserSpy.mockResolvedValueOnce({ error: 'Error getting collections' });
 
