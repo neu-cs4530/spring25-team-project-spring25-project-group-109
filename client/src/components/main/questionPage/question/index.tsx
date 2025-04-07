@@ -10,7 +10,6 @@ import {
   Stack,
   Typography,
   Avatar,
-  Button,
   Modal,
   IconButton,
 } from '@mui/material';
@@ -107,17 +106,6 @@ const QuestionView = ({ question }: QuestionProps) => {
             {getMetaData(new Date(question.askDateTime))}
           </Typography>
         </Box>
-
-        <Button
-          variant='contained'
-          color='secondary'
-          sx={{ mt: 2 }}
-          onClick={e => {
-            e.stopPropagation();
-            setShowSaveModal(true);
-          }}>
-          Save to Collection
-        </Button>
       </CardContent>
 
       <Modal open={showSaveModal} onClose={() => setShowSaveModal(false)}>

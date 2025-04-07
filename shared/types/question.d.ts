@@ -68,6 +68,16 @@ export interface PopulatedDatabaseQuestion
 }
 
 /**
+ * Represents a fully populated question from the database with additional feed-related information.
+ * - `feedReason`: Indicates the reason for the question being in the feed.
+ * - `followedUpvoters`: An array of usernames of users who upvoted the question and are followed by the user.
+ */
+export interface PopulatedFeedQuestion extends PopulatedDatabaseQuestion {
+  feedReasons: ('askedByFollowed' | 'upvotedByFollowed')[];
+  followedUpvoters: string[];
+}
+
+/**
  * Type representing possible responses for a Question-related operation.
  * - Either a `DatabaseQuestion` object or an error message.
  */

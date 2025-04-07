@@ -3,9 +3,7 @@ import {
   AnswerResponse,
   DatabaseAnswer,
   DatabaseQuestion,
-  DatabaseUser,
   PopulatedDatabaseAnswer,
-  PopulatedDatabaseComment,
   PopulatedDatabaseQuestion,
   QuestionResponse,
 } from '../types/types';
@@ -13,8 +11,6 @@ import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
 import UserStatsModel from '../models/userstats.model';
 import { updateCoins } from './store.service';
-import UserModel from '../models/users.model';
-import CommentModel from '../models/comments.model';
 
 /**
  * Records the most recent answer time for a given question based on its answers.
@@ -43,7 +39,7 @@ export const getMostRecentAnswerTime = (
 export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
   try {
     const result: DatabaseAnswer = await AnswerModel.create(answer);
-    await updateCoins(answer.ansBy, 1);
+    await updateCoins(answer.ansBy, 2);
 
     return result;
   } catch (error) {
@@ -88,42 +84,5 @@ export const addAnswerToQuestion = async (
     return result;
   } catch (error) {
     return { error: 'Error when adding answer to question' };
-  }
-};
-
-/**
- * Gather all the answers of the users that the user is following.
- */
-
-export const fetchAnswersByFollowing = async (
-  following: string[],
-): Promise<PopulatedDatabaseAnswer[] | { error: string }> => {
-  try {
-    const answers = await AnswerModel.find({ ansBy: { $in: following } })
-      .populate<{
-        comments: PopulatedDatabaseComment[];
-        ansBy: DatabaseUser;
-      }>([
-        {
-          path: 'comments',
-          model: CommentModel,
-          populate: {
-            path: 'commentBy',
-            model: UserModel,
-            localField: 'commentBy',
-            foreignField: 'username',
-          },
-        },
-        { path: 'ansBy', model: UserModel, localField: 'ansBy', foreignField: 'username' },
-      ])
-      .sort({ ansDateTime: -1 });
-
-    if (!answers) {
-      return [];
-    }
-
-    return answers;
-  } catch (error) {
-    return { error: 'Error when fetching answers by following!' };
   }
 };

@@ -7,7 +7,7 @@ export interface Feature {
   price: number;
 }
 
-export type FeatureType = 'Nim' | 'Custom Profile Photo';
+export type FeatureType = 'Nim' | 'Custom Profile Photo' | 'Additional Avatars';
 
 /**
  * Defines the available feature types.

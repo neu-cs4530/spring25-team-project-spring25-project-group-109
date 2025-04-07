@@ -1,5 +1,4 @@
 import React from 'react';
-import './index.css';
 import { Box, Button, Paper, Stack, Typography, useTheme } from '@mui/material';
 import { Feature } from '../../../types/types';
 

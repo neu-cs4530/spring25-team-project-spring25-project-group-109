@@ -1,5 +1,4 @@
 import React from 'react';
-import './index.css';
 import { Box, Button, List, ListItemText, Paper, Stack, Typography } from '@mui/material';
 import { GameInstance, NimGameState } from '../../../../types/types';
 import useNimGamePage from '../../../../hooks/useNimGamePage';
