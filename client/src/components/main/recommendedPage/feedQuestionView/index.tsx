@@ -20,7 +20,9 @@ const FeedQuestionView = ({ question }: FeedQuestionProps) => (
       {question.feedReasons.includes('upvotedByFollowed') &&
         question.followedUpvoters.length > 0 && (
           <Chip
-            label={`Upvoted by your follower${question.followedUpvoters.length > 1 ? 's' : ''}: ${question.followedUpvoters.join(', ')}`}
+            label={`Upvoted by ${
+              question.followedUpvoters.length === 1 ? 'someone you follow' : 'people you follow'
+            }: ${question.followedUpvoters.join(', ')}`}
             size='small'
             color='secondary'
             sx={{ mb: 1 }}
