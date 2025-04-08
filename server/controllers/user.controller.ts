@@ -297,11 +297,12 @@ const userController = (socket: FakeSOSocket) => {
       }
 
       // delete previously uploaded profile photo to avoid storing unecessary images
-      if (
-        user.profilePhoto?.includes('uploads') &&
-        fs.existsSync(path.join(__dirname, '../../client/public', user.profilePhoto))
-      ) {
-        fs.unlinkSync(path.join(__dirname, '../../client/public', user.profilePhoto));
+      if (user.profilePhoto?.includes('uploads')) {
+        const filename = user.profilePhoto.split('/uploads/')[1];
+        const filePath = path.join(__dirname, '..', 'uploads', filename);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
       }
 
       // Call the same updateUser(...) service used by resetPassword
@@ -342,16 +343,19 @@ const userController = (socket: FakeSOSocket) => {
       }
 
       // delete previously uploaded profile photo to avoid storing unecessary images
-      if (
-        user.profilePhoto?.includes('uploads') &&
-        fs.existsSync(path.join(__dirname, '../../client/public', user.profilePhoto))
-      ) {
-        fs.unlinkSync(path.join(__dirname, '../../client/public', user.profilePhoto));
+      if (user.profilePhoto?.includes('uploads')) {
+        const filename = user.profilePhoto.split('/uploads/')[1];
+        const filePath = path.join(__dirname, '..', 'uploads', filename);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
       }
+      const { filename } = req.file;
+      const filePath = `${req.protocol}://${req.get('host')}/uploads/${filename}`;
 
-      const filePath = `/uploads/${req.file.filename}`;
-      const { username } = req.body;
-      const updatedUser = await updateUser(username, { profilePhoto: filePath });
+      const updatedUser = await updateUser(req.body.username, {
+        profilePhoto: filePath,
+      });
 
       if ('error' in updatedUser) {
         throw new Error(updatedUser.error);
