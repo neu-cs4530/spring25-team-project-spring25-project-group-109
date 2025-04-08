@@ -312,6 +312,18 @@ describe('Test questionController', () => {
       expect(response.status).toBe(200);
       expect(response.body).toEqual(simplifyQuestion(result)); // Expect only unique tags
     });
+
+    it('should return 500 if a non-Error is thrown when saving a question', async () => {
+      jest.spyOn(tagUtil, 'processTags').mockResolvedValue([dbTag1, dbTag2]);
+      jest.spyOn(questionUtil, 'saveQuestion').mockImplementation(() => {
+        throw 'not an error';
+      });
+
+      const response = await supertest(app).post('/question/addQuestion').send(mockQuestion);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error when saving question');
+    });
   });
 
   describe('POST /upvoteQuestion', () => {
@@ -476,6 +488,56 @@ describe('Test questionController', () => {
       const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
 
       expect(response.status).toBe(500);
+    });
+
+    it('should return 500 if a non-Error is thrown in voteQuestion', async () => {
+      const mockReqBody = {
+        qid: '65e9b5a995b6c7045a30d823',
+        username: 'some-user',
+      };
+
+      addVoteToQuestionSpy.mockImplementation(() => {
+        throw 'not an error';
+      });
+
+      const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+    });
+
+    it('should return 500 if voteQuestion returns an error in status', async () => {
+      const mockReqBody = {
+        qid: '65e9b5a995b6c7045a30d823',
+        username: 'some-user',
+      };
+
+      addVoteToQuestionSpy.mockResolvedValueOnce({ error: 'vote failed' });
+
+      const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toMatch('Error when upvoteing: vote failed');
+    });
+
+    it('should return 500 if the question is not found in the database after upvote', async () => {
+      const mockReqBody = {
+        qid: '65e9b5a995b6c7045a30d823',
+        username: 'some-user',
+      };
+
+      const mockVoteResult = {
+        msg: 'Question upvoted successfully',
+        upVotes: ['some-user'],
+        downVotes: [],
+      };
+
+      addVoteToQuestionSpy.mockResolvedValueOnce(mockVoteResult);
+      QuestionModel.findOne = jest.fn().mockResolvedValue(null);
+
+      const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toMatch('Error when upvoteing: Question not found');
     });
   });
 
@@ -742,6 +804,25 @@ describe('Test questionController', () => {
         'Error when fetching question by id: Error while fetching question by id',
       );
     });
+
+    it('should return 500 if a non-Error is thrown when saving a question', async () => {
+      const mockReqParams = {
+        qid: '65e9b5a995b6c7045a30d823',
+      };
+      const mockReqQuery = {
+        username: 'question3_user',
+      };
+
+      jest.spyOn(questionUtil, 'fetchAndIncrementQuestionViewsById').mockImplementation(() => {
+        throw 'not an error';
+      });
+
+      const response = await supertest(app).get(
+        `/question/getQuestionById/${mockReqParams.qid}?username=${mockReqQuery.username}`,
+      );
+
+      expect(response.status).toBe(500);
+    });
   });
 
   describe('GET /getQuestion', () => {
@@ -804,5 +885,31 @@ describe('Test questionController', () => {
       // Asserting the response
       expect(response.status).toBe(500);
     });
+  });
+
+  it('should filter questions by askedBy if provided in query', async () => {
+    const askedBy = 'question1_user';
+
+    getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+
+    const filterByAskedBySpy = jest
+      .spyOn(questionUtil, 'filterQuestionsByAskedBy')
+      .mockReturnValueOnce([MOCK_POPULATED_QUESTIONS[0]]);
+
+    const response = await supertest(app).get('/question/getQuestion').query({ askedBy });
+
+    expect(response.status).toBe(200);
+    expect(filterByAskedBySpy).toHaveBeenCalledWith(MOCK_POPULATED_QUESTIONS, askedBy);
+  });
+
+  it('should return 500 with generic error message if getQuestionsByOrder throws non-Error', async () => {
+    getQuestionsByOrderSpy.mockImplementation(() => {
+      throw 'not an error';
+    });
+
+    const response = await supertest(app).get('/question/getQuestion');
+
+    expect(response.status).toBe(500);
+    expect(response.text).toBe('Error when fetching questions by filter');
   });
 });
