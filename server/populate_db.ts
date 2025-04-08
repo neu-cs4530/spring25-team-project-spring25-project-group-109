@@ -454,6 +454,160 @@ const populate = async () => {
       [],
     );
 
+    // fill the leaderboard
+    await userCreate("Alice Nguyen", "pw1", new Date("2023-12-01"), "AI researcher");
+    await userCreate("Bob Smith", "pw2", new Date("2024-01-10"), "Backend dev" );
+    await userCreate("Carol Johnson", "pw3", new Date("2024-02-15"), "Cloud engineer");
+    await userCreate("Daniel Lee", "pw4", new Date("2024-03-20"), "Algorithms tutor");
+    await userCreate("Eva Patel", "pw5", new Date("2024-01-05"), "Blockchain dev");
+    await userCreate("Frank Moore", "pw6", new Date("2024-01-25"), "React/Next.js dev");
+    await userCreate("Grace Kim", "pw7", new Date("2024-02-05"), "API engineer");
+    await userCreate("Heidi Chen", "pw8", new Date("2024-03-01"), "Parallel computing student");
+    await userCreate("Ian Garcia", "pw9", new Date("2024-03-10"), "Security analyst");
+    await userCreate("Kyle Davis", "pw10", new Date("2024-03-15"), "OS/systems nerd");
+
+    const ans1 = await answerCreate("Make sure you're not directly mutating state. Always use the setter function returned by useState.", "Daniel Lee", new Date(), []);
+    const ans2 = await answerCreate("Use `document.createElement` and `appendChild`. Remember to wait for the DOM to load with `DOMContentLoaded`.", "Ian Garcia", new Date(), []);
+    const ans3 = await answerCreate("Try upgrading your Gradle version manually in `gradle-wrapper.properties` and syncing again.", "Alice Nguyen", new Date(), []);
+    const ans4 = await answerCreate("You can save login state using `SharedPreferences` and check it in your `onCreate()` method.", "Bob Smith", new Date(), []);
+    const ans5 = await answerCreate("localStorage persists until cleared manually, while sessionStorage is cleared when the browser/tab closes.", "Grace Kim", new Date(), []);
+    const ans6 = await answerCreate("Ensure your `<link>` tag is placed inside the `<head>` and the path to your CSS file is correct.", "Kyle Davis", new Date(), []);
+    const ans7 = await answerCreate("Consider splitting components into 'pages', 'components', and 'utils'. Use index.js for module exports.", "Bob Smith", new Date(), []);
+    const ans8 = await answerCreate("SharedPreferences is not ideal for large objects. Use SQLite or Room instead.", "Alice Nguyen", new Date(), []);
+    const ans9 = await answerCreate("Call `context.getSharedPreferences().edit().clear().apply()` and use `context.getCacheDir().delete()` recursively.", "Daniel Lee", new Date(), []);
+    const ans10 = await answerCreate("Use the `gh-pages` npm package. Make sure to update your package.json `homepage` field too.", "Eva Patel", new Date(), []);
+    const ans11 = await answerCreate(
+      "To manipulate the DOM directly in plain JavaScript, you can use the document.createElement() method to create a new div, and appendChild() to add it to an existing element. Here's an example:", 
+      "Bob Smith", 
+      new Date(), 
+      [], 
+    );
+    const ans12 = await answerCreate(
+      "SharedPreferences is a great option for persisting simple data like login state. You can store a boolean indicating whether the user is logged in and check it when the app starts. Here's an example:", 
+      "Bob Smith", 
+      new Date(), 
+      []
+    );
+    
+    const ans13 = await answerCreate(
+      "Both localStorage and sessionStorage are used to store data on the client's browser, but they differ in their lifespan: `localStorage` persists data even after the browser is closed, while `sessionStorage` stores data only for the duration of the page session. Use localStorage for persistent data and sessionStorage for temporary data.", 
+      "Bob Smith", 
+      new Date(), 
+      [] 
+    );
+    
+    
+
+    await questionCreate(
+      "Why isn't my React component updating state correctly?",
+      "I'm using useState in a React component, but the UI isn't updating as expected. What could cause this?",
+      [t1, t2], 
+      [ans1],
+      "Alice Nguyen", 
+      new Date(), 
+      ["Daniel Lee"], 
+      []
+    );
+    
+    await questionCreate(
+      "How do I manipulate the DOM in plain JavaScript?",
+      "I want to add a new div to my page when a button is clicked, without using jQuery or frameworks.",
+      [t2, t6],
+      [ans2, ans11],
+      "Bob Smith", 
+      new Date(), 
+      ["Ian Garcia"], 
+      []
+    );
+    
+    await questionCreate(
+      "How do I fix Android Studio's build.gradle sync errors?",
+      "I just updated Android Studio and now my project won't sync. The error is in the Gradle files.",
+      [t3],
+      [ans3],
+      "Daniel Lee", 
+      new Date(), 
+      ["Alice Nguyen"], 
+      []
+    );
+    
+    await questionCreate(
+      "How to persist user login state using SharedPreferences?",
+      "What's the best way to keep a user logged in after restarting the app in Android?",
+      [t3, t4],
+      [ans4, ans12],
+      "Carol Johnson", 
+      new Date(), 
+      ["Bob Smith"], 
+      []
+    );
+    
+    await questionCreate(
+      "What is the difference between localStorage and sessionStorage?",
+      "I'm confused about when to use localStorage versus sessionStorage in a web app.",
+      [t2, t5, t6],
+      [ans5, ans13],
+      "Frank Moore", 
+      new Date(), 
+      ["Grace Kim"], 
+      []
+    );
+    
+    await questionCreate(
+      "How do I link stylesheets correctly on a website?",
+      "My styles.css file doesn't seem to be applying on my homepage. What could be wrong?",
+      [t2, t6],
+      [ans6],
+      "Eva Patel", 
+      new Date(), 
+      ["Kyle Davis"], 
+      []
+    );
+    
+    await questionCreate(
+      "How to organize large React projects?",
+      "My React codebase is getting messy. Any advice on folder structure or file naming conventions?",
+      [t1, t6],
+      [ans7],
+      "Grace Kim", 
+      new Date(), 
+      ["Bob Smith"], 
+      []
+    );
+    
+    await questionCreate(
+      "Can I store large objects in SharedPreferences?",
+      "I need to save a list of user preferences as an object. Is SharedPreferences the right tool?",
+      [t4, t5],
+      [ans8],
+      "Heidi Chen", 
+      new Date(), 
+      ["Alice Nguyen"], 
+      []
+    );
+    
+    await questionCreate(
+      "How do I clear app storage programmatically in Android?",
+      "Is there a method to clear all SharedPreferences and cache data on a button click?",
+      [t3, t4, t5],
+      [ans9],
+      "Kyle Davis", 
+      new Date(), 
+      ["Daniel Lee"], 
+      []
+    );
+    
+    await questionCreate(
+      "How do I deploy a React website to GitHub Pages?",
+      "I finished a React project and want to host it for free. What's the best way to do this?",
+      [t1, t6],
+      [ans10],
+      "Carol Johnson", 
+      new Date(), 
+      ["Eva Patel"], 
+      []
+    );
+    
     await notificationCreate(
       'sama',
       `You have earned the badge ${q1badge.name}: ${q1badge.description}!`,
