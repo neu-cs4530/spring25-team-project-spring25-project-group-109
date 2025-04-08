@@ -18,7 +18,7 @@ import {
 } from '../types/types';
 import { saveMessage } from '../services/message.service';
 
-/*
+/**
  * This controller handles chat-related routes.
  * @param socket The socket instance to emit events.
  * @returns {express.Router} The router object containing the chat routes.
