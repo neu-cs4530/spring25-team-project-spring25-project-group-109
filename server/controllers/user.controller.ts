@@ -1,4 +1,5 @@
 import express, { Request, Response, Router } from 'express';
+import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
 import {
@@ -23,7 +24,6 @@ import {
   updateUser,
 } from '../services/user.service';
 import { saveNotification } from '../services/notification.service';
-import { upload } from '../multer.config';
 
 const userController = (socket: FakeSOSocket) => {
   const router: Router = express.Router();
@@ -485,6 +485,15 @@ const userController = (socket: FakeSOSocket) => {
       res.status(500).send(`Error when unfollowing: ${error}`);
     }
   };
+
+  const storage = multer.diskStorage({
+    destination: '../client/public/uploads/',
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + path.extname(file.originalname));
+    },
+  });
+
+  const upload = multer({ storage });
 
   // Define routes for the user-related operations.
   router.post('/signup', createUser);
