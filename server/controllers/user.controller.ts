@@ -323,6 +323,12 @@ const userController = (socket: FakeSOSocket) => {
     }
   };
 
+  /**
+   * Uploads a user's profile photo.
+   * @param req The request containing the username and profile photo path.
+   * @param res The response, either confirming the update or returning an error.
+   * @returns A promise resolving to void.
+   */
   const uploadProfilePhoto = async (req: UserByUsernameRequest, res: Response): Promise<void> => {
     try {
       if (!req.file || !req.body.username) {
@@ -487,7 +493,7 @@ const userController = (socket: FakeSOSocket) => {
   };
 
   const storage = multer.diskStorage({
-    destination: '../client/public/uploads/',
+    destination: path.join(__dirname, '..', 'uploads'),
     filename: (req, file, cb) => {
       cb(null, Date.now() + path.extname(file.originalname));
     },
