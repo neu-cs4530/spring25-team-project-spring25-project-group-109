@@ -25,13 +25,27 @@ import useLeaderboard from '../../../hooks/useLeaderboard';
 const LeaderboardPage = () => {
   const context = useContext(UserContext);
   const username = context?.user.username;
-  const [dateFilter, setDateFilter] = useState('week');
+  const [dateFilter, setDateFilter] = useState('all time');
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs());
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs());
   const { users, loading, error } = useLeaderboard(username || '', dateFilter, startDate, endDate);
-  let topTen = users;
-  const userScore = users.find(user => user.username === username);
-  const userRanking = users.findIndex(user => user.username === username);
+
+  let rank = 0;
+
+  let previousPoints: number | null = null;
+
+  const rankedUsers = users.map((user, index) => {
+    if (user.count !== previousPoints) {
+      rank = index + 1;
+    }
+    previousPoints = user.count;
+
+    return { ...user, rank };
+  });
+
+  let topTen = rankedUsers;
+  const userScore = rankedUsers.find(user => user.username === username);
+
   if (topTen.length > 10) {
     topTen = topTen.slice(0, 10);
   }
@@ -48,6 +62,9 @@ const LeaderboardPage = () => {
             Leaderboard
           </Typography>
         </Stack>
+        <Typography variant='h6'>
+          Answer questions to rise to the top of the Threadscape Leaderboard!
+        </Typography>
       </Box>
 
       <Box
@@ -107,7 +124,7 @@ const LeaderboardPage = () => {
                   key={user.username}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell component='th' scope='row'>
-                    {index + 1}
+                    {user.rank}
                   </TableCell>
                   <TableCell align='left'>
                     {' '}
@@ -129,6 +146,11 @@ const LeaderboardPage = () => {
           <LeaderboardRoundedIcon sx={{ marginRight: '4px' }} />
           Your Position
         </Typography>
+        {(!userScore || userScore.count === 0) && (
+          <Typography variant='h6' color='error'>
+            You have not answered any questions yet. Answer a question to become ranked!
+          </Typography>
+        )}
         {userScore && (
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label='simple table'>
@@ -142,7 +164,7 @@ const LeaderboardPage = () => {
               <TableBody>
                 <TableRow key={username} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell component='th' scope='row'>
-                    {userRanking + 1}
+                    {userScore.rank}
                   </TableCell>
                   <TableCell align='left'>
                     {' '}
