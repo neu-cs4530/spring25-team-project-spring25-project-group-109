@@ -34,7 +34,7 @@ jobs:
 
       - name: Install all dependencies from root
         if: ${{ always() }}
-        run: npm i
+        run: npm cache clean --force; npm i
 
       - name: Lint all folders
         if: ${{ always() }}

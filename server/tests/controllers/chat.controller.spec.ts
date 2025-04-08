@@ -98,6 +98,28 @@ describe('Chat Controller', () => {
       expect(populateDocumentSpy).toHaveBeenCalledWith(chatResponse._id.toString(), 'chat');
     });
 
+    it('should return 500 if populate fails', async () => {
+      const validChatPayload = {
+        participants: ['user1', 'user2'],
+        messages: [{ msg: 'Hello!', msgFrom: 'user1', msgDateTime: new Date('2025-01-01') }],
+      };
+
+      const chatResponse: DatabaseChat = {
+        _id: new mongoose.Types.ObjectId(),
+        participants: ['user1', 'user2'],
+        messages: [new mongoose.Types.ObjectId()],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      saveChatSpy.mockResolvedValue(chatResponse);
+      populateDocumentSpy.mockResolvedValue({ error: 'Error populating chat' });
+
+      const response = await supertest(app).post('/chat/createChat').send(validChatPayload);
+
+      expect(response.status).toBe(500);
+    });
+
     it('should return 400 if participants array is invalid', async () => {
       const invalidPayload = {
         participants: [],

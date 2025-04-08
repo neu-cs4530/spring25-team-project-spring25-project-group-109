@@ -77,7 +77,7 @@ app.use(
 
 app.use(express.json());
 app.use('/images', express.static(path.join(__dirname, '../client/public/images')));
-app.use('/uploads', express.static(path.join(__dirname, '../client/public/uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/', (_: Request, res: Response) => {
   res.send('hello world');

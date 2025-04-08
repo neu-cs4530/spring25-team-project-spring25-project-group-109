@@ -140,6 +140,22 @@ describe('Test userController', () => {
       expect(saveUserStoreSpy).toHaveBeenCalledWith(mockSafeUser.username);
     });
 
+    it('should return 500 response if saveUserStore fails', async () => {
+      const mockReqBody = {
+        username: mockUser.username,
+        password: mockUser.password,
+        biography: 'This is a test biography',
+        profilePhoto: '/images/avatars/avatar1.png',
+      };
+
+      saveUserSpy.mockResolvedValueOnce({ ...mockSafeUser, biography: mockReqBody.biography });
+      saveUserStatsSpy.mockResolvedValueOnce(mockUserStats);
+      saveUserStoreSpy.mockResolvedValueOnce({ error: 'Error saving user store' });
+
+      const response = await supertest(app).post('/user/signup').send(mockReqBody);
+      expect(response.status).toBe(500);
+    });
+
     it('should return 400 for request missing username', async () => {
       const mockReqBody = {
         password: mockUser.password,
@@ -574,6 +590,50 @@ describe('Test userController', () => {
       expect(response.status).toBe(200);
     });
 
+    it('should delete old profile photo if it exists in /uploads', async () => {
+      const mockReqBody = {
+        username: mockSafeUser.username,
+        profilePhoto: '/uploads/new-image.jpg',
+      };
+
+      const oldPhoto = '/uploads/old-image.jpg';
+
+      getUserByUsernameSpy.mockResolvedValueOnce({
+        ...mockSafeUser,
+        profilePhoto: oldPhoto,
+      });
+
+      existsSyncSpy.mockReturnValueOnce(true);
+      unlinkSyncSpy.mockImplementationOnce(() => {});
+
+      updatedUserSpy.mockResolvedValueOnce({
+        ...mockSafeUser,
+        profilePhoto: mockReqBody.profilePhoto,
+      });
+
+      const res = await supertest(app).patch('/user/updateProfilePhoto').send(mockReqBody);
+
+      expect(res.status).toBe(200);
+      expect(unlinkSyncSpy).toHaveBeenCalledTimes(1);
+
+      // Grab the actual path passed to unlinkSync and assert it ends correctly
+      const actualPath = unlinkSyncSpy.mock.calls[0][0] as string;
+      expect(actualPath.endsWith('/client/public/uploads/old-image.jpg')).toBe(true);
+    });
+
+    it('should return 500 if getUserByUsername fails', async () => {
+      const mockReqBody = {
+        username: mockUser2.username,
+        profilePhoto: '/images/avatars/avatar1.png',
+      };
+
+      getUserByUsernameSpy.mockResolvedValueOnce({ error: 'Error finding user' });
+
+      const response = await supertest(app).patch('/user/updateProfilePhoto').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+    });
+
     it('should return 400 for request missing username', async () => {
       const response = await supertest(app)
         .patch('/user/updateProfilePhoto')
@@ -837,6 +897,25 @@ describe('Test userController', () => {
 
       expect(response.status).toBe(500);
     });
+
+    it('should return 500 if saveNotification fails', async () => {
+      const mockReqBody = {
+        follower: mockSafeUser.username,
+        followee: mockSafeUser2.username,
+      };
+
+      getUserByUsernameSpy.mockResolvedValueOnce(mockSafeUser);
+      getUserByUsernameSpy.mockResolvedValueOnce(mockSafeUser2);
+
+      updatedUserSpy.mockResolvedValueOnce(mockSafeUser);
+      updatedUserSpy.mockResolvedValueOnce(mockSafeUser2);
+
+      saveNotificationSpy.mockResolvedValueOnce({ error: 'Error saving notification' });
+
+      const response = await supertest(app).patch('/user/follow').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+    });
   });
 
   describe('PATCH /unfollow', () => {
@@ -914,6 +993,45 @@ describe('Test userController', () => {
 
       expect(response.status).toBe(400);
       expect(response.text).toEqual('Cannot unfollow yourself');
+    });
+
+    it("should remove followee from follower's following list", async () => {
+      const mockReqBody = {
+        follower: mockSafeUser.username,
+        followee: mockSafeUser2.username,
+      };
+
+      // Mock that the follower is currently following followee
+      getUserByUsernameSpy.mockResolvedValueOnce({
+        ...mockSafeUser,
+        following: [mockSafeUser2.username],
+      });
+      getUserByUsernameSpy.mockResolvedValueOnce({
+        ...mockSafeUser2,
+        followers: [mockSafeUser.username],
+      });
+
+      const updatedFollower = {
+        ...mockSafeUser,
+        following: [],
+      };
+      const updatedFollowee = {
+        ...mockSafeUser2,
+        followers: [],
+      };
+
+      updatedUserSpy.mockResolvedValueOnce(updatedFollower); // update follower
+      updatedUserSpy.mockResolvedValueOnce(updatedFollowee); // update followee
+
+      const response = await supertest(app).patch('/user/unfollow').send(mockReqBody);
+
+      expect(response.status).toBe(200);
+      expect(updatedUserSpy).toHaveBeenNthCalledWith(1, mockSafeUser.username, {
+        following: [],
+      });
+      expect(updatedUserSpy).toHaveBeenNthCalledWith(2, mockSafeUser2.username, {
+        followers: [],
+      });
     });
 
     it('should return 500 if updateUser returns an error', async () => {
