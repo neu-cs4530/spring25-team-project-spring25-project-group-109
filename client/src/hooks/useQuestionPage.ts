@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import useUserContext from './useUserContext';
 import { AnswerUpdatePayload, OrderType, PopulatedDatabaseQuestion } from '../types/types';
@@ -13,7 +13,7 @@ import { getQuestionsByFilter } from '../services/questionService';
  */
 const useQuestionPage = () => {
   const { socket } = useUserContext();
-
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [titleText, setTitleText] = useState<string>('All Questions');
   const [search, setSearch] = useState<string>('');
@@ -38,6 +38,15 @@ const useQuestionPage = () => {
     setTitleText(pageTitle);
     setSearch(searchString);
   }, [searchParams]);
+
+  /**
+   * Function to navigate to the home page with the specified question
+   *
+   * @param tagName - The name of the question to be viewed
+   */
+  const clickQuestion = (questionId: string) => {
+    navigate(`/question/${questionId}`);
+  };
 
   useEffect(() => {
     /**
@@ -105,7 +114,7 @@ const useQuestionPage = () => {
     };
   }, [questionOrder, search, socket]);
 
-  return { titleText, qlist, setQuestionOrder };
+  return { titleText, qlist, setQuestionOrder, clickQuestion };
 };
 
 export default useQuestionPage;

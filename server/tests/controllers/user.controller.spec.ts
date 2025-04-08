@@ -662,6 +662,7 @@ describe('Test userController', () => {
         text: `${mockSafeUser.username} followed you!`,
         seen: false,
         type: 'follow' as NotificationType,
+        link: `/user/${mockSafeUser.username}`,
         createdAt: new Date('2025-01-01'),
         updatedAt: new Date('2025-01-01'),
       };

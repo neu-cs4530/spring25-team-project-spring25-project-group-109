@@ -87,10 +87,10 @@ async function commentCreate(
     commentDateTime: commentDateTime,
   };
   const comment = await CommentModel.create(commentDetail);
-  const stats  = await UserStatsModel.findOneAndUpdate(
+  const stats = await UserStatsModel.findOneAndUpdate(
     { username: commentBy },
     { $inc: { commentsCount: 1 } },
-    { new: true }
+    { new: true },
   );
   if (stats) {
     await checkAndAwardBadges(commentBy);
@@ -123,10 +123,10 @@ async function answerCreate(
     comments: comments,
   };
   const answer = await AnswerModel.create(answerDetail);
-  const stats  = await UserStatsModel.findOneAndUpdate(
+  const stats = await UserStatsModel.findOneAndUpdate(
     { username: ansBy },
     { $inc: { answersCount: 1 } },
-    { new: true }
+    { new: true },
   );
   if (stats) {
     await checkAndAwardBadges(ansBy);
@@ -179,10 +179,10 @@ async function questionCreate(
     downVotes: [],
     comments: comments,
   });
-  const stats  = await UserStatsModel.findOneAndUpdate(
+  const stats = await UserStatsModel.findOneAndUpdate(
     { username: question.askedBy },
     { $inc: { questionsCount: 1 } },
-    { new: true }
+    { new: true },
   );
   if (stats) {
     await checkAndAwardBadges(question.askedBy);
@@ -290,14 +290,16 @@ async function notificationCreate(
   text: string,
   seen: boolean,
   type: NotificationType,
+  link: string,
 ): Promise<DatabaseNotification> {
-  if (username === '' || text === '' || seen === null || type === null)
+  if (username === '' || text === '' || seen === null || type === null || link === null)
     throw new Error('Invalid Notification Format');
   const notification: Notification = {
     username,
     text,
     seen,
     type,
+    link,
   };
   return await NotificationModel.create(notification);
 }
@@ -319,28 +321,104 @@ async function collectionCreate(
  */
 const populate = async () => {
   try {
-    await featureCreate("Nim", strings.NIM_FEATURE_DESCRIPTION, 5);
-    await featureCreate("Custom Profile Photo", strings.PROFILE_FEATURE_DESCRIPTION, 10);
-    
-    await badgeCreate(strings.BQ1_NAME, strings.BQ1_DESCRIPTION, 'question', 1, `/images/badges/question/1.png`);
-    await badgeCreate(strings.BQ10_NAME, strings.BQ10_DESCRIPTION, 'question', 10, `/images/badges/question/10.png`);
-    await badgeCreate(strings.BQ50_NAME, strings.BQ50_DESCRIPTION, 'question', 50, `/images/badges/question/50.png`);
+    await featureCreate('Nim', strings.NIM_FEATURE_DESCRIPTION, 5);
+    await featureCreate('Custom Profile Photo', strings.PROFILE_FEATURE_DESCRIPTION, 10);
 
-    await badgeCreate(strings.BA1_NAME, strings.BA1_DESCRIPTION, 'answer', 1, `/images/badges/answer/1.png`);
-    await badgeCreate(strings.BA10_NAME, strings.BA10_DESCRIPTION, 'answer', 10, `/images/badges/answer/10.png`);
-    await badgeCreate(strings.BA50_NAME, strings.BA50_DESCRIPTION, 'answer', 50, `/images/badges/answer/50.png`);
+    const q1badge = await badgeCreate(
+      strings.BQ1_NAME,
+      strings.BQ1_DESCRIPTION,
+      'question',
+      1,
+      `/images/badges/question/1.png`,
+    );
+    await badgeCreate(
+      strings.BQ10_NAME,
+      strings.BQ10_DESCRIPTION,
+      'question',
+      10,
+      `/images/badges/question/10.png`,
+    );
+    await badgeCreate(
+      strings.BQ50_NAME,
+      strings.BQ50_DESCRIPTION,
+      'question',
+      50,
+      `/images/badges/question/50.png`,
+    );
 
-    await badgeCreate(strings.BC1_NAME, strings.BC1_DESCRIPTION, 'comment', 1, `/images/badges/comment/1.png`);
-    await badgeCreate(strings.BC10_NAME, strings.BC10_DESCRIPTION, 'comment', 10, `/images/badges/comment/10.png`);
-    await badgeCreate(strings.BC50_NAME, strings.BC50_DESCRIPTION, 'comment', 50, `/images/badges/comment/50.png`);
+    const a1badge = await badgeCreate(
+      strings.BA1_NAME,
+      strings.BA1_DESCRIPTION,
+      'answer',
+      1,
+      `/images/badges/answer/1.png`,
+    );
+    await badgeCreate(
+      strings.BA10_NAME,
+      strings.BA10_DESCRIPTION,
+      'answer',
+      10,
+      `/images/badges/answer/10.png`,
+    );
+    await badgeCreate(
+      strings.BA50_NAME,
+      strings.BA50_DESCRIPTION,
+      'answer',
+      50,
+      `/images/badges/answer/50.png`,
+    );
 
-    await badgeCreate(strings.BN1_NAME, strings.BN1_DESCRIPTION, 'nim', 1, `/images/badges/nim/1.png`);
-    await badgeCreate(strings.BN5_NAME, strings.BN5_DESCRIPTION, 'nim', 5, `/images/badges/nim/5.png`);
-    await badgeCreate(strings.BN10_NAME, strings.BN10_DESCRIPTION, 'nim', 10, `/images/badges/nim/10.png`);
+    const c1badge = await badgeCreate(
+      strings.BC1_NAME,
+      strings.BC1_DESCRIPTION,
+      'comment',
+      1,
+      `/images/badges/comment/1.png`,
+    );
+    await badgeCreate(
+      strings.BC10_NAME,
+      strings.BC10_DESCRIPTION,
+      'comment',
+      10,
+      `/images/badges/comment/10.png`,
+    );
+    await badgeCreate(
+      strings.BC50_NAME,
+      strings.BC50_DESCRIPTION,
+      'comment',
+      50,
+      `/images/badges/comment/50.png`,
+    );
+
+    await badgeCreate(
+      strings.BN1_NAME,
+      strings.BN1_DESCRIPTION,
+      'nim',
+      1,
+      `/images/badges/nim/1.png`,
+    );
+    await badgeCreate(
+      strings.BN5_NAME,
+      strings.BN5_DESCRIPTION,
+      'nim',
+      5,
+      `/images/badges/nim/5.png`,
+    );
+    await badgeCreate(
+      strings.BN10_NAME,
+      strings.BN10_DESCRIPTION,
+      'nim',
+      10,
+      `/images/badges/nim/10.png`,
+    );
 
     await userCreate('sama', 'sama', new Date('2023-12-11T03:30:00'), 'I am a student.', ['Nim']);
-    await userCreate('kyle', 'kyle', new Date('2022-12-11T03:30:00'), 'I am a software engineer.', ['Nim']);
-    await userCreate('nitsa', 'nitsa', new Date('2023-12-11T03:30:00'), 'I am a designer.', ['Custom Profile Photo']);
+    await userCreate('kyle', 'kyle', new Date('2022-12-11T03:30:00'), 'I am a software engineer.', [
+      'Nim',
+    ]);
+    await userCreate('nitsa', 'nitsa', new Date('2023-12-11T03:30:00'), 'I am a designer.', [
+      'Custom Profile Photo',
+    ]);
     await userCreate('annabelle', 'annabelle', new Date('2022-12-11T03:30:00'), 'I am a manager.');
    
 
@@ -548,13 +626,90 @@ const populate = async () => {
       []
     );
     
-
-
-    await notificationCreate('sama', `annabelle answered your question: "${q1.title}"`, false, 'answer');
-    await notificationCreate('sama', `kyle answered your question: "${q1.title}"`, false, 'answer');
-    await notificationCreate('sama', `nitsa commented on your question: "${q1.title}"`, false, 'comment');
-    await notificationCreate('annabelle', `sama commented on your answer!`, false, 'comment');
-    await notificationCreate('kyle', `nitsa commented on your answer!`, false, 'comment');
+    await notificationCreate(
+      'sama',
+      `You have earned the badge ${q1badge.name}: ${q1badge.description}!`,
+      true,
+      'badge',
+      `/user/sama`,
+    );
+    await notificationCreate(
+      'sama',
+      `annabelle answered your question: "${q1.title}"`,
+      true,
+      'answer',
+      `/question/${q1._id}`,
+    );
+    await notificationCreate(
+      'annabelle',
+      `You have earned the badge ${a1badge.name}: ${a1badge.description}!`,
+      true,
+      'badge',
+      `/user/annabelle`,
+    );
+    await notificationCreate(
+      'sama',
+      `kyle answered your question: "${q1.title}"`,
+      true,
+      'answer',
+      `/question/${q1._id}`,
+    );
+    await notificationCreate(
+      'kyle',
+      `You have earned the badge ${a1badge.name}: ${a1badge.description}!`,
+      true,
+      'badge',
+      `/user/kyle`,
+    );
+    await notificationCreate(
+      'sama',
+      `nitsa commented on your question: "${q1.title}"`,
+      false,
+      'comment',
+      `/question/${q1._id}`,
+    );
+    await notificationCreate(
+      'nitsa',
+      `You have earned the badge ${c1badge.name}: ${c1badge.description}!`,
+      true,
+      'badge',
+      `/user/nitsa`,
+    );
+    await notificationCreate(
+      'annabelle',
+      `sama commented on your answer on "${q1.title}"`,
+      true,
+      'comment',
+      `/question/${q1._id}`,
+    );
+    await notificationCreate(
+      'sama',
+      `You have earned the badge ${c1badge.name}: ${c1badge.description}!`,
+      false,
+      'badge',
+      `/user/sama`,
+    );
+    await notificationCreate(
+      'kyle',
+      `nitsa commented on your answer on "${q1.title}"`,
+      true,
+      'comment',
+      `/question/${q1._id}`,
+    );
+    await notificationCreate(
+      'annabelle',
+      `You have earned the badge ${q1badge.name}: ${q1badge.description}!`,
+      false,
+      'badge',
+      `/user/annabelle`,
+    );
+    await notificationCreate(
+      'nitsa',
+      `You have earned the badge ${q1badge.name}!`,
+      false,
+      'badge',
+      `/user/nitsa`,
+    );
 
     await collectionCreate('favorites', 'nitsa', 'private', [q1._id]);
     await collectionCreate('typescript', 'annabelle', 'public', []);
