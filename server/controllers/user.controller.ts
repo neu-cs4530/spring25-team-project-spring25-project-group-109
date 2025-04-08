@@ -1,5 +1,4 @@
 import express, { Request, Response, Router } from 'express';
-import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
 import {
@@ -24,6 +23,7 @@ import {
   updateUser,
 } from '../services/user.service';
 import { saveNotification } from '../services/notification.service';
+import { upload } from '../multer.config';
 
 const userController = (socket: FakeSOSocket) => {
   const router: Router = express.Router();
@@ -296,12 +296,12 @@ const userController = (socket: FakeSOSocket) => {
         throw new Error(user.error);
       }
 
-      // delete previously uploaded profile photo to avoid storing unecessary images
-      if (
-        user.profilePhoto?.includes('uploads') &&
-        fs.existsSync(path.join(__dirname, '../../client/public', user.profilePhoto))
-      ) {
-        fs.unlinkSync(path.join(__dirname, '../../client/public', user.profilePhoto));
+      if (user.profilePhoto?.includes('uploads')) {
+        const filename = user.profilePhoto.split('/uploads/')[1];
+        const filePath = path.join(__dirname, '..', 'uploads', filename);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
       }
 
       // Call the same updateUser(...) service used by resetPassword
@@ -335,23 +335,26 @@ const userController = (socket: FakeSOSocket) => {
         throw new Error(user.error);
       }
 
-      // delete previously uploaded profile photo to avoid storing unecessary images
-      if (
-        user.profilePhoto?.includes('uploads') &&
-        fs.existsSync(path.join(__dirname, '../../client/public', user.profilePhoto))
-      ) {
-        fs.unlinkSync(path.join(__dirname, '../../client/public', user.profilePhoto));
+      if (user.profilePhoto?.includes('uploads')) {
+        const filename = user.profilePhoto.split('/uploads/')[1];
+        const filePath = path.join(__dirname, '..', 'uploads', filename);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
       }
 
-      const filePath = `/uploads/${req.file.filename}`;
-      const { username } = req.body;
-      const updatedUser = await updateUser(username, { profilePhoto: filePath });
+      const { filename } = req.file;
+      const fullUrl = `${req.protocol}://${req.get('host')}/uploads/${filename}`;
+
+      const updatedUser = await updateUser(req.body.username, {
+        profilePhoto: fullUrl,
+      });
 
       if ('error' in updatedUser) {
         throw new Error(updatedUser.error);
       }
 
-      res.status(200).json({ imageUrl: filePath, user: updatedUser });
+      res.status(200).json({ imageUrl: fullUrl, user: updatedUser });
     } catch (error) {
       res.status(500).json({ error: 'Error uploading file' });
     }
@@ -485,15 +488,6 @@ const userController = (socket: FakeSOSocket) => {
       res.status(500).send(`Error when unfollowing: ${error}`);
     }
   };
-
-  const storage = multer.diskStorage({
-    destination: '../client/public/uploads/',
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + path.extname(file.originalname));
-    },
-  });
-
-  const upload = multer({ storage });
 
   // Define routes for the user-related operations.
   router.post('/signup', createUser);
