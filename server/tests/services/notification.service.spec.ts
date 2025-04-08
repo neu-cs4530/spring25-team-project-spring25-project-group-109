@@ -86,6 +86,20 @@ describe('NotificationService', () => {
       jest.clearAllMocks();
     });
 
+    it('should throw an error if findOneAndUpdate fails', async () => {
+      const notificationId = String(mockDatabaseNotification._id);
+      const errorMessage =
+        'Error occurred when updating notification: Error: Notification update failed';
+      mockingoose(NotificationModel).toReturn(mockDatabaseNotification, 'findOne');
+      mockingoose(NotificationModel).toReturn(null, 'findOneAndUpdate');
+      try {
+        const result = await updateNotificationSeen(notificationId);
+        expect(result).toBeUndefined();
+      } catch (error) {
+        expect(error).toEqual(new Error(errorMessage));
+      }
+    });
+
     it('should successfully toggle the seen status of a notification', async () => {
       const updatedNotification = {
         ...mockDatabaseNotification,

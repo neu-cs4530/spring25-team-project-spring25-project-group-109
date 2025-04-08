@@ -400,6 +400,21 @@ describe('Question model', () => {
       });
     });
 
+    it('should replace with empty array if findOneAndUpdate returns no upvotes or downvotes', async () => {
+      const mockQuestion = {
+        _id: 'someQuestionId',
+      };
+
+      mockingoose(QuestionModel).toReturn(mockQuestion, 'findOneAndUpdate');
+      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'upvote');
+
+      expect(result).toEqual({
+        msg: 'Upvote cancelled successfully',
+        upVotes: [],
+        downVotes: [],
+      });
+    });
+
     test('should cancel the upvote if already upvoted', async () => {
       const mockQuestion = {
         _id: 'someQuestionId',
