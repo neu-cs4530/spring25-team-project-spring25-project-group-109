@@ -344,17 +344,17 @@ const userController = (socket: FakeSOSocket) => {
       }
 
       const { filename } = req.file;
-      // const fullUrl = `${req.protocol}://${req.get('host')}/uploads/${filename}`;
+      const fullUrl = `${req.protocol}://${req.get('host')}/uploads/${filename}`;
 
       const updatedUser = await updateUser(req.body.username, {
-        profilePhoto: filename,
+        profilePhoto: fullUrl,
       });
 
       if ('error' in updatedUser) {
         throw new Error(updatedUser.error);
       }
 
-      res.status(200).json({ imageUrl: filename, user: updatedUser });
+      res.status(200).json({ imageUrl: fullUrl, user: updatedUser });
     } catch (error) {
       res.status(500).json({ error: 'Error uploading file' });
     }
