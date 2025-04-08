@@ -1,5 +1,4 @@
 import React from 'react';
-import './index.css';
 import { Alert, Box, Button, Typography } from '@mui/material';
 import NimGamePage from '../nimGamePage';
 import useGamePage from '../../../../hooks/useGamePage';

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './index.css';
 import { Card, CardContent, Typography } from '@mui/material';
 import { TagData } from '../../../../types/types';
 import useTagSelected from '../../../../hooks/useTagSelected';

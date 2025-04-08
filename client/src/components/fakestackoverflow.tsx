@@ -21,6 +21,7 @@ import StorePage from './main/storePage';
 import YouTubeVideoPage from './main/youtubePage';
 import LeaderboardPage from './main/LeaderboardPage';
 import NotificationsPage from './main/notificationPage';
+import RecommendedPage from './main/recommendedPage';
 
 const ProtectedRoute = ({
   user,
@@ -74,6 +75,7 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
             <Route path='/videos' element={<YouTubeVideoPage />} />
             <Route path='/leaderboard' element={<LeaderboardPage />} />
             <Route path='/notifications' element={<NotificationsPage />} />
+            <Route path='/recommended' element={<RecommendedPage />} />
           </Route>
         }
       </Routes>

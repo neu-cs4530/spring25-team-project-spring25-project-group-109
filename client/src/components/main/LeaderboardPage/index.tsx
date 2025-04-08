@@ -62,7 +62,7 @@ const LeaderboardPage = () => {
             Leaderboard
           </Typography>
         </Stack>
-        <Typography variant='h6'>
+        <Typography variant='body1' color='text.secondary'>
           Answer questions to rise to the top of the Threadscape Leaderboard!
         </Typography>
       </Box>
@@ -119,17 +119,21 @@ const LeaderboardPage = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {topTen.map((user, index) => (
+              {topTen.map(user => (
                 <TableRow
                   key={user.username}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                  selected={user.username === username}
+                  sx={{
+                    '&:last-child td, &:last-child th': { border: 0 },
+                    'backgroundColor':
+                      user.username === username ? 'rgba(25, 118, 210, 0.1)' : 'inherit',
+                  }}>
                   <TableCell component='th' scope='row'>
                     {user.rank}
                   </TableCell>
                   <TableCell align='left'>
-                    {' '}
-                    <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
-                      <Avatar alt='No Photo' src={user.profilePhoto} sx={{ marginRight: '4px' }} />
+                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <Avatar alt='Photo' src={user.profilePhoto} sx={{ marginRight: '4px' }} />
                       {user.username}
                     </Box>
                   </TableCell>
@@ -139,50 +143,6 @@ const LeaderboardPage = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        <Typography
-          variant='h4'
-          fontWeight='bold'
-          sx={{ display: 'inline-flex', alignItems: 'center' }}>
-          <LeaderboardRoundedIcon sx={{ marginRight: '4px' }} />
-          Your Position
-        </Typography>
-        {(!userScore || userScore.count === 0) && (
-          <Typography variant='h6' color='error'>
-            You have not answered any questions yet. Answer a question to become ranked!
-          </Typography>
-        )}
-        {userScore && (
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Ranking</TableCell>
-                  <TableCell align='left'>Username</TableCell>
-                  <TableCell align='right'>Total Answers</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRow key={username} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                  <TableCell component='th' scope='row'>
-                    {userScore.rank}
-                  </TableCell>
-                  <TableCell align='left'>
-                    {' '}
-                    <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
-                      <Avatar
-                        alt='No Photo'
-                        src={userScore?.profilePhoto}
-                        sx={{ marginRight: '4px' }}
-                      />
-                      {username}
-                    </Box>
-                  </TableCell>
-                  <TableCell align='right'>{userScore?.count}</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
       </Box>
     </>
   );

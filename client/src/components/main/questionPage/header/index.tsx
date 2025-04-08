@@ -1,4 +1,3 @@
-import './index.css';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { OrderType } from '../../../../types/types';
 import { orderTypeDisplayName } from '../../../../types/constants';

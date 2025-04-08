@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './index.css';
 import { Box, IconButton, Typography, Modal } from '@mui/material';
 import { PopulatedDatabaseQuestion } from '@fake-stack-overflow/shared';
 import { BookmarkBorder } from '@mui/icons-material';

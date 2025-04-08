@@ -165,6 +165,21 @@ const SideBarNav = () => {
         </ListItem>
         <ListItem disablePadding>
           <NavLink
+            to='/recommended'
+            style={({ isActive }) => ({
+              textDecoration: 'none',
+              color: isActive ? '#1976d2' : '#333',
+              backgroundColor: isActive ? theme.palette.secondary.main : 'transparent',
+              padding: '8px 16px',
+              borderRadius: '4px',
+            })}>
+            <Button fullWidth>
+              <Typography variant='body1'>Recommended</Typography>
+            </Button>
+          </NavLink>
+        </ListItem>
+        <ListItem disablePadding>
+          <NavLink
             to='/leaderboard'
             style={({ isActive }) => ({
               textDecoration: 'none',
