@@ -109,13 +109,44 @@ const LeaderboardPage = () => {
             <DatePicker label='end' value={endDate} onChange={newValue => setEndDate(newValue)} />
           </LocalizationProvider>
         )}
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+        <TableContainer
+          component={Paper}
+          sx={{
+            maxHeight: '68%',
+            overflowY: 'auto',
+          }}>
+          <Table stickyHeader aria-label='sticky table'>
             <TableHead>
               <TableRow>
-                <TableCell>Ranking</TableCell>
-                <TableCell align='left'>Username</TableCell>
-                <TableCell align='right'>Total Answers</TableCell>
+                <TableCell
+                  sx={{
+                    position: 'sticky',
+                    top: 0,
+                    backgroundColor: 'background.paper',
+                    zIndex: 1,
+                  }}>
+                  Ranking
+                </TableCell>
+                <TableCell
+                  align='left'
+                  sx={{
+                    position: 'sticky',
+                    top: 0,
+                    backgroundColor: 'background.paper',
+                    zIndex: 1,
+                  }}>
+                  Username
+                </TableCell>
+                <TableCell
+                  align='right'
+                  sx={{
+                    position: 'sticky',
+                    top: 0,
+                    backgroundColor: 'background.paper',
+                    zIndex: 1,
+                  }}>
+                  Total Answers
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
