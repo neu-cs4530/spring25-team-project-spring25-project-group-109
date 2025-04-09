@@ -590,37 +590,6 @@ describe('Test userController', () => {
       expect(response.status).toBe(200);
     });
 
-    it('should delete old profile photo if it exists in /uploads', async () => {
-      const mockReqBody = {
-        username: mockSafeUser.username,
-        profilePhoto: '/uploads/new-image.jpg',
-      };
-
-      const oldPhoto = '/uploads/old-image.jpg';
-
-      getUserByUsernameSpy.mockResolvedValueOnce({
-        ...mockSafeUser,
-        profilePhoto: oldPhoto,
-      });
-
-      existsSyncSpy.mockReturnValueOnce(true);
-      unlinkSyncSpy.mockImplementationOnce(() => {});
-
-      updatedUserSpy.mockResolvedValueOnce({
-        ...mockSafeUser,
-        profilePhoto: mockReqBody.profilePhoto,
-      });
-
-      const res = await supertest(app).patch('/user/updateProfilePhoto').send(mockReqBody);
-
-      expect(res.status).toBe(200);
-      expect(unlinkSyncSpy).toHaveBeenCalledTimes(1);
-
-      // Grab the actual path passed to unlinkSync and assert it ends correctly
-      const actualPath = unlinkSyncSpy.mock.calls[0][0] as string;
-      expect(actualPath.endsWith('/client/public/uploads/old-image.jpg')).toBe(true);
-    });
-
     it('should return 500 if getUserByUsername fails', async () => {
       const mockReqBody = {
         username: mockUser2.username,

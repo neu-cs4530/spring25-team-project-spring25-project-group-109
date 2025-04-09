@@ -382,6 +382,33 @@ describe('getRankedUsersList', () => {
     mockingoose.resetAll();
   });
 
+  it('should push to the pipeline if startDate and endDate are provided', async () => {
+    const startDate = '2023-01-01';
+    const endDate = '2023-12-31';
+
+    const pipeline = [
+      {
+        $match: {
+          createdAt: { $gte: startDate, $lte: endDate },
+        },
+      },
+      {
+        $group: {
+          _id: '$userId',
+          count: { $sum: 1 },
+          user_info: { $first: '$$ROOT' },
+        },
+      },
+      {
+        $sort: { count: -1 },
+      },
+    ];
+
+    mockingoose(AnswerModel).toReturn(pipeline, 'aggregate');
+
+    await getRankedUsersList(startDate, endDate);
+  });
+
   it('should return the users', async () => {
     const usersArray = [safeUser, safeUserTwo];
     const answerArray = [

@@ -172,6 +172,15 @@ describe('Tag model', () => {
       jest.clearAllMocks();
     });
 
+    it('should return error if questions length is 0', async () => {
+      const askedBy = 'testUser';
+      mockingoose(QuestionModel).toReturn([], 'find');
+
+      const result = await getMostRecentQuestionTags(askedBy);
+
+      expect((result as { error: string }).error).toBe('Error when fetching tags');
+    });
+
     it('should return the tags of the most recent question', async () => {
       const askedBy = 'testUser';
       const mockQuestions = [

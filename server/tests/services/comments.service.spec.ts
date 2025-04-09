@@ -5,6 +5,7 @@ import { DatabaseComment, DatabaseQuestion, DatabaseAnswer } from '../../types/t
 import AnswerModel from '../../models/answers.model';
 import { QUESTIONS, ans1, com1, mockUserStats } from '../mockData.models';
 import UserStatsModel from '../../models/userstats.model';
+import CommentModel from '../../models/comments.model';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
@@ -21,6 +22,14 @@ describe('Comment model', () => {
       expect(result.text).toEqual(com1.text);
       expect(result.commentBy).toEqual(com1.commentBy);
       expect(result.commentDateTime).toEqual(com1.commentDateTime);
+    });
+
+    test('saveComment should return error if create fails', async () => {
+      mockingoose(CommentModel).toReturn(new Error('Error from create'), '$save');
+
+      const result = (await saveComment(com1)) as DatabaseComment;
+
+      expect(result).toEqual({ error: 'Error when saving a comment' });
     });
   });
 
@@ -89,6 +98,23 @@ describe('Comment model', () => {
 
       expect(addComment(qid, 'question', invalidComment)).resolves.toEqual({
         error: `Error when adding comment: Invalid comment`,
+      });
+    });
+
+    test('addComment should return error if UserStats findOneAndUpdate returns null', () => {
+      mockingoose(UserStatsModel).toReturn(null, 'findOneAndUpdate');
+
+      const question = QUESTIONS[0];
+      mockingoose(QuestionModel).toReturn(question, 'findOneAndUpdate');
+
+      const result = addComment(
+        question._id.toString() as string,
+        'question',
+        com1,
+      ) as Promise<DatabaseQuestion>;
+
+      expect(result).resolves.toEqual({
+        error: 'Error when adding comment: Error updating user stats',
       });
     });
   });

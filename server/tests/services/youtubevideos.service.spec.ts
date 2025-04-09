@@ -29,6 +29,16 @@ describe('Tag model', () => {
       jest.restoreAllMocks();
     });
 
+    it('should return empty array if no tags are found', async () => {
+      mockingoose(TagModel).toReturn([], 'find');
+      mockingoose(QuestionModel).toReturn([], 'find');
+
+      const askedBy = 'testUser';
+      const videos = await fetchYoutubeVideos(askedBy);
+
+      expect(videos).toEqual([]);
+    });
+
     it('should return YouTube videos for found tags', async () => {
       mockingoose(TagModel).toReturn([tag1, tag2, tag3], 'find');
       mockingoose(QuestionModel).toReturn(POPULATED_QUESTIONS, 'find');

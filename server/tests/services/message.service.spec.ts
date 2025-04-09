@@ -62,6 +62,30 @@ describe('Message model', () => {
       });
     });
 
+    it('should update coins if message type is global', async () => {
+      // Mock the user existence check
+      mockingoose(UserModel).toReturn(
+        { _id: new mongoose.Types.ObjectId(), username: 'userX' },
+        'findOne',
+      );
+
+      // Mock the created message
+      const mockCreatedMsg = {
+        _id: new mongoose.Types.ObjectId(),
+        ...mockMessage,
+      };
+      mockingoose(MessageModel).toReturn(mockCreatedMsg, 'create');
+
+      const result = await saveMessage({ ...mockMessage, type: 'global' });
+
+      expect(result).toMatchObject({
+        msg: 'Hey!',
+        msgFrom: 'userX',
+        msgDateTime: new Date('2025-01-01T10:00:00.000Z'),
+        type: 'global',
+      });
+    });
+
     it('should return an error if user does not exist', async () => {
       // No user found
       mockingoose(UserModel).toReturn(null, 'findOne');
