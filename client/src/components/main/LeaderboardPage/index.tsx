@@ -113,7 +113,7 @@ const LeaderboardPage = () => {
                     {index + 1}
                   </TableCell>
                   <TableCell align='left'>
-                    <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                       <Avatar alt='No Photo' src={user.profilePhoto} sx={{ marginRight: '4px' }} />
                       {user.username}
                     </Box>
