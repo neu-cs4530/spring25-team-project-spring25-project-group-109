@@ -105,12 +105,14 @@ const LeaderboardPage = () => {
               {topTen.map((user, index) => (
                 <TableRow
                   key={user.username}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                  sx={{
+                    '&:last-child td, &:last-child th': { border: 0 },
+                    'backgroundColor': user.username === username ? '#e3f2fd' : 'inherit',
+                  }}>
                   <TableCell component='th' scope='row'>
                     {index + 1}
                   </TableCell>
                   <TableCell align='left'>
-                    {' '}
                     <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
                       <Avatar alt='No Photo' src={user.profilePhoto} sx={{ marginRight: '4px' }} />
                       {user.username}
@@ -150,7 +152,7 @@ const LeaderboardPage = () => {
                       <Avatar
                         alt='No Photo'
                         src={userScore?.profilePhoto}
-                        sx={{ marginRight: '4px' }}
+                        sx={{ marginRight: '7px' }}
                       />
                       {username}
                     </Box>
