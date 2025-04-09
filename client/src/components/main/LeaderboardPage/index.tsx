@@ -25,26 +25,13 @@ import useLeaderboard from '../../../hooks/useLeaderboard';
 const LeaderboardPage = () => {
   const context = useContext(UserContext);
   const username = context?.user.username;
-  const [dateFilter, setDateFilter] = useState('all time');
+  const [dateFilter, setDateFilter] = useState('week');
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs());
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs());
   const { users, loading, error } = useLeaderboard(username || '', dateFilter, startDate, endDate);
-
-  let rank = 0;
-
-  let previousPoints: number | null = null;
-
-  const rankedUsers = users.map((user, index) => {
-    if (user.count !== previousPoints) {
-      rank = index + 1;
-    }
-    previousPoints = user.count;
-
-    return { ...user, rank };
-  });
-
-  let topTen = rankedUsers;
-
+  let topTen = users;
+  const userScore = users.find(user => user.username === username);
+  const userRanking = users.findIndex(user => user.username === username);
   if (topTen.length > 10) {
     topTen = topTen.slice(0, 10);
   }
@@ -61,9 +48,6 @@ const LeaderboardPage = () => {
             Leaderboard
           </Typography>
         </Stack>
-        <Typography variant='body1' color='text.secondary'>
-          Answer questions to rise to the top of the Threadscape Leaderboard!
-        </Typography>
       </Box>
 
       <Box
@@ -108,62 +92,27 @@ const LeaderboardPage = () => {
             <DatePicker label='end' value={endDate} onChange={newValue => setEndDate(newValue)} />
           </LocalizationProvider>
         )}
-        <TableContainer
-          component={Paper}
-          sx={{
-            maxHeight: '68%',
-            overflowY: 'auto',
-          }}>
-          <Table stickyHeader aria-label='sticky table'>
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label='simple table'>
             <TableHead>
               <TableRow>
-                <TableCell
-                  sx={{
-                    position: 'sticky',
-                    top: 0,
-                    backgroundColor: 'background.paper',
-                    zIndex: 1,
-                  }}>
-                  Ranking
-                </TableCell>
-                <TableCell
-                  align='left'
-                  sx={{
-                    position: 'sticky',
-                    top: 0,
-                    backgroundColor: 'background.paper',
-                    zIndex: 1,
-                  }}>
-                  Username
-                </TableCell>
-                <TableCell
-                  align='right'
-                  sx={{
-                    position: 'sticky',
-                    top: 0,
-                    backgroundColor: 'background.paper',
-                    zIndex: 1,
-                  }}>
-                  Total Answers
-                </TableCell>
+                <TableCell>Ranking</TableCell>
+                <TableCell align='left'>Username</TableCell>
+                <TableCell align='right'>Total Answers</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {topTen.map(user => (
+              {topTen.map((user, index) => (
                 <TableRow
                   key={user.username}
-                  selected={user.username === username}
-                  sx={{
-                    '&:last-child td, &:last-child th': { border: 0 },
-                    'backgroundColor':
-                      user.username === username ? 'rgba(25, 118, 210, 0.1)' : 'inherit',
-                  }}>
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell component='th' scope='row'>
-                    {user.rank}
+                    {index + 1}
                   </TableCell>
                   <TableCell align='left'>
-                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      <Avatar alt='Photo' src={user.profilePhoto} sx={{ marginRight: '4px' }} />
+                    {' '}
+                    <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
+                      <Avatar alt='No Photo' src={user.profilePhoto} sx={{ marginRight: '4px' }} />
                       {user.username}
                     </Box>
                   </TableCell>
@@ -173,6 +122,45 @@ const LeaderboardPage = () => {
             </TableBody>
           </Table>
         </TableContainer>
+        <Typography
+          variant='h4'
+          fontWeight='bold'
+          sx={{ display: 'inline-flex', alignItems: 'center' }}>
+          <LeaderboardRoundedIcon sx={{ marginRight: '4px' }} />
+          Your Position
+        </Typography>
+        {userScore && (
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Ranking</TableCell>
+                  <TableCell align='left'>Username</TableCell>
+                  <TableCell align='right'>Total Answers</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow key={username} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                  <TableCell component='th' scope='row'>
+                    {userRanking + 1}
+                  </TableCell>
+                  <TableCell align='left'>
+                    {' '}
+                    <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
+                      <Avatar
+                        alt='No Photo'
+                        src={userScore?.profilePhoto}
+                        sx={{ marginRight: '4px' }}
+                      />
+                      {username}
+                    </Box>
+                  </TableCell>
+                  <TableCell align='right'>{userScore?.count}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Box>
     </>
   );
