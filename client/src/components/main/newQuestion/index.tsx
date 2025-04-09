@@ -1,9 +1,6 @@
 import React from 'react';
+import { Box, Button, Stack, TextField, Typography, Autocomplete } from '@mui/material';
 import useNewQuestion from '../../../hooks/useNewQuestion';
-import Form from '../baseComponents/form';
-import Input from '../baseComponents/input';
-import TextArea from '../baseComponents/textarea';
-import './index.css';
 
 /**
  * NewQuestionPage component allows users to submit a new question with a title,
@@ -21,45 +18,66 @@ const NewQuestionPage = () => {
     textErr,
     tagErr,
     postQuestion,
+    existingTags, // List of predefined tags
   } = useNewQuestion();
 
   return (
-    <Form>
-      <Input
-        title={'Question Title'}
-        hint={'Limit title to 100 characters or less'}
-        id={'formTitleInput'}
-        val={title}
-        setState={setTitle}
-        err={titleErr}
-      />
-      <TextArea
-        title={'Question Text'}
-        hint={'Add details'}
-        id={'formTextInput'}
-        val={text}
-        setState={setText}
-        err={textErr}
-      />
-      <Input
-        title={'Tags'}
-        hint={'Add keywords separated by whitespace'}
-        id={'formTagInput'}
-        val={tagNames}
-        setState={setTagNames}
-        err={tagErr}
-      />
-      <div className='btn_indicator_container'>
-        <button
-          className='form_postBtn'
-          onClick={() => {
-            postQuestion();
-          }}>
-          Post Question
-        </button>
-        <div className='mandatory_indicator'>* indicates mandatory fields</div>
-      </div>
-    </Form>
+    <Box sx={{ maxWidth: 600, margin: '0 auto', padding: 4 }}>
+      <Stack spacing={3}>
+        <Typography variant='h4' gutterBottom>
+          Submit a New Question
+        </Typography>
+        <Box>
+          <TextField
+            fullWidth
+            label='Question Title'
+            id='formTitleInput'
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            error={Boolean(titleErr)}
+            helperText={titleErr}
+          />
+        </Box>
+        <Box>
+          <TextField
+            fullWidth
+            label='Question Text'
+            placeholder='Add details'
+            id='formTextInput'
+            value={text}
+            onChange={e => setText(e.target.value)}
+            error={Boolean(textErr)}
+            helperText={textErr}
+            multiline
+            rows={4}
+          />
+        </Box>
+        <Box>
+          <Autocomplete
+            multiple
+            id='tags'
+            options={existingTags} // Predefined tags
+            freeSolo
+            value={tagNames} // Array of selected tags
+            onChange={(event, newValue) => setTagNames(newValue)} // Update the tags
+            renderInput={params => (
+              <TextField {...params} label='Tags' error={Boolean(tagErr)} helperText={tagErr} />
+            )}
+            isOptionEqualToValue={(option, value) => option === value} // Ensures custom input is treated as a valid option
+          />
+        </Box>
+        <Box>
+          <Button variant='contained' fullWidth onClick={postQuestion}>
+            Post Question
+          </Button>
+        </Box>
+        <Box sx={{ textAlign: 'center', mt: 1 }}>
+          <Typography variant='body2' color='textSecondary'>
+            <strong>*</strong> indicates mandatory fields
+          </Typography>
+        </Box>
+      </Stack>
+    </Box>
   );
 };
 

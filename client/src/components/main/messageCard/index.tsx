@@ -1,5 +1,5 @@
 import React from 'react';
-import './index.css';
+import { Box, Paper, Stack, Typography, useTheme } from '@mui/material';
 import { DatabaseMessage } from '../../../types/types';
 import { getMetaData } from '../../../tool';
 
@@ -8,14 +8,27 @@ import { getMetaData } from '../../../tool';
  *
  * @param message: The message object to display.
  */
-const MessageCard = ({ message }: { message: DatabaseMessage }) => (
-  <div className='message'>
-    <div className='message-header'>
-      <div className='message-sender'>{message.msgFrom}</div>
-      <div className='message-time'>{getMetaData(new Date(message.msgDateTime))}</div>
-    </div>
-    <div className='message-body'>{message.msg}</div>
-  </div>
-);
+const MessageCard = ({ message }: { message: DatabaseMessage }) => {
+  const theme = useTheme();
+
+  return (
+    <Paper
+      variant='outlined'
+      elevation={0}
+      sx={{ p: 2, bgcolor: theme.palette.grey[100], borderRadius: 2, my: 1 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Stack>
+          <Typography variant='body2' fontWeight={'bold'}>
+            {message.msgFrom}
+          </Typography>
+          <Typography variant='body1'>{message.msg}</Typography>
+        </Stack>
+        <Typography color={theme.palette.grey[200]} variant='body2'>
+          {getMetaData(new Date(message.msgDateTime))}
+        </Typography>
+      </Box>
+    </Paper>
+  );
+};
 
 export default MessageCard;

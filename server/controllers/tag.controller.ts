@@ -1,5 +1,5 @@
 import express, { Request, Response, Router } from 'express';
-import { getTagCountMap } from '../services/tag.service';
+import { getTagCountMap, getMostRecentQuestionTags } from '../services/tag.service';
 import TagModel from '../models/tags.model';
 import { DatabaseTag } from '../types/types';
 
@@ -59,9 +59,34 @@ const tagController = () => {
     }
   };
 
+  /**
+   * Retrieves a list of tags for the most recent question asked by a given user.
+   *
+   * @param req The HTTP request object, containing the askedBy parameter in the URL.
+   * @param res The HTTP response object used to send back the list of tags.
+   *
+   * @returns A Promise that resolves to void.
+   */
+  const getMostRecentQuestionTagsRoute = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { askedBy } = req.params;
+      const tags = await getMostRecentQuestionTags(askedBy);
+
+      if ('error' in tags) {
+        res.status(500).send('No tags found for this user.');
+        return;
+      }
+
+      res.json(tags); // Return the tags as JSON
+    } catch (err) {
+      res.status(500).send(`Error fetching tags: ${(err as Error).message}`);
+    }
+  };
+
   // Add appropriate HTTP verbs and their endpoints to the router.
   router.get('/getTagsWithQuestionNumber', getTagsWithQuestionNumber);
   router.get('/getTagByName/:name', getTagByName); // New endpoint to get tag by name
+  router.get('/getMostRecentQuestionTags/:askedBy', getMostRecentQuestionTagsRoute); // Route to get tags by user
 
   return router;
 };

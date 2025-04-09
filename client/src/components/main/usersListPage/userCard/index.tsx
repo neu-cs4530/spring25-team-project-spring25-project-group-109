@@ -1,5 +1,6 @@
 import React from 'react';
 import './index.css';
+import { Avatar, Box, Card, Typography } from '@mui/material';
 import { SafeDatabaseUser } from '../../../../types/types';
 
 /**
@@ -24,14 +25,38 @@ const UserCardView = (props: UserProps) => {
   const { user, handleUserCardViewClickHandler } = props;
 
   return (
-    <div className='user right_padding' onClick={() => handleUserCardViewClickHandler(user)}>
-      <div className='user_mid'>
-        <div className='userUsername'>{user.username}</div>
-      </div>
-      <div className='userStats'>
-        <div>joined {new Date(user.dateJoined).toUTCString()}</div>
-      </div>
-    </div>
+    <Card
+      sx={{
+        'display': 'flex',
+        'padding': 2,
+        'cursor': 'pointer',
+        'boxShadow': 3,
+        'borderRadius': 2,
+        '&:hover': { boxShadow: 6 },
+        'margin': 2,
+      }}
+      onClick={() => handleUserCardViewClickHandler(user)}>
+      <Avatar
+        src={user.profilePhoto}
+        alt={`${user.username}'s profile`}
+        sx={{ width: 56, height: 56, marginRight: 2 }}
+      />
+
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          width: '100%',
+        }}>
+        <Typography variant='h6' component='div' sx={{ fontWeight: 'bold' }}>
+          {user.username}
+        </Typography>
+        <Typography variant='body2' color='textSecondary'>
+          Joined: {new Date(user.dateJoined).toLocaleDateString()}
+        </Typography>
+      </Box>
+    </Card>
   );
 };
 

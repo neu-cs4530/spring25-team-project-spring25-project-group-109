@@ -123,3 +123,33 @@ export const getTagCountMap = async (): Promise<Map<string, number> | null | { e
     return { error: 'Error when constructing tag map' };
   }
 };
+
+/**
+ * Retreives the list of tags from the last question asked by the given user.
+ *
+ * @param askedBy the user which asked the question
+ * @returns {DatabaseTag[] | { error: string }}
+ */
+export async function getMostRecentQuestionTags(
+  askedBy: string,
+): Promise<DatabaseTag[] | { error: string }> {
+  try {
+    // Query the database for all questions asked by the user
+    const questions = await QuestionModel.find({ askedBy }).sort({ askDateTime: -1 }); // Sort by askDateTime descending (most recent first)
+
+    if (questions.length === 0) throw new Error('No questions found for the user');
+
+    // Take the most recent question
+    const mostRecentQuestion = questions[0];
+    const mostRecentQTags = mostRecentQuestion.tags;
+    if (!mostRecentQTags || mostRecentQTags.length === 0) {
+      throw new Error('No tags found for the most recent question.');
+    }
+
+    // Return the tag of the most recent question
+    const tags = await TagModel.find({ _id: { $in: mostRecentQTags } });
+    return tags;
+  } catch (error) {
+    return { error: 'Error when fetching tags' };
+  }
+}

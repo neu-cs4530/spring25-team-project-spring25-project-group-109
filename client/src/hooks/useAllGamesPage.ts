@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createGame, getGames } from '../services/gamesService';
+import { getUserStore } from '../services/storeService';
 import { GameInstance, GameState, GameType } from '../types/types';
+import useUserContext from './useUserContext';
 
 /**
  * Custom hook to manage the state and logic for the "All Games" page, including fetching games,
@@ -15,10 +17,21 @@ import { GameInstance, GameState, GameType } from '../types/types';
  * - `handleSelectGameType`: A function to select a game type, create a new game, and close the modal.
  */
 const useAllGamesPage = () => {
+  const { user } = useUserContext();
   const navigate = useNavigate();
   const [availableGames, setAvailableGames] = useState<GameInstance<GameState>[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [permissions, setPermissions] = useState<{ nim: boolean }>({ nim: false });
+
+  const fetchUserStore = async () => {
+    try {
+      const userStore = await getUserStore(user.username); // Fetch store
+      setPermissions({ nim: userStore.unlockedFeatures.includes('Nim') });
+    } catch (storeError) {
+      setError('Error fetching user store');
+    }
+  };
 
   const fetchGames = async () => {
     try {
@@ -43,6 +56,10 @@ const useAllGamesPage = () => {
   };
 
   useEffect(() => {
+    fetchUserStore();
+  });
+
+  useEffect(() => {
     fetchGames();
   }, []);
 
@@ -63,6 +80,7 @@ const useAllGamesPage = () => {
     handleToggleModal,
     handleSelectGameType,
     error,
+    permissions,
   };
 };
 

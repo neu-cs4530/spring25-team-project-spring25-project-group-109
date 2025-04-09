@@ -1,7 +1,8 @@
-import React from 'react';
-import './index.css';
+import React, { useState } from 'react';
+import { Card, CardContent, Typography } from '@mui/material';
 import { TagData } from '../../../../types/types';
 import useTagSelected from '../../../../hooks/useTagSelected';
+import TagDialog from '../tagDialog';
 
 /**
  * Props for the Tag component.
@@ -24,18 +25,42 @@ interface TagProps {
  */
 const TagView = ({ t, clickTag }: TagProps) => {
   const { tag } = useTagSelected(t);
+  const [open, setOpen] = useState(false);
 
   return (
-    <div
-      className='tagNode'
-      onClick={() => {
-        clickTag(t.name);
-      }}>
-      <div className='tagName'>{tag.name}</div>
-      <div className='tagDescription'>{tag.description}</div>
-      <div>{t.qcnt} questions</div>
-    </div>
+    <>
+      <Card
+        sx={{
+          'cursor': 'pointer',
+          'boxShadow': 2,
+          'transition': '0.3s',
+          '&:hover': { boxShadow: 6 },
+          'borderRadius': 2,
+        }}
+        onClick={() => setOpen(true)}>
+        <CardContent>
+          <Typography variant='h6' color='primary'>
+            {tag.name}
+          </Typography>
+          <Typography variant='body2' color='textSecondary'>
+            {tag.description.length > 50
+              ? `${tag.description.substring(0, 50)}...`
+              : tag.description}
+          </Typography>
+          <Typography variant='caption' color='textSecondary'>
+            {t.qcnt} questions
+          </Typography>
+        </CardContent>
+      </Card>
+
+      <TagDialog
+        open={open}
+        handleClose={() => setOpen(false)}
+        tag={tag}
+        tagData={t}
+        clickTag={clickTag}
+      />
+    </>
   );
 };
-
 export default TagView;

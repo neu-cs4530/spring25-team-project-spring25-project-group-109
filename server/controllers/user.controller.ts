@@ -1,4 +1,8 @@
 import express, { Request, Response, Router } from 'express';
+import multer from 'multer';
+import fs from 'fs';
+import path from 'path';
+import dayjs from 'dayjs';
 import {
   UserRequest,
   User,
@@ -6,15 +10,21 @@ import {
   UserByUsernameRequest,
   FakeSOSocket,
   UpdateBiographyRequest,
+  UpdateProfilePhotoRequest,
+  ToggleFollowRequest,
 } from '../types/types';
 import {
   deleteUserByUsername,
+  getRankedUsersList,
   getUserByUsername,
   getUsersList,
   loginUser,
   saveUser,
+  saveUserStats,
+  saveUserStore,
   updateUser,
 } from '../services/user.service';
+import { saveNotification } from '../services/notification.service';
 
 const userController = (socket: FakeSOSocket) => {
   const router: Router = express.Router();
@@ -43,6 +53,17 @@ const userController = (socket: FakeSOSocket) => {
     req.body.biography !== undefined;
 
   /**
+   * Validates that the request body contains all required fields to update a biography.
+   * @param req The incoming request containing user data.
+   * @returns `true` if the body contains valid user fields; otherwise, `false`.
+   */
+  const isUpdateProfilePhotoBodyValid = (req: UpdateProfilePhotoRequest): boolean =>
+    req.body !== undefined &&
+    req.body.username !== undefined &&
+    req.body.username.trim() !== '' &&
+    req.body.profilePhoto !== undefined;
+
+  /**
    * Handles the creation of a new user account.
    * @param req The request containing username, email, and password in the body.
    * @param res The response, either returning the created user or an error.
@@ -60,6 +81,10 @@ const userController = (socket: FakeSOSocket) => {
       ...requestUser,
       dateJoined: new Date(),
       biography: requestUser.biography ?? '',
+      profilePhoto: requestUser.profilePhoto,
+      badgesEarned: [],
+      followers: [],
+      following: [],
     };
 
     try {
@@ -67,6 +92,18 @@ const userController = (socket: FakeSOSocket) => {
 
       if ('error' in result) {
         throw new Error(result.error);
+      }
+
+      // Create corresponding user stats object
+      const statsResult = await saveUserStats(result.username);
+      if ('error' in statsResult) {
+        throw new Error(statsResult.error);
+      }
+
+      // Create corresponding user store object
+      const storeResult = await saveUserStore(result.username);
+      if ('error' in storeResult) {
+        throw new Error(storeResult.error);
       }
 
       socket.emit('userUpdate', {
@@ -236,6 +273,254 @@ const userController = (socket: FakeSOSocket) => {
     }
   };
 
+  /**
+   * Updates a user's profile photo.
+   * @param req The request containing the username and profile photo path.
+   * @param res The response, either confirming the update or returning an error.
+   * @returns A promise resolving to void.
+   */
+  const updateProfilePhoto = async (
+    req: UpdateProfilePhotoRequest,
+    res: Response,
+  ): Promise<void> => {
+    try {
+      if (!isUpdateProfilePhotoBodyValid(req)) {
+        res.status(400).send('Invalid user body');
+        return;
+      }
+
+      // Validate that request has username and profile photo
+      const { username, profilePhoto } = req.body;
+
+      const user = await getUserByUsername(req.body.username);
+      if ('error' in user) {
+        throw new Error(user.error);
+      }
+
+      // delete previously uploaded profile photo to avoid storing unecessary images
+      if (user.profilePhoto?.includes('uploads')) {
+        const filename = user.profilePhoto.split('/uploads/')[1];
+        const filePath = path.join(__dirname, '..', 'uploads', filename);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      }
+
+      // Call the same updateUser(...) service used by resetPassword
+      const updatedUser = await updateUser(username, { profilePhoto });
+
+      if ('error' in updatedUser) {
+        throw new Error(updatedUser.error);
+      }
+
+      // Emit socket event for real-time updates
+      socket.emit('userUpdate', {
+        user: updatedUser,
+        type: 'updated',
+      });
+
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      res.status(500).send(`Error when updating user profile photo: ${error}`);
+    }
+  };
+
+  /**
+   * Uploads a user's profile photo.
+   * @param req The request containing the username and profile photo path.
+   * @param res The response, either confirming the update or returning an error.
+   * @returns A promise resolving to void.
+   */
+  const uploadProfilePhoto = async (req: UserByUsernameRequest, res: Response): Promise<void> => {
+    try {
+      if (!req.file || !req.body.username) {
+        res.status(400).send('Invalid user body');
+        return;
+      }
+
+      const user = await getUserByUsername(req.body.username);
+      if ('error' in user) {
+        throw new Error(user.error);
+      }
+
+      // delete previously uploaded profile photo to avoid storing unecessary images
+      if (user.profilePhoto?.includes('uploads')) {
+        const filename = user.profilePhoto.split('/uploads/')[1];
+        const filePath = path.join(__dirname, '..', 'uploads', filename);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      }
+      const { filename } = req.file;
+      const filePath = `${req.protocol}://${req.get('host')}/uploads/${filename}`;
+
+      const updatedUser = await updateUser(req.body.username, {
+        profilePhoto: filePath,
+      });
+
+      if ('error' in updatedUser) {
+        throw new Error(updatedUser.error);
+      }
+
+      res.status(200).json({ imageUrl: filePath, user: updatedUser });
+    } catch (error) {
+      res.status(500).json({ error: 'Error uploading file' });
+    }
+  };
+
+  const getRankedUsers = async (req: Request, res: Response) => {
+    try {
+      let startDate = null;
+      let endDate = null;
+      if (req.query.dateFilter) {
+        if (req.query.dateFilter === 'custom') {
+          startDate = req.query.startDate as string;
+          endDate = req.query.endDate as string;
+        } else if (req.query.dateFilter === 'week') {
+          startDate = dayjs().subtract(7, 'day').toISOString();
+          endDate = dayjs().toISOString();
+        } else if (req.query.dateFilter === 'month') {
+          startDate = dayjs().subtract(1, 'month').toISOString();
+          endDate = dayjs().toISOString();
+        }
+      }
+
+      const users = await getRankedUsersList(startDate, endDate);
+
+      if ('error' in users) {
+        throw Error(users.error);
+      }
+
+      res.status(200).json(users);
+    } catch (error) {
+      res.status(500).send(`Error when getting ranked users: ${error}`);
+    }
+  };
+
+  /**
+   * Adds a user to another user's followers and vice versa for following.
+   * @param req The request containing the two usernames in the body.
+   * @param res The response, either confirming the update or returning an error.
+   * @returns A promise resolving to void.
+   */
+  const follow = async (req: ToggleFollowRequest, res: Response): Promise<void> => {
+    try {
+      const { follower, followee } = req.body;
+
+      if (!follower || !followee) {
+        res.status(400).send('Invalid body');
+        return;
+      }
+      if (follower === followee) {
+        res.status(400).send('Cannot follow yourself');
+        return;
+      }
+
+      const followerUser = await getUserByUsername(follower);
+      const followeeUser = await getUserByUsername(followee);
+
+      if ('error' in followerUser) {
+        throw new Error(followerUser.error);
+      }
+      if ('error' in followeeUser) {
+        throw new Error(followeeUser.error);
+      }
+
+      const result1 = await updateUser(follower, {
+        following: [...followerUser.following, followee],
+      });
+      const result2 = await updateUser(followee, {
+        followers: [...followeeUser.followers, follower],
+      });
+
+      if ('error' in result1) {
+        throw new Error(result1.error);
+      }
+      if ('error' in result2) {
+        throw new Error(result2.error);
+      }
+
+      // send a notification to the followee
+      const notification = await saveNotification({
+        username: followee,
+        text: `${follower} followed you!`,
+        seen: false,
+        type: 'follow',
+        link: `/user/${follower}`,
+      });
+      if ('error' in notification) {
+        throw new Error(notification.error);
+      }
+      socket.emit('notificationUpdate', { notification, type: 'created' });
+
+      res.status(200).json([result1, result2]);
+    } catch (error) {
+      res.status(500).send(`Error when following: ${error}`);
+    }
+  };
+
+  /**
+   * Removes a user from another user's followers and vice versa for following.
+   * @param req The request containing the two usernames in the body.
+   * @param res The response, either confirming the update or returning an error.
+   * @returns A promise resolving to void.
+   */
+  const unfollow = async (req: ToggleFollowRequest, res: Response): Promise<void> => {
+    try {
+      const { follower, followee } = req.body;
+
+      if (!follower || !followee) {
+        res.status(400).send('Invalid body');
+        return;
+      }
+
+      if (follower === followee) {
+        res.status(400).send('Cannot unfollow yourself');
+        return;
+      }
+
+      const followerUser = await getUserByUsername(follower);
+      const followeeUser = await getUserByUsername(followee);
+
+      if ('error' in followerUser) {
+        throw new Error(followerUser.error);
+      }
+
+      if ('error' in followeeUser) {
+        throw new Error(followeeUser.error);
+      }
+
+      const result1 = await updateUser(follower, {
+        following: followerUser.following.filter(user => user !== followee),
+      });
+
+      if ('error' in result1) {
+        throw new Error(result1.error);
+      }
+
+      const result2 = await updateUser(followee, {
+        followers: followeeUser.followers.filter(user => user !== follower),
+      });
+
+      if ('error' in result2) {
+        throw new Error(result2.error);
+      }
+
+      res.status(200).json([result1, result2]);
+    } catch (error) {
+      res.status(500).send(`Error when unfollowing: ${error}`);
+    }
+  };
+
+  const storage = multer.diskStorage({
+    destination: path.join(__dirname, '..', 'uploads'),
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + path.extname(file.originalname));
+    },
+  });
+
+  const upload = multer({ storage });
+
   // Define routes for the user-related operations.
   router.post('/signup', createUser);
   router.post('/login', userLogin);
@@ -244,6 +529,12 @@ const userController = (socket: FakeSOSocket) => {
   router.get('/getUsers', getUsers);
   router.delete('/deleteUser/:username', deleteUser);
   router.patch('/updateBiography', updateBiography);
+  router.patch('/updateProfilePhoto', updateProfilePhoto);
+  router.get('/getUsers/ranking', getRankedUsers);
+  router.patch('/follow', follow);
+  router.patch('/unfollow', unfollow);
+  router.post('/uploadProfilePhoto', upload.single('file'), uploadProfilePhoto);
+
   return router;
 };
 

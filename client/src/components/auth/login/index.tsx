@@ -1,6 +1,14 @@
-import React from 'react';
 import './index.css';
-import { Link } from 'react-router-dom';
+import {
+  Button,
+  TextField,
+  Typography,
+  Link,
+  Box,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import useAuth from '../../../hooks/useAuth';
 
 /**
@@ -20,44 +28,57 @@ const Login = () => {
 
   return (
     <div className='container'>
-      <h2>Welcome to FakeStackOverflow!</h2>
-      <h3>Please login to continue.</h3>
-      <form onSubmit={handleSubmit}>
-        <h4>Please enter your username.</h4>
-        <input
+      <Typography variant='h1' sx={{ mb: 3 }}>
+        Threadscape
+      </Typography>
+      <Box
+        component='form'
+        onSubmit={handleSubmit}
+        sx={{ display: 'flex', flexDirection: 'column', width: 500, mb: 2 }}>
+        <Typography variant='h6'>Please enter your username.</Typography>
+        <TextField
           type='text'
           value={username}
           onChange={event => handleInputChange(event, 'username')}
-          placeholder='Enter your username'
           required
-          className='input-text'
           id='username-input'
+          label='Username'
+          fullWidth
         />
-        <h4>Please enter your password.</h4>
-        <input
+        <Typography variant='h6'>Please enter your password.</Typography>
+        <TextField
           type={showPassword ? 'text' : 'password'}
           value={password}
           onChange={event => handleInputChange(event, 'password')}
-          placeholder='Enter your password'
           required
-          className='input-text'
           id='password-input'
+          label='Password'
+          fullWidth
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position='end'>
+                  <IconButton
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    onClick={togglePasswordVisibility}
+                    edge='end'>
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
         />
-        <div className='show-password'>
-          <input
-            type='checkbox'
-            id='showPasswordToggle'
-            checked={showPassword}
-            onChange={togglePasswordVisibility}
-          />
-          <label htmlFor='showPasswordToggle'>Show Password</label>
-        </div>
-        <button type='submit' className='login-button'>
+        <Button type='submit' variant='contained' sx={{ mt: 2, mb: 1 }}>
           Submit
-        </button>
-      </form>
-      {err && <p className='error-message'>{err}</p>}
-      <Link to='/signup' className='signup-link'>
+        </Button>
+      </Box>
+      {err && (
+        <Typography variant='body2' color='error.main' sx={{ fontWeight: 'bold', mt: 1, mb: 2 }}>
+          {err}
+        </Typography>
+      )}
+      <Link variant='body2' href='/signup'>
         Don&apos;t have an account? Sign up here.
       </Link>
     </div>

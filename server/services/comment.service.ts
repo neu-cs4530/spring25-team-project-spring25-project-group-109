@@ -10,6 +10,7 @@ import {
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
 import CommentModel from '../models/comments.model';
+import UserStatsModel from '../models/userstats.model';
 
 /**
  * Saves a new comment to the database.
@@ -60,6 +61,15 @@ export const addComment = async (
 
     if (result === null) {
       throw new Error('Failed to add comment');
+    }
+
+    const userStats = await UserStatsModel.findOneAndUpdate(
+      { username: comment.commentBy },
+      { $inc: { commentsCount: 1 } },
+      { new: true },
+    );
+    if (!userStats) {
+      throw new Error('Error updating user stats');
     }
 
     return result;

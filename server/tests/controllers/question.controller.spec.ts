@@ -1,9 +1,11 @@
 import mongoose from 'mongoose';
 import supertest from 'supertest';
+import { ObjectId } from 'mongodb';
 import { app } from '../../app';
 import * as questionUtil from '../../services/question.service';
 import * as tagUtil from '../../services/tag.service';
 import * as databaseUtil from '../../utils/database.util';
+import * as notifUtil from '../../services/notification.service';
 import {
   Answer,
   DatabaseQuestion,
@@ -14,6 +16,7 @@ import {
   Tag,
   VoteResponse,
 } from '../../types/types';
+import QuestionModel from '../../models/questions.model';
 
 const addVoteToQuestionSpy = jest.spyOn(questionUtil, 'addVoteToQuestion');
 const getQuestionsByOrderSpy: jest.SpyInstance = jest.spyOn(questionUtil, 'getQuestionsByOrder');
@@ -21,6 +24,7 @@ const filterQuestionsBySearchSpy: jest.SpyInstance = jest.spyOn(
   questionUtil,
   'filterQuestionsBySearch',
 );
+const saveNotificationSpy = jest.spyOn(notifUtil, 'saveNotification');
 
 const tag1: Tag = {
   name: 'tag1',
@@ -165,6 +169,10 @@ const simplifyQuestion = (question: PopulatedDatabaseQuestion) => ({
 const EXPECTED_QUESTIONS = MOCK_POPULATED_QUESTIONS.map(question => simplifyQuestion(question));
 
 describe('Test questionController', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.resetAllMocks();
+  });
   describe('POST /addQuestion', () => {
     it('should add a new question', async () => {
       jest.spyOn(tagUtil, 'processTags').mockResolvedValue([dbTag1, dbTag2]);
@@ -304,6 +312,18 @@ describe('Test questionController', () => {
       expect(response.status).toBe(200);
       expect(response.body).toEqual(simplifyQuestion(result)); // Expect only unique tags
     });
+
+    it('should return 500 if a non-Error is thrown when saving a question', async () => {
+      jest.spyOn(tagUtil, 'processTags').mockResolvedValue([dbTag1, dbTag2]);
+      jest.spyOn(questionUtil, 'saveQuestion').mockImplementation(() => {
+        throw 'not an error';
+      });
+
+      const response = await supertest(app).post('/question/addQuestion').send(mockQuestion);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error when saving question');
+    });
   });
 
   describe('POST /upvoteQuestion', () => {
@@ -319,6 +339,17 @@ describe('Test questionController', () => {
         downVotes: [],
       };
 
+      QuestionModel.findOne = jest.fn().mockResolvedValue(mockQuestion);
+      saveNotificationSpy.mockResolvedValue({
+        _id: new ObjectId(),
+        username: 'original-user',
+        text: 'new-user upvoted your question: "Sample Question"',
+        seen: false,
+        type: 'upvote',
+        link: '/question/65e9b5a995b6c7045a30d823',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
       addVoteToQuestionSpy.mockResolvedValueOnce(mockResponse);
 
       const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
@@ -346,6 +377,17 @@ describe('Test questionController', () => {
       };
 
       addVoteToQuestionSpy.mockResolvedValueOnce(mockFirstResponse);
+      QuestionModel.findOne = jest.fn().mockResolvedValue(mockQuestion);
+      saveNotificationSpy.mockResolvedValue({
+        _id: new ObjectId(),
+        username: 'original-user',
+        text: 'new-user upvoted your question: "Sample Question"',
+        seen: false,
+        type: 'upvote',
+        link: '/question/65e9b5a995b6c7045a30d823',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
       const firstResponse = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
       expect(firstResponse.status).toBe(200);
@@ -375,6 +417,17 @@ describe('Test questionController', () => {
       };
 
       addVoteToQuestionSpy.mockResolvedValueOnce(mockResponseWithBothVotes);
+      QuestionModel.findOne = jest.fn().mockResolvedValue(mockQuestion);
+      saveNotificationSpy.mockResolvedValue({
+        _id: new ObjectId(),
+        username: 'original-user',
+        text: 'new-user upvoted your question: "Sample Question"',
+        seen: false,
+        type: 'upvote',
+        link: '/question/65e9b5a995b6c7045a30d823',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
       let response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
 
@@ -415,6 +468,77 @@ describe('Test questionController', () => {
 
       expect(response.status).toBe(400);
     });
+
+    it('should return 500 if saveNotification fails', async () => {
+      const mockReqBody = {
+        qid: '65e9b5a995b6c7045a30d823',
+        username: 'new-user',
+      };
+
+      const mockResponse = {
+        msg: 'Question upvoted successfully',
+        upVotes: ['new-user'],
+        downVotes: [],
+      };
+
+      QuestionModel.findOne = jest.fn().mockResolvedValue(mockQuestion);
+      addVoteToQuestionSpy.mockResolvedValueOnce(mockResponse);
+      saveNotificationSpy.mockResolvedValue({ error: 'Error saving notification' });
+
+      const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+    });
+
+    it('should return 500 if a non-Error is thrown in voteQuestion', async () => {
+      const mockReqBody = {
+        qid: '65e9b5a995b6c7045a30d823',
+        username: 'some-user',
+      };
+
+      addVoteToQuestionSpy.mockImplementation(() => {
+        throw 'not an error';
+      });
+
+      const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+    });
+
+    it('should return 500 if voteQuestion returns an error in status', async () => {
+      const mockReqBody = {
+        qid: '65e9b5a995b6c7045a30d823',
+        username: 'some-user',
+      };
+
+      addVoteToQuestionSpy.mockResolvedValueOnce({ error: 'vote failed' });
+
+      const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toMatch('Error when upvoteing: vote failed');
+    });
+
+    it('should return 500 if the question is not found in the database after upvote', async () => {
+      const mockReqBody = {
+        qid: '65e9b5a995b6c7045a30d823',
+        username: 'some-user',
+      };
+
+      const mockVoteResult = {
+        msg: 'Question upvoted successfully',
+        upVotes: ['some-user'],
+        downVotes: [],
+      };
+
+      addVoteToQuestionSpy.mockResolvedValueOnce(mockVoteResult);
+      QuestionModel.findOne = jest.fn().mockResolvedValue(null);
+
+      const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toMatch('Error when upvoteing: Question not found');
+    });
   });
 
   describe('POST /downvoteQuestion', () => {
@@ -425,7 +549,7 @@ describe('Test questionController', () => {
       };
 
       const mockResponse = {
-        msg: 'Question upvoted successfully',
+        msg: 'Question downvoted successfully',
         downVotes: ['new-user'],
         upVotes: [],
       };
@@ -502,6 +626,17 @@ describe('Test questionController', () => {
       };
 
       addVoteToQuestionSpy.mockResolvedValueOnce(mockResponse);
+      QuestionModel.findOne = jest.fn().mockResolvedValue(mockQuestion);
+      saveNotificationSpy.mockResolvedValue({
+        _id: new ObjectId(),
+        username: 'original-user',
+        text: 'new-user upvoted your question: "Sample Question"',
+        seen: false,
+        type: 'upvote',
+        link: '/question/65e9b5a995b6c7045a30d823',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
       response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
 
@@ -669,6 +804,25 @@ describe('Test questionController', () => {
         'Error when fetching question by id: Error while fetching question by id',
       );
     });
+
+    it('should return 500 if a non-Error is thrown when saving a question', async () => {
+      const mockReqParams = {
+        qid: '65e9b5a995b6c7045a30d823',
+      };
+      const mockReqQuery = {
+        username: 'question3_user',
+      };
+
+      jest.spyOn(questionUtil, 'fetchAndIncrementQuestionViewsById').mockImplementation(() => {
+        throw 'not an error';
+      });
+
+      const response = await supertest(app).get(
+        `/question/getQuestionById/${mockReqParams.qid}?username=${mockReqQuery.username}`,
+      );
+
+      expect(response.status).toBe(500);
+    });
   });
 
   describe('GET /getQuestion', () => {
@@ -731,5 +885,44 @@ describe('Test questionController', () => {
       // Asserting the response
       expect(response.status).toBe(500);
     });
+    it('should filter questions by askedBy if provided', async () => {
+      const mockReqQuery = {
+        askedBy: 'question3_user',
+      };
+
+      getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+      filterQuestionsBySearchSpy.mockReturnValueOnce([MOCK_POPULATED_QUESTIONS[2]]);
+
+      const response = await supertest(app).get('/question/getQuestion').query(mockReqQuery);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([EXPECTED_QUESTIONS[2]]);
+    });
+  });
+
+  it('should filter questions by askedBy if provided in query', async () => {
+    const askedBy = 'question1_user';
+
+    getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+
+    const filterByAskedBySpy = jest
+      .spyOn(questionUtil, 'filterQuestionsByAskedBy')
+      .mockReturnValueOnce([MOCK_POPULATED_QUESTIONS[0]]);
+
+    const response = await supertest(app).get('/question/getQuestion').query({ askedBy });
+
+    expect(response.status).toBe(200);
+    expect(filterByAskedBySpy).toHaveBeenCalledWith(MOCK_POPULATED_QUESTIONS, askedBy);
+  });
+
+  it('should return 500 with generic error message if getQuestionsByOrder throws non-Error', async () => {
+    getQuestionsByOrderSpy.mockImplementation(() => {
+      throw 'not an error';
+    });
+
+    const response = await supertest(app).get('/question/getQuestion');
+
+    expect(response.status).toBe(500);
+    expect(response.text).toBe('Error when fetching questions by filter');
   });
 });

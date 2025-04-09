@@ -1,11 +1,12 @@
 import { ObjectId } from 'mongodb';
 import { QueryOptions } from 'mongoose';
 import {
-  DatabaseComment,
   DatabaseQuestion,
   DatabaseTag,
+  DatabaseUser,
   OrderType,
   PopulatedDatabaseAnswer,
+  PopulatedDatabaseComment,
   PopulatedDatabaseQuestion,
   Question,
   QuestionResponse,
@@ -17,12 +18,15 @@ import TagModel from '../models/tags.model';
 import CommentModel from '../models/comments.model';
 import { parseKeyword, parseTags } from '../utils/parse.util';
 import { checkTagInQuestion } from './tag.service';
+import { updateCoins } from './store.service';
 import {
   sortQuestionsByActive,
   sortQuestionsByMostViews,
   sortQuestionsByNewest,
   sortQuestionsByUnanswered,
 } from '../utils/sort.util';
+import UserStatsModel from '../models/userstats.model';
+import UserModel from '../models/users.model';
 
 /**
  * Checks if keywords exist in a question's title or text.
@@ -51,11 +55,38 @@ export const getQuestionsByOrder = async (
     const qlist: PopulatedDatabaseQuestion[] = await QuestionModel.find().populate<{
       tags: DatabaseTag[];
       answers: PopulatedDatabaseAnswer[];
-      comments: DatabaseComment[];
+      comments: PopulatedDatabaseComment[];
+      askedBy: DatabaseUser;
     }>([
       { path: 'tags', model: TagModel },
-      { path: 'answers', model: AnswerModel, populate: { path: 'comments', model: CommentModel } },
-      { path: 'comments', model: CommentModel },
+      {
+        path: 'answers',
+        model: AnswerModel,
+        populate: [
+          {
+            path: 'comments',
+            model: CommentModel,
+            populate: {
+              path: 'commentBy',
+              model: UserModel,
+              localField: 'commentBy',
+              foreignField: 'username',
+            },
+          },
+          { path: 'ansBy', model: UserModel, localField: 'ansBy', foreignField: 'username' },
+        ],
+      },
+      {
+        path: 'comments',
+        model: CommentModel,
+        populate: {
+          path: 'commentBy',
+          model: UserModel,
+          localField: 'commentBy',
+          foreignField: 'username',
+        },
+      },
+      { path: 'askedBy', model: UserModel, localField: 'askedBy', foreignField: 'username' },
     ]);
 
     switch (order) {
@@ -133,11 +164,38 @@ export const fetchAndIncrementQuestionViewsById = async (
     ).populate<{
       tags: DatabaseTag[];
       answers: PopulatedDatabaseAnswer[];
-      comments: DatabaseComment[];
+      comments: PopulatedDatabaseComment[];
+      askedBy: DatabaseUser;
     }>([
       { path: 'tags', model: TagModel },
-      { path: 'answers', model: AnswerModel, populate: { path: 'comments', model: CommentModel } },
-      { path: 'comments', model: CommentModel },
+      {
+        path: 'answers',
+        model: AnswerModel,
+        populate: [
+          {
+            path: 'comments',
+            model: CommentModel,
+            populate: {
+              path: 'commentBy',
+              model: UserModel,
+              localField: 'commentBy',
+              foreignField: 'username',
+            },
+          },
+          { path: 'ansBy', model: UserModel, localField: 'ansBy', foreignField: 'username' },
+        ],
+      },
+      {
+        path: 'comments',
+        model: CommentModel,
+        populate: {
+          path: 'commentBy',
+          model: UserModel,
+          localField: 'commentBy',
+          foreignField: 'username',
+        },
+      },
+      { path: 'askedBy', model: UserModel, localField: 'askedBy', foreignField: 'username' },
     ]);
 
     if (!q) {
@@ -159,9 +217,20 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
   try {
     const result: DatabaseQuestion = await QuestionModel.create(question);
 
+    const userStats = await UserStatsModel.findOneAndUpdate(
+      { username: question.askedBy },
+      { $inc: { questionsCount: 1 } },
+      { new: true },
+    );
+    if (!userStats) {
+      throw new Error('Error updating user stats');
+    }
+
+    await updateCoins(question.askedBy, 1);
+
     return result;
   } catch (error) {
-    return { error: 'Error when saving a question' };
+    return { error: 'Error when saving question' };
   }
 };
 

@@ -1,8 +1,7 @@
 import React from 'react';
-import { handleHyperlink } from '../../../../tool';
+import { Card, CardContent, Paper, Stack, Typography, Avatar } from '@mui/material';
 import CommentSection from '../../commentSection';
-import './index.css';
-import { Comment, DatabaseComment } from '../../../../types/types';
+import { Comment, DatabaseUser, PopulatedDatabaseComment } from '../../../../types/types';
 
 /**
  * Interface representing the props for the AnswerView component.
@@ -15,9 +14,9 @@ import { Comment, DatabaseComment } from '../../../../types/types';
  */
 interface AnswerProps {
   text: string;
-  ansBy: string;
+  ansBy: DatabaseUser;
   meta: string;
-  comments: DatabaseComment[];
+  comments: PopulatedDatabaseComment[];
   handleAddComment: (comment: Comment) => void;
 }
 
@@ -32,16 +31,29 @@ interface AnswerProps {
  * @param handleAddComment Function to handle adding a new comment.
  */
 const AnswerView = ({ text, ansBy, meta, comments, handleAddComment }: AnswerProps) => (
-  <div className='answer right_padding'>
-    <div id='answerText' className='answerText'>
-      {handleHyperlink(text)}
-    </div>
-    <div className='answerAuthor'>
-      <div className='answer_author'>{ansBy}</div>
-      <div className='answer_question_meta'>{meta}</div>
-    </div>
-    <CommentSection comments={comments} handleAddComment={handleAddComment} />
-  </div>
+  <Paper elevation={1} sx={{ p: 1, borderRadius: 2 }}>
+    <Card sx={{ boxShadow: 'none' }}>
+      <CardContent>
+        <Stack spacing={2}>
+          <Typography variant='body1' sx={{ mb: 2 }}>
+            {text}
+          </Typography>
+          <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mt: 1 }}>
+            <Stack spacing={1} direction='row' justifyContent='space-between' alignItems='center'>
+              <Avatar alt='No Photo' src={ansBy.profilePhoto} />
+              <Typography variant='subtitle2' color='primary'>
+                {ansBy.username}
+              </Typography>
+            </Stack>
+            <Typography variant='caption' color='text.secondary'>
+              {meta}
+            </Typography>
+          </Stack>
+          <CommentSection comments={comments} handleAddComment={handleAddComment} />
+        </Stack>
+      </CardContent>
+    </Card>
+  </Paper>
 );
 
 export default AnswerView;

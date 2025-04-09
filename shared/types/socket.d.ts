@@ -1,9 +1,11 @@
 import { PopulatedDatabaseAnswer } from './answer';
 import { PopulatedDatabaseChat } from './chat';
 import { DatabaseMessage } from './message';
+import { DatabaseCollection } from './collection';
 import { PopulatedDatabaseQuestion } from './question';
 import { SafeDatabaseUser } from './user';
 import { BaseMove, GameInstance, GameInstanceID, GameMove, GameState } from './game';
+import { DatabaseNotification } from './notification';
 
 /**
  * Payload for an answer update event.
@@ -84,6 +86,17 @@ export interface UserUpdatePayload {
 }
 
 /**
+ * Payload for a collection update event.
+ * - `collection`: The updated collection object.
+ * - `type`: The type of modification (`'created'`, `'deleted'`, or `'updated'`).
+ */
+
+export interface CollectionUpdatePayload {
+  collection: DatabaseCollection;
+  type: 'created' | 'deleted' | 'updated';
+}
+
+/**
  * Interface representing the payload for a game move operation, which contains:
  * - `gameID`: The ID of the game being played.
  * - `move`: The move being made in the game, defined by `GameMove`.
@@ -91,6 +104,16 @@ export interface UserUpdatePayload {
 export interface GameMovePayload {
   gameID: GameInstanceID;
   move: GameMove<BaseMove>;
+}
+
+/**
+ * Payload for a notification update event.
+ * - `notification`: The updated notification object.
+ * - `type`: The type of modification (`'created'` or `'updated'`).
+ */
+export interface NotificationUpdatePayload {
+  notification: DatabaseNotification;
+  type: 'created' | 'updated';
 }
 
 /**
@@ -121,6 +144,8 @@ export interface ClientToServerEvents {
  * - `gameUpdate`: Server sends updated game state.
  * - `gameError`: Server sends error message related to game operation.
  * - `chatUpdate`: Server sends updated chat.
+ * - `collectionUpdate`: Server sends an updated collection.
+ * - `notificationUpdate`: Server sends an updated notification.
  */
 export interface ServerToClientEvents {
   questionUpdate: (question: PopulatedDatabaseQuestion) => void;
@@ -133,4 +158,6 @@ export interface ServerToClientEvents {
   gameUpdate: (game: GameUpdatePayload) => void;
   gameError: (error: GameErrorPayload) => void;
   chatUpdate: (chat: ChatUpdatePayload) => void;
+  collectionUpdate: (collection: CollectionUpdatePayload) => void;
+  notificationUpdate: (notification: NotificationUpdatePayload) => void;
 }

@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { Box, Button, Collapse, Paper, TextField, Typography, Avatar, Stack } from '@mui/material';
 import { getMetaData } from '../../../tool';
-import { Comment, DatabaseComment } from '../../../types/types';
-import './index.css';
+import { Comment, DatabaseComment, DatabaseUser } from '../../../types/types';
 import useUserContext from '../../../hooks/useUserContext';
+
+type EnhancedComment = DatabaseComment & { commentBy: DatabaseUser };
 
 /**
  * Interface representing the props for the Comment Section component.
@@ -11,7 +13,7 @@ import useUserContext from '../../../hooks/useUserContext';
  * - handleAddComment - a function that handles adding a new comment, taking a Comment object as an argument
  */
 interface CommentSectionProps {
-  comments: DatabaseComment[];
+  comments: EnhancedComment[];
   handleAddComment: (comment: Comment) => void;
 }
 
@@ -48,45 +50,56 @@ const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => 
   };
 
   return (
-    <div className='comment-section'>
-      <button className='toggle-button' onClick={() => setShowComments(!showComments)}>
+    <Box>
+      <Button variant='outlined' size='small' onClick={() => setShowComments(!showComments)}>
         {showComments ? 'Hide Comments' : 'Show Comments'}
-      </button>
-
-      {showComments && (
-        <div className='comments-container'>
-          <ul className='comments-list'>
-            {comments.length > 0 ? (
-              comments.map(comment => (
-                <li key={String(comment._id)} className='comment-item'>
-                  <p className='comment-text'>{comment.text}</p>
-                  <small className='comment-meta'>
-                    {comment.commentBy}, {getMetaData(new Date(comment.commentDateTime))}
-                  </small>
-                </li>
-              ))
-            ) : (
-              <p className='no-comments'>No comments yet.</p>
-            )}
-          </ul>
-
-          <div className='add-comment'>
-            <div className='input-row'>
-              <textarea
-                placeholder='Comment'
-                value={text}
-                onChange={e => setText(e.target.value)}
-                className='comment-textarea'
-              />
-              <button className='add-comment-button' onClick={handleAddCommentClick}>
-                Add Comment
-              </button>
-            </div>
-            {textErr && <small className='error'>{textErr}</small>}
-          </div>
-        </div>
-      )}
-    </div>
+      </Button>
+      <Collapse in={showComments} timeout='auto'>
+        <Paper sx={{ p: 3, mt: 2 }} elevation={3}>
+          {comments.length > 0 ? (
+            comments.map(comment => (
+              <Box key={String(comment._id)} sx={{ mb: 1 }}>
+                <Typography variant='body1'>{comment.text}</Typography>
+                <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                  <Stack
+                    spacing={1}
+                    direction='row'
+                    justifyContent='space-between'
+                    alignItems='center'>
+                    <Avatar alt='No Photo' src={comment.commentBy.profilePhoto} />
+                    <Typography variant='subtitle2' color='primary'>
+                      {comment.commentBy.username}
+                    </Typography>
+                  </Stack>
+                  <Typography variant='caption' color='text.secondary'>
+                    {getMetaData(new Date(comment.commentDateTime))}
+                  </Typography>
+                </Stack>
+              </Box>
+            ))
+          ) : (
+            <Typography variant='body2' color='textSecondary'>
+              No comments yet.
+            </Typography>
+          )}
+          <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <TextField
+              label='Add a comment'
+              multiline
+              minRows={2}
+              value={text}
+              onChange={e => setText(e.target.value)}
+              error={!!textErr}
+              helperText={textErr}
+              fullWidth
+            />
+            <Button variant='contained' onClick={handleAddCommentClick}>
+              Add Comment
+            </Button>
+          </Box>
+        </Paper>
+      </Collapse>
+    </Box>
   );
 };
 

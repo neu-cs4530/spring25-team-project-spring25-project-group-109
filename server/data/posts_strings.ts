@@ -76,3 +76,43 @@ export const C11_TEXT =
   'I found the discussion on SharedPreferences vs apply() very useful. Great explanation of the differences!';
 export const C12_TEXT =
   "I feel like there's so much more to Android Studio that I'm just scratching the surface of. Thanks for sharing your experience!";
+
+// Badge for Questions
+export const BQ1_NAME = 'Inquisitive Beginner';
+export const BQ1_DESCRIPTION = 'Asked 1 Question';
+export const BQ10_NAME = 'Questioning Enthusiast';
+export const BQ10_DESCRIPTION = 'Asked 10 Questions';
+export const BQ50_NAME = 'Most Inquisitive';
+export const BQ50_DESCRIPTION = 'Asked 50 Questions';
+
+// Badge for Answers
+export const BA1_NAME = 'Helpful Newbie';
+export const BA1_DESCRIPTION = 'Answered 1 Question';
+export const BA10_NAME = 'Answering Pro';
+export const BA10_DESCRIPTION = 'Answered 10 Questions';
+export const BA50_NAME = 'Answering Master';
+export const BA50_DESCRIPTION = 'Answered 50 Questions';
+
+// Badge for Comments
+export const BC1_NAME = 'First Impressions';
+export const BC1_DESCRIPTION = 'Commented 1 Time';
+export const BC10_NAME = 'Chatty Contributor';
+export const BC10_DESCRIPTION = 'Commented 10 Times';
+export const BC50_NAME = 'Commenting Champion';
+export const BC50_DESCRIPTION = 'Commented 50 Times';
+
+// Badge for Nim Game
+export const BN1_NAME = 'Nim Rookie';
+export const BN1_DESCRIPTION = 'Won 1 Game of Nim';
+export const BN5_NAME = 'Nim Strategist';
+export const BN5_DESCRIPTION = 'Won 5 Games of Nim';
+export const BN10_NAME = 'Nim Legend';
+export const BN10_DESCRIPTION = 'Won 10 Games of Nim';
+
+export const NIM_FEATURE_DESCRIPTION =
+  'Nim is a two-player strategy game where players take turns removing objects from piles. Interact with other users and earn badges along the way!';
+
+export const PROFILE_FEATURE_DESCRIPTION =
+  'Make your profile truly yours and upload your own photo instead of picking from the default avatars!';
+
+export const AVATAR_FEATURE_DESCRIPTION = 'Unlock additional avatars to personalize your profile!';

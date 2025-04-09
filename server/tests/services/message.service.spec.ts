@@ -7,6 +7,10 @@ import { Message } from '../../types/types';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
 
+jest.mock('../../services/store.service', () => ({
+  updateCoins: jest.fn().mockResolvedValue({ coinCount: 100 }),
+}));
+
 const message1: Message = {
   msg: 'Hello',
   msgFrom: 'User1',
@@ -55,6 +59,30 @@ describe('Message model', () => {
         msgFrom: 'userX',
         msgDateTime: new Date('2025-01-01T10:00:00.000Z'),
         type: 'direct',
+      });
+    });
+
+    it('should update coins if message type is global', async () => {
+      // Mock the user existence check
+      mockingoose(UserModel).toReturn(
+        { _id: new mongoose.Types.ObjectId(), username: 'userX' },
+        'findOne',
+      );
+
+      // Mock the created message
+      const mockCreatedMsg = {
+        _id: new mongoose.Types.ObjectId(),
+        ...mockMessage,
+      };
+      mockingoose(MessageModel).toReturn(mockCreatedMsg, 'create');
+
+      const result = await saveMessage({ ...mockMessage, type: 'global' });
+
+      expect(result).toMatchObject({
+        msg: 'Hey!',
+        msgFrom: 'userX',
+        msgDateTime: new Date('2025-01-01T10:00:00.000Z'),
+        type: 'global',
       });
     });
 

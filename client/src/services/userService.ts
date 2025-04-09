@@ -123,6 +123,82 @@ const updateBiography = async (
   return res.data;
 };
 
+/**
+ * Updates the user's profile picture.
+ * @param username - The username of the user whose profile picture is being updated
+ * @param newPhoto - The new profile photo URL
+ * @returns A promise resolving to the updated user
+ * @throws Error if the request fails
+ */
+const updateProfilePhoto = async (username: string, newPhoto: string) => {
+  const res = await api.patch(`${USER_API_URL}/updateProfilePhoto`, {
+    username,
+    profilePhoto: newPhoto,
+  });
+  if (res.status !== 200) {
+    throw new Error('Error when updating profile photo');
+  }
+  return res.data;
+};
+
+/**
+ * Updates the user's profile picture.
+ * @param username - The username of the user whose profile picture is being updated
+ * @param newPhoto - The new profile photo URL
+ * @returns A promise resolving to the updated user
+ * @throws Error if the request fails
+ */
+const uploadProfilePhoto = async (username: string, file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('username', username);
+
+  const res = await api.post(`${USER_API_URL}/uploadProfilePhoto`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+
+  if (res.status !== 200) {
+    throw new Error('Error when updating profile photo');
+  }
+  return res.data.imageUrl;
+};
+
+/**
+ * Follows the user.
+ * @param follower - The username of the user who is following.
+ * @param followee - The username of the user who is being followed..
+ * @returns A promise resolving to the updated user
+ * @throws Error if the request fails
+ */
+const follow = async (follower: string, followee: string) => {
+  const res = await api.patch(`${USER_API_URL}/follow`, {
+    follower,
+    followee,
+  });
+  if (res.status !== 200) {
+    throw new Error('Error when following');
+  }
+  return res.data;
+};
+
+/**
+ * Unfllows the user.
+ * @param follower - The username of the user who is unfollowing.
+ * @param followee - The username of the user who is being unfollowed..
+ * @returns A promise resolving to the updated user
+ * @throws Error if the request fails
+ */
+const unfollow = async (follower: string, followee: string) => {
+  const res = await api.patch(`${USER_API_URL}/unfollow`, {
+    follower,
+    followee,
+  });
+  if (res.status !== 200) {
+    throw new Error('Error when unfollowing');
+  }
+  return res.data;
+};
+
 export {
   getUsers,
   getUserByUsername,
@@ -131,4 +207,8 @@ export {
   deleteUser,
   resetPassword,
   updateBiography,
+  updateProfilePhoto,
+  uploadProfilePhoto,
+  follow,
+  unfollow,
 };

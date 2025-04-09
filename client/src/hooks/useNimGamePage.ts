@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import useUserContext from './useUserContext';
 import { GameInstance, NimGameState, GameMove, NimMove } from '../types/types';
+import { updateBadges } from '../services/badgeService';
 
 /**
  * Custom hook to manage the state and logic for the "Nim" game page,
@@ -28,6 +29,9 @@ const useNimGamePage = (gameInstance: GameInstance<NimGameState>) => {
       gameID: gameInstance.gameID,
       move: nimMove,
     });
+
+    const badgePromises = gameInstance.players.map(player => updateBadges(player));
+    await Promise.all(badgePromises);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

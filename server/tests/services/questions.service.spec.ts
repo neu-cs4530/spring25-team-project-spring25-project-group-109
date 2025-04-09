@@ -1,4 +1,5 @@
 import QuestionModel from '../../models/questions.model';
+import UserStatsModel from '../../models/userstats.model';
 import {
   filterQuestionsBySearch,
   filterQuestionsByAskedBy,
@@ -17,10 +18,15 @@ import {
   ans3,
   ans4,
   POPULATED_QUESTIONS,
+  mockUserStats,
 } from '../mockData.models';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
+
+jest.mock('../../services/store.service', () => ({
+  updateCoins: jest.fn().mockResolvedValue({ coinCount: 100 }),
+}));
 
 describe('Question model', () => {
   beforeEach(() => {
@@ -287,6 +293,7 @@ describe('Question model', () => {
 
   describe('saveQuestion', () => {
     test('saveQuestion should return the saved question', async () => {
+      mockingoose(UserStatsModel).toReturn(mockUserStats, 'findOneAndUpdate');
       const mockQn = {
         title: 'New Question Title',
         text: 'New Question Text',
@@ -311,6 +318,42 @@ describe('Question model', () => {
       expect(result.askDateTime).toEqual(mockQn.askDateTime);
       expect(result.views).toEqual([]);
       expect(result.answers.length).toEqual(0);
+    });
+    it('should return error if there is an issue with saving the question', async () => {
+      mockingoose(QuestionModel).toReturn(new Error('Database error'), '$save');
+
+      const result = await saveQuestion({
+        title: 'New Question Title',
+        text: 'New Question Text',
+        tags: [tag1, tag2],
+        askedBy: 'question3_user',
+        askDateTime: new Date('2024-06-06'),
+        answers: [],
+        views: [],
+        upVotes: [],
+        downVotes: [],
+        comments: [],
+      });
+
+      expect(result).toEqual({ error: 'Error when saving question' });
+    });
+    it('should return error if there is an issue with updating user stats', async () => {
+      mockingoose(UserStatsModel).toReturn(null, 'findOneAndUpdate');
+
+      const result = await saveQuestion({
+        title: 'New Question Title',
+        text: 'New Question Text',
+        tags: [tag1, tag2],
+        askedBy: 'question3_user',
+        askDateTime: new Date('2024-06-06'),
+        answers: [],
+        views: [],
+        upVotes: [],
+        downVotes: [],
+        comments: [],
+      });
+
+      expect(result).toEqual({ error: 'Error when saving question' });
     });
   });
 
@@ -353,6 +396,21 @@ describe('Question model', () => {
       expect(result).toEqual({
         msg: 'Question upvoted successfully',
         upVotes: ['testUser'],
+        downVotes: [],
+      });
+    });
+
+    it('should replace with empty array if findOneAndUpdate returns no upvotes or downvotes', async () => {
+      const mockQuestion = {
+        _id: 'someQuestionId',
+      };
+
+      mockingoose(QuestionModel).toReturn(mockQuestion, 'findOneAndUpdate');
+      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'upvote');
+
+      expect(result).toEqual({
+        msg: 'Upvote cancelled successfully',
+        upVotes: [],
         downVotes: [],
       });
     });
