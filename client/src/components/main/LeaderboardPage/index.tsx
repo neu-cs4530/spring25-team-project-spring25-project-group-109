@@ -44,7 +44,6 @@ const LeaderboardPage = () => {
   });
 
   let topTen = rankedUsers;
-  const userScore = rankedUsers.find(user => user.username === username);
 
   if (topTen.length > 10) {
     topTen = topTen.slice(0, 10);

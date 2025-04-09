@@ -145,6 +145,28 @@ describe('Chat Controller', () => {
       expect(response.status).toBe(500);
       expect(response.text).toBe('Error creating a chat: Service error');
     });
+    it('should error if populate document errors', async () => {
+      const validChatPayload = {
+        participants: ['user1', 'user2'],
+        messages: [{ msg: 'Hello!', msgFrom: 'user1', msgDateTime: new Date('2025-01-01') }],
+      };
+
+      const chatResponse: DatabaseChat = {
+        _id: new mongoose.Types.ObjectId(),
+        participants: ['user1', 'user2'],
+        messages: [new mongoose.Types.ObjectId()],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      saveChatSpy.mockResolvedValue(chatResponse);
+      populateDocumentSpy.mockResolvedValue({ error: 'Error populating chat' });
+
+      const response = await supertest(app).post('/chat/createChat').send(validChatPayload);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error creating a chat: Error populating chat');
+    });
   });
 
   describe('POST /chat/:chatId/addMessage', () => {
@@ -481,8 +503,7 @@ describe('Chat Controller', () => {
       expect(response.status).toBe(500);
       expect(response.text).toBe('Error adding participant to chat: Service error');
     });
-
-    it('should return 500 if populate document fails', async () => {
+    it('should error if populate document errors', async () => {
       const chatId = new mongoose.Types.ObjectId().toString();
       const userId = new mongoose.Types.ObjectId().toString();
 

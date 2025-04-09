@@ -885,6 +885,19 @@ describe('Test questionController', () => {
       // Asserting the response
       expect(response.status).toBe(500);
     });
+    it('should filter questions by askedBy if provided', async () => {
+      const mockReqQuery = {
+        askedBy: 'question3_user',
+      };
+
+      getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+      filterQuestionsBySearchSpy.mockReturnValueOnce([MOCK_POPULATED_QUESTIONS[2]]);
+
+      const response = await supertest(app).get('/question/getQuestion').query(mockReqQuery);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([EXPECTED_QUESTIONS[2]]);
+    });
   });
 
   it('should filter questions by askedBy if provided in query', async () => {
